@@ -17,12 +17,20 @@ Hash functions map data of an arbitrary size to data of a fixed size. There are 
 When it comes to hash tables, a size-16 hash function might hash string-typed keys like so:
 
 `"foo"` -> `10`
+
 `"bar"` -> `12`
+
 `"baz"` -> `5`
+
 `"Hello world!"` -> `6`
+
 `"Very long keys can hash be hashed as well"` -> `10`
 
 In this way, keys of any length can be mapped to an integer value which can be used as an array index. Note that since there are an infinite amount of possible keys that must map to only 16 possible indices, values with different keys will inevitably collide.
+
+![Hash Table](img/HashTableImage.png)
+
+In this diagram, you can see the key (a string) is run through a hash function which produces an integer 0-15 which is used as the index in a 16-element array.
 
 ## How are hash table collisions handled?
 
@@ -31,24 +39,35 @@ There are many ways to handle (hash table collisions)[https://en.wikipedia.org/w
 Let's say we have a hash table of size 4 and we are adding 5 elements like so:
 
 `ht["a"] = "aardvark"`
+
 `ht["b"] = "bear"`
+
 `ht["c"] = "cat"`
+
 `ht["d"] = "dog"`
+
 `ht["e"] = "elephant"`
 
 Now, let's say our hash function maps the keys like so:
 
 `"a"` -> `0`
+
 `"b"` -> `1`
+
 `"c"` -> `2`
+
 `"d"` -> `3`
+
 `"e"` -> `2`
 
 Our array would look something like this:
 
 `0` = `<"a", "aardvark">  ->  NULL`
+
 `1` = `<"b", "bear">  ->  NULL`
+
 `2` = `<"c", "cat">  ->  <"e", "elephant">  ->  NULL`
+
 `3` = `<"d", "dog">  ->  NULL`
 
 Now if we want to find the value stored for "e", we would first find it's hashed index (2), then travel through the linked list until we find the key/value pair with a matching key and return the value.
