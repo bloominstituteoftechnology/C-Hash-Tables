@@ -6,15 +6,13 @@ Hash tables are arguably the single most important data structure known to manki
 
 Underneath the hood, a hash table is simply an array with its elements indexed by a hashed key. Like arrays, hash tables are initalized to a fixed size and inserting, deleting, and reading elements within those boundaries can be accomplished in constant time, or O(1).
 
+![Hash Table](img/HashTableImage.png)
+
+In this diagram, you can see the key (a string) is run through a hash function which produces an integer 0-15 which is used as the index in a 16-element array.
+
 ## What is a hash function?
 
-Hash functions map data of an arbitrary size to data of a fixed size. There are many different types of hash functions with different uses (you may have come across cryptographic hashes for storing passwords in a database) but they generally have a few common characteristics:
-
-1. Deterministic: For a given input, the output will always be the same.
-2. Defined output range: For a hash table of size 16, all keys must hash to a value 0-15. For smaller values, this is usually accomplished using the modulo `%` operation.
-3. Non-invertible: You should not be able to reconstruct the input value from the output.
-
-When it comes to hash tables, a size-16 hash function might hash string-typed keys like so:
+Hash functions map data of an arbitrary size to data of a fixed size. For example, a size-16 hash function might hash string-typed keys like so:
 
 `"foo"` -> `10`
 
@@ -26,11 +24,13 @@ When it comes to hash tables, a size-16 hash function might hash string-typed ke
 
 `"Very long keys can hash be hashed as well"` -> `10`
 
-In this way, keys of any length can be mapped to an integer value which can be used as an array index. Note that since there are an infinite amount of possible keys that must map to only 16 possible indices, values with different keys will inevitably collide.
+In this way, keys of any length can be mapped to an integer value which can be used as an array index for a hash table. Note that since there are an infinite amount of possible keys that must map to only 16 possible indices, values with different keys will inevitably collide.
 
-![Hash Table](img/HashTableImage.png)
+There are many different types of hash functions with different uses (you may have come across cryptographic hashes for storing passwords in a database) but they generally have a few common characteristics:
 
-In this diagram, you can see the key (a string) is run through a hash function which produces an integer 0-15 which is used as the index in a 16-element array.
+1. Deterministic: For a given input, the output will always be the same.
+2. Defined output range: For a hash table of size 16, all keys must hash to a value 0-15. For smaller values, this is usually accomplished using the modulo `%` operation.
+3. Non-invertible: You should not be able to reconstruct the input value from the output.
 
 ## How are hash table collisions handled?
 
