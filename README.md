@@ -34,7 +34,7 @@ There are many different types of hash functions with different uses (you may ha
 
 ## How are hash table collisions handled?
 
-There are many ways to handle (hash table collisions)[https://en.wikipedia.org/wiki/Hash_table#Collision_resolution] but we'll focus on the linked list chaining method.
+There are many ways to handle [hash table collisions](https://en.wikipedia.org/wiki/Hash_table#Collision_resolution) but we'll focus on the linked list chaining method.
 
 Let's say we have a hash table of size 4 and we are adding 5 elements like so:
 
