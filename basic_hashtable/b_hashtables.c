@@ -66,7 +66,13 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  printf("Value of capacity: %d\n", capacity);
+  // ht->storage = calloc(capacity, sizeof(int)); // 8 null elements
+  // ht->storage = calloc(capacity, 8); //16 null elements
+  ht->storage = (Pair**) calloc(capacity, sizeof(Pair*)); // 16 Null
+  // ht->storage = malloc(2*capacity); //4 ? elements
 
   return ht;
 }
@@ -80,7 +86,17 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  //Take the key -> Hash function -> array index-> place value in array?
+  int arrayIndex = hash(key, ht->capacity); //13 returned
+  
+  if (ht->storage[arrayIndex]) {
+    printf("Warning overwriting value...");
+    destroy_pair(ht->storage[arrayIndex]);
+  }
+  ht->storage[arrayIndex] = create_pair(key,value);
+    // printf("Value of storage: %s", ht->storage[arrayIndex]->value );
+    
+  
 }
 
 /****
@@ -90,7 +106,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int arrayIndex = hash(key, ht->capacity);
+  destroy_pair(ht->storage[arrayIndex]);
+  // printf("\nht-storage: %s\n", ht->storage[arrayIndex]);
+  // printf("ht-storage: %d\n", *ht->storage[arrayIndex]);
+  ht->storage[arrayIndex] = NULL;
 }
 
 /****
@@ -100,6 +120,10 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int arrayIndex = hash(key, ht->capacity);
+  if (ht->storage[arrayIndex]){
+    return ht->storage[arrayIndex]->value;
+  }
   return NULL;
 }
 
@@ -110,7 +134,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  free(ht);
 }
 
 
@@ -121,7 +145,10 @@ int main(void)
 
   hash_table_insert(ht, "line", "Here today...\n");
 
-  printf("%s", hash_table_retrieve(ht, "line"));
+  hash_table_insert(ht, "line", "Here today...\n");
+
+  // printf("%s", hash_table_retrieve(ht, "line"));
+  printf("hash_table_retrieve: %s\n", hash_table_retrieve(ht, "line"));
 
   hash_table_remove(ht, "line");
 
