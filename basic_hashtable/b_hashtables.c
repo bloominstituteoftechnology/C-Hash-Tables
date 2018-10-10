@@ -104,7 +104,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 }
 
 /****
-  Fill this in.
+   Fill this in.
 
   Don't forget to free any malloc'ed memory!
  ****/
