@@ -67,7 +67,13 @@ unsigned int hash(char *str, int max)
 BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
+  if (capacity <= 0) {
+    printf("Please use size larger than 0");
+    return 0;
+  }
 
+  ht = malloc(sizeof(BasicHashTable));
+  
   return ht;
 }
 
