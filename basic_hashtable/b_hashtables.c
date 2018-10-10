@@ -19,9 +19,6 @@ typedef struct BasicHashTable {
   Pair **storage;
 } BasicHashTable;
 
-/****
-  Create a key/value pair to be stored in the hash table.
- ****/
 Pair *create_pair(char *key, char *value)
 {
   Pair *pair = malloc(sizeof(Pair));
@@ -31,19 +28,11 @@ Pair *create_pair(char *key, char *value)
   return pair;
 }
 
-/****
-  Use this function to safely destroy a hashtable pair.
- ****/
 void destroy_pair(Pair *pair)
 {
   if (pair != NULL) free(pair);
 }
 
-/****
-  djb2 hash function
-
-  Do not modify this!
- ****/
 unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
@@ -57,50 +46,37 @@ unsigned int hash(char *str, int max)
   return hash % max;
 }
 
-
-/****
-  Fill this in.
-
-  All values in storage should be initialized to NULL
-  (hint: look up `calloc`)
- ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-
+  BasicHashTable *ht = calloc(capacity, sizeof(BasicHashTable));
+  ht->capacity = capacity;
   return ht;
 }
 
-/****
-  Fill this in.
 
-  If you are overwriting a value with a different key, print a warning.
-
-  Don't forget to free any malloc'ed memory!
- ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  puts("line 59: creating hash table");
+  int hashed_index = hash(key, ht->capacity);
+  *ht[hashed_index].storage = create_pair(key,value);
+    // ht->storage[hashed_index] = create_pair(key,value);
+  puts("creating hash table");
+  printf("%s\n", ht->storage[hashed_index]->value);
 }
 
-/****
-  Fill this in.
-
-  Don't forget to free any malloc'ed memory!
- ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  puts("removing table from hash table");
+  int hashed_index = hash(key, ht->capacity);
+  if( ht->storage[hashed_index] != NULL) free(ht->storage[hashed_index]);
 }
 
-/****
-  Fill this in.
 
-  Should return NULL if the key is not found.
- ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  puts("retrieving value from hash table");
+  int hashed_index = hash(key, ht->capacity);
+  return ht->storage[hashed_index]->value;
 }
 
 /****
@@ -110,7 +86,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  if(ht != NULL) free(ht);
 }
 
 
