@@ -82,8 +82,19 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  Pair* item = create_pair(key, value);
+  int index = hash(item->key, ht->capacity);
+  Pair* cur_item = ht->storage[index];
+  int i = 1;
+  while (cur_item != NULL) {
+    index = hash(item->key, ht->capacity);
+    cur_item = ht->storage[index];
+    i++;
+  }
+  ht->storage[index] = item;
 }
+
+
 
 /****
   Fill this in.
