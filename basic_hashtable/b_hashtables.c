@@ -69,6 +69,28 @@ BasicHashTable *create_hash_table(int capacity)
   BasicHashTable *ht;
   ht = NULL;
 
+  if (capacity < 1)
+  {
+    return NULL;
+  }
+
+  if ((ht = calloc(capacity, sizeof(BasicHashTable))) == NULL)
+  {
+    return NULL;
+  }
+
+  if ((ht->storage = malloc((sizeof(Pair) * capacity))) == NULL)
+  {
+    return NULL;
+  }
+
+  for (int i=0; i < capacity; i++)
+  {
+    ht->storage[i] = NULL;
+  }
+
+  ht->capacity = capacity;
+
   return ht;
 }
 
