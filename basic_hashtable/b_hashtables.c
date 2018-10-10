@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
+// #include <limits.h>
 
 /****
   Basic hash table key/value pair
@@ -9,7 +9,7 @@
 typedef struct Pair {
   char *key;
   char *value;
-  struct entry_s *next;
+  // struct entry_s *next;
 } Pair;
 
 /****
