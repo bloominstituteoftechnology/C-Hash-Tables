@@ -66,8 +66,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-  ht = calloc(capacity, sizeof(int));
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(ht->capacity, sizeof(Pair*));
   return ht;
 }
 
@@ -80,7 +81,7 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  ht->storage = create_pair(key, value);
 }
 
 /****
