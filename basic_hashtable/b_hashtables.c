@@ -95,42 +95,92 @@ BasicHashTable *create_hash_table(int capacity)
 
   Don't forget to free any malloc'ed memory!
  ****/
+// void hash_table_insert(BasicHashTable *ht, char *key, char *value)
+// {
+
+// }
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  unsigned int hashed_index = hash(key, ht->capacity);
 
+  if(ht->storage[hashed_index] != NULL) {
+
+    printf("Warning: Overwriting value.\n");
+    destroy_pair(ht->storage[hashed_index]);
+
+  }
+
+  ht->storage[hashed_index] = create_pair(key, value);
 }
-
 /****
   Fill this in.
 
   Don't forget to free any malloc'ed memory!
  ****/
+// void hash_table_remove(BasicHashTable *ht, char *key)
+// {
+
+// }
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int hashed_index = hash(key, ht->capacity);
 
+  if(ht->storage[hashed_index] != NULL) {
+    destroy_pair(ht->storage[hashed_index]);
+    ht->storage[hashed_index] = NULL;
+  } else {
+    printf("Value does not exist.\n");
+  }
 }
-
 /****
   Fill this in.
 
   Should return NULL if the key is not found.
  ****/
+// char *hash_table_retrieve(BasicHashTable *ht, char *key)
+// {
+//   return NULL;
+// }
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
-}
+  unsigned int hashed_index = hash(key, ht->capacity);
 
+  if(ht->storage[hashed_index] != NULL) {
+    if(strcmp(ht->storage[hashed_index]->key, key) == 0){
+        return ht->storage[hashed_index]->value;
+      } 
+      else {
+        return NULL;
+      }
+    }
+    else {
+        printf("Index not found\n");
+        return NULL;
+    }
+}
 /****
   Fill this in.
 
   Don't forget to free any malloc'ed memory!
  ****/
+// void destroy_hash_table(BasicHashTable *ht)
+// {
+
+// }
+
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++) {
+    if(ht->storage[i] != 0) {
+      destroy_pair(ht->storage[i]);
+    } else {
+      destroy_pair(ht->storage[0]);
+    } 
+  }
 
+  free(ht->storage);
+  free(ht);
 }
-
-
 #ifndef TESTING
 int main(void)
 {
