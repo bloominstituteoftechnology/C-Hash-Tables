@@ -86,7 +86,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   // Hash key
   int hashed = hash(key, ht->capacity);
   // Check if overwriting
-  if (ht->storage[hashed] != 0) {
+  if (ht->storage[hashed] != NULL) {
     printf("Overwriting value");
     destroy_pair(ht->storage[hashed]);
   }
