@@ -103,7 +103,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  
 }
 
 /****
@@ -123,7 +123,14 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for (int i = 0; i < ht->capacity; i++) {
+    Pair* item = ht->storage[i];
+    if (item != NULL) {
+      hash_table_remove(ht, item->key);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
