@@ -67,6 +67,9 @@ unsigned int hash(char *str, int max)
 HashTable *create_hash_table(int capacity)
 {
   HashTable *ht;
+  ht = (HashTable *)malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = (LinkedPair**) calloc(capacity, sizeof(LinkedPair));
 
   return ht;
 }
@@ -82,7 +85,17 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int hashed_index = hash(key, ht->capacity);
 
+  if(ht->storage[hashed_index] != 0)
+  {
+
+    printf("Overwriting value");
+    destroy_pair(ht->storage[hashed_index]);
+
+  }
+
+  ht->storage[hashed_index] = create_pair(key, value);
 }
 
 /****

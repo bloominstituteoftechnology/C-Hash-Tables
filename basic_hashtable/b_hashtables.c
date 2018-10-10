@@ -69,7 +69,7 @@ BasicHashTable *create_hash_table(int capacity)
   BasicHashTable *ht;
   ht = (BasicHashTable *)malloc(sizeof(BasicHashTable));
   ht->capacity = capacity;
-  ht->storage = (Pair**) calloc(capacity, sizeof(Pair));
+  ht->storage = (Pair**) calloc(capacity, sizeof(Pair*));
 
   return ht;
 }
@@ -135,11 +135,9 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
       
       return ht->storage[hashed_index]->value;
 
-    }else{
-
-      return NULL;
-
     }
+    
+    return NULL;
   
   }else{
 
