@@ -70,7 +70,7 @@ BasicHashTable *create_hash_table(int capacity)
   ht->capacity = capacity;
   ht->storage = calloc(ht->capacity, sizeof(Pair**));
   for (int i = 0; i < ht->capacity; i++) {
-        ht->storage[i] = NULL;
+    ht->storage[i] = NULL;
   }
   return ht;
 }
@@ -94,7 +94,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
     else{
       ht->storage[h] = create_pair(key, value);
     }
-    h=(h+1) % ht->capacity;
+    //h=(h+1) % ht->capacity;
   }
 }
 
@@ -105,7 +105,8 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  free(ht->storage[key]);
+  int h = hash(key, ht->capacity);
+  free(ht->storage[h]);
 }
 
 /****
@@ -119,8 +120,8 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
     if(i==*key){
       return key;
     }
-    else return NULL;
   }
+  return NULL;
 }
 
 /****
