@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <limits.h>
 
 /****
   Basic hash table key/value pair
@@ -66,7 +66,19 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = NULL;
+  int i, n;
+
+  if (capacity < 1) return NULL;
+
+  if ((ht = calloc(n, sizeof(BasicHashTable)) ) == NULL) {
+    return NULL;
+  } 
+  for( i=0;i < capacity; i++) {
+    ht->storage[i] = NULL;
+  }
+
+  ht->capacity = capacity;
 
   return ht;
 }
