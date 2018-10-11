@@ -69,6 +69,7 @@ BasicHashTable *create_hash_table(int capacity)
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
   ht->capacity = capacity;
   ht->storage = calloc(ht->capacity, sizeof(Pair*));
+
   return ht;
 }
 
@@ -84,12 +85,15 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   Pair *pair = create_pair(key, value);
   int index = hash(pair->key, ht->capacity);
   Pair *cur_pair = ht->storage[index];
-  int i = 1;
-  while(cur_pair != NULL)
+
+  if(cur_pair != NULL)
   {
-    index = hash(pair->key, ht->capacity);
-    cur_pair = ht->storage[index];
-    i++;
+    if(strcmp(cur_pair->key, key) != 0)
+    {
+      printf("WARNING: Overwriting value: %s, %s with %s, %s\n",
+               cur_pair->key, cur_pair->value, key, value);
+    }
+    destroy_pair(cur_pair);
   }
   ht->storage[index] = pair;
 }
@@ -101,7 +105,18 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  int index = hash(key, ht->capacity);
+  Pair *pair = ht->storage[index];
 
+  if(pair != NULL)
+  {
+    destroy_pair(pair);
+    ht->storage[index] = NULL;
+  }
+  else
+  {
+    printf("Unable to remove entry with key: %s\n", key);
+  }
 }
 
 /****
@@ -111,7 +126,15 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  int index = hash(key, ht->capacity);
+  Pair *pair = ht->storage[index];
+
+  if(pair == NULL)
+  {
+    printf("Unable to retrieve entry with key: %s\n", key);
+    return NULL;
+  }
+  return pair->value;
 }
 
 /****
