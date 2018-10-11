@@ -88,17 +88,20 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   unsigned int index = hash(key, ht->capacity);
   LinkedPair *current = ht->storage[index];
-  if (current == NULL)
+  LinkedPair *temp = create_pair(key, value);
+
+  while (current != NULL && strcmp(current->key, key) != 0)
   {
-    current = create_pair(key, value);
+    current = current->next;
+  }
+  if (current != NULL)
+  {
+    current->value = value;
   }
   else
   {
-    while (current != NULL)
-    {
-      current = current->next;
-    }
-    current = create_pair(key, value);
+    temp->next = ht->storage[index];
+    ht->storage[index] = temp;
   }
 }
 
