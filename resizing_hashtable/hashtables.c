@@ -127,7 +127,8 @@ void hash_table_remove(HashTable *ht, char *key)
 
   if (current_pair != NULL)
   {
-    current_pair->value = NULL;
+    ht->storage[index] = current_pair->next;
+    destroy_pair(current_pair);
   }
 }
 
@@ -194,7 +195,12 @@ HashTable *hash_table_resize(HashTable *ht)
   {
     if (ht->storage[i] != NULL)
     {
-      hash_table_insert(new_ht, ht->storage[i]->key, ht->storage[i]->value);
+      LinkedPair *current_pair = ht->storage[i];
+      while (current_pair != NULL)
+      {
+        hash_table_insert(new_ht, current_pair->key, current_pair->value);
+        current_pair = current_pair->next;
+      }
     }
   }
 

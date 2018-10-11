@@ -20,25 +20,25 @@ char *basic_hash_table_test()
     hash_table_insert(ht, "key-9", "val-9");
 
     return_value = hash_table_retrieve(ht, "key-0");
-    mu_assert(strcmp(return_value, "val-0") == 0, "Value is not stored correctly");
+    mu_assert(strcmp(return_value, "val-0") == 0, "Value is not stored correctly1");
     return_value = hash_table_retrieve(ht, "key-1");
-    mu_assert(strcmp(return_value, "val-1") == 0, "Value is not stored correctly");
+    mu_assert(strcmp(return_value, "val-1") == 0, "Value is not stored correctly2");
     return_value = hash_table_retrieve(ht, "key-2");
-    mu_assert(strcmp(return_value, "val-2") == 0, "Value is not stored correctly");
+    mu_assert(strcmp(return_value, "val-2") == 0, "Value is not stored correctly3");
     return_value = hash_table_retrieve(ht, "key-3");
-    mu_assert(strcmp(return_value, "val-3") == 0, "Value is not stored correctly");
+    mu_assert(strcmp(return_value, "val-3") == 0, "Value is not stored correctly4");
     return_value = hash_table_retrieve(ht, "key-4");
-    mu_assert(strcmp(return_value, "val-4") == 0, "Value is not stored correctly");
+    mu_assert(strcmp(return_value, "val-4") == 0, "Value is not stored correctly5");
     return_value = hash_table_retrieve(ht, "key-5");
-    mu_assert(strcmp(return_value, "val-5") == 0, "Value is not stored correctly");
+    mu_assert(strcmp(return_value, "val-5") == 0, "Value is not stored correctly6");
     return_value = hash_table_retrieve(ht, "key-6");
-    mu_assert(strcmp(return_value, "val-6") == 0, "Value is not stored correctly");
+    mu_assert(strcmp(return_value, "val-6") == 0, "Value is not stored correctly7");
     return_value = hash_table_retrieve(ht, "key-7");
-    mu_assert(strcmp(return_value, "val-7") == 0, "Value is not stored correctly");
+    mu_assert(strcmp(return_value, "val-7") == 0, "Value is not stored correctly8");
     return_value = hash_table_retrieve(ht, "key-8");
-    mu_assert(strcmp(return_value, "val-8") == 0, "Value is not stored correctly");
+    mu_assert(strcmp(return_value, "val-8") == 0, "Value is not stored correctly9");
     return_value = hash_table_retrieve(ht, "key-9");
-    mu_assert(strcmp(return_value, "val-9") == 0, "Value is not stored correctly");
+    mu_assert(strcmp(return_value, "val-9") == 0, "Value is not stored correctly10");
 
     hash_table_insert(ht, "key-0", "new-val-0");
     hash_table_insert(ht, "key-1", "new-val-1");
@@ -119,6 +119,8 @@ char *hash_table_resizing_test()
     hash_table_insert(ht, "resize-key-5", "resize-val-5");
     hash_table_insert(ht, "resize-key-6", "resize-val-6");
     hash_table_insert(ht, "resize-key-7", "resize-val-7");
+    hash_table_insert(ht, "resize-key-8", "resize-val-8");
+    hash_table_insert(ht, "resize-key-9", "resize-val-9");
 
     ht = hash_table_resize(ht);
     char *return_value = hash_table_retrieve(ht, "resize-key");
@@ -141,6 +143,10 @@ char *hash_table_resizing_test()
     mu_assert(strcmp(return_value, "resize-val-6") == 0, "Resized hash table did not copy values correctly");
     return_value = hash_table_retrieve(ht, "resize-key-7");
     mu_assert(strcmp(return_value, "resize-val-7") == 0, "Resized hash table did not copy values correctly");
+    return_value = hash_table_retrieve(ht, "resize-key-8");
+    mu_assert(strcmp(return_value, "resize-val-8") == 0, "Resized hash table did not copy values correctly");
+    return_value = hash_table_retrieve(ht, "resize-key-9");
+    mu_assert(strcmp(return_value, "resize-val-9") == 0, "Resized hash table did not copy values correctly");
 
     return NULL;
 }
