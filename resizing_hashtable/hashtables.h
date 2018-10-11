@@ -12,7 +12,6 @@ typedef struct HashTable {
   LinkedPair **storage;
 } HashTable;
 
-
 HashTable *create_hash_table(int capacity);
 
 void hash_table_insert(HashTable *ht, char *key, char *value);
