@@ -26,8 +26,12 @@ typedef struct BasicHashTable
 Pair *create_pair(char *key, char *value)
 {
   Pair *pair = malloc(sizeof(Pair));
-  pair->key = key;
-  pair->value = value;
+  // don't use because of danger of changing the content of the original pointer
+  // pair->key = key;
+  pair->key = strdup(key);
+  // don't use because of danger of changing the content of the original pointer
+  // pair->value = value;
+  pair->value = strdup(value);
 
   return pair;
 }
@@ -38,7 +42,12 @@ Pair *create_pair(char *key, char *value)
 void destroy_pair(Pair *pair)
 {
   if (pair != NULL)
+  {
+    // because strdup, have to free key & value
+    free(pair->key);
+    free(pair->value);
     free(pair);
+  }
 }
 
 /****
@@ -90,7 +99,8 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   unsigned int index = hash(key, ht->capacity);
 
-  if (ht->storage[index] != 0)
+  // it is OK to overwrite if the same key
+  if (ht->storage[index] && (strcmp(key, ht->storage[index]->key) != 0))
   {
     printf("Overwriting the old value of %s\n", ht->storage[index]->value);
     destroy_pair(ht->storage[index]);
@@ -108,7 +118,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 {
   unsigned int index = hash(key, ht->capacity);
 
-  if (ht->storage[index] != 0)
+  if (ht->storage[index])
   {
     destroy_pair(ht->storage[index]);
     ht->storage[index] = 0;
@@ -147,15 +157,13 @@ void destroy_hash_table(BasicHashTable *ht)
 {
   for (int i = 0; i < ht->capacity; i++)
   {
-    // if it hasn't been created, don't need to destroy it
-    if (ht->storage[i] != 0)
-    {
-      destroy_pair(ht->storage[i]);
-    }
+    // destroy_pair checks for NULLs, so don't have to here
+    destroy_pair(ht->storage[i]);
   }
 
   if (ht->storage != NULL)
     free(ht->storage);
+
   if (ht != NULL)
     free(ht);
 }
