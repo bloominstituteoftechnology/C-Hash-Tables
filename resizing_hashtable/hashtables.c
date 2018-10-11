@@ -154,6 +154,8 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   }
   if (current_pair != NULL) {
     return current_pair->value;
+  }else{
+    return NULL;
   }
 }
 
