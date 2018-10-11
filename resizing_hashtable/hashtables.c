@@ -139,7 +139,7 @@ void hash_table_remove(HashTable *ht, char *key)
   }
   if (currentPair != NULL) {              // If we've found the remove key
 
-    if(currentPair == last_pair){         // If we're deleting the first
+    if(currentPair == last_pair){         // If we're deleting the first item in the LL
 
       ht->storage[hashed_index] = currentPair->next;  // Reassign the bucket to be the next item in the LL (or NULL if no next item)
 
@@ -150,7 +150,9 @@ void hash_table_remove(HashTable *ht, char *key)
 
 
   } else {                                // currentPair at the end of list, no key match
-    
+
+    printf("No matching key, can't delete\n");
+
   }
 }
 
@@ -167,6 +169,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   unsigned int hashed_index = hash(key, ht->capacity);
 
   if(ht->storage[hashed_index]){
+    
     LinkedPair *currentPair = ht->storage[hashed_index];
 
 
