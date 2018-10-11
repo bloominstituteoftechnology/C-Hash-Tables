@@ -72,6 +72,8 @@ BasicHashTable *create_hash_table(int capacity)
   // set the capacity
   ht->capacity = capacity;
   // initialize storage locations to 0
+  // sizeof(Pair*) because Pair** is an array of pointers(addresses)
+  // and we want the size of each "bucket", i.e. the address there
   ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
