@@ -128,6 +128,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
   unsigned int index = hash(key, ht->capacity);
 
+  // we get a seg fault if don't check this first
   if (ht->storage[index] != 0)
   {
     if (strcmp(ht->storage[index]->key, key) == 0)
@@ -144,12 +145,11 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  // don't have to check if capacity == 0
+  // because the memory has been set aside with calloc
   for (int i = 0; i < ht->capacity; i++)
   {
-    if (ht->storage[i] != 0)
-    {
-      destroy_pair(ht->storage[i]);
-    }
+    destroy_pair(ht->storage[i]);
   }
 
   if (ht->storage != NULL)
