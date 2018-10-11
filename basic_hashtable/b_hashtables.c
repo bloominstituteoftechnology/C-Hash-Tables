@@ -2,31 +2,34 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Basic hash table key/value pair
  ****/
-typedef struct Pair {
+typedef struct LinkedPair
+{
   char *key;
   char *value;
-} Pair;
+  struct LinkedPair *next;
+} LinkedPair;
 
 /****
   Basic hash table
  ****/
-typedef struct BasicHashTable {
+typedef struct BasicHashTable
+{
   int capacity;
-  Pair **storage;
+  LinkedPair **storage;
 } BasicHashTable;
 
 /****
   Create a key/value pair to be stored in the hash table.
  ****/
-Pair *create_pair(char *key, char *value)
+LinkedPair *create_pair(char *key, char *value)
 {
-  Pair *pair = malloc(sizeof(Pair));
-  pair->key = key;
-  pair->value = value;
+  LinkedPair *pair = malloc(sizeof(LinkedPair));
+  pair->key = strdup(key);
+  pair->value = strdup(value);
+  pair->next = NULL;
 
   return pair;
 }
@@ -34,9 +37,14 @@ Pair *create_pair(char *key, char *value)
 /****
   Use this function to safely destroy a hashtable pair.
  ****/
-void destroy_pair(Pair *pair)
+void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL)
+  {
+    free(pair->key);
+    free(pair->value);
+    free(pair);
+  }
 }
 
 /****
@@ -48,15 +56,17 @@ unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
   int c;
-  unsigned char * u_str = (unsigned char *)str;
+  unsigned char *u_str = (unsigned char *)str;
 
-  while ((c = *u_str++)) {
+  while ((c = *u_str++))
+  {
     hash = ((hash << 5) + hash) + c;
   }
 
+  hash = 1;
+
   return hash % max;
 }
-
 
 /****
   Fill this in.
@@ -66,7 +76,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -80,7 +92,27 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  unsigned int index = hash(key, ht->capacity);
 
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair;
+
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0)
+  {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
+
+  if (current_pair != NULL)
+  {
+    current_pair->value = value;
+  }
+  else
+  {
+    LinkedPair *new_pair = create_pair(key, value);
+    new_pair->next = ht->storage[index];
+    ht->storage[index] = new_pair;
+  }
 }
 
 /****
@@ -90,7 +122,17 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
 
+  if (ht->storage[index] == NULL)
+  {
+    printf("Unable to remove entry with key: %s\n", key);
+  }
+  else
+  {
+    destroy_pair(ht->storage[index]);
+    ht->storage[index] = NULL;
+  }
 }
 
 /****
@@ -100,7 +142,15 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int index = hash(key, ht->capacity);
+
+  if (ht->storage[index] == NULL)
+  {
+    printf("Unable to retrieve entry with key: %s", key);
+    return NULL;
+  }
+
+  return ht->storage[index]->value;
 }
 
 /****
@@ -110,24 +160,36 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    if (ht->storage[i] != NULL)
+    {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
-
 
 #ifndef TESTING
 int main(void)
 {
-  struct BasicHashTable *ht = create_hash_table(16);
+  struct BasicHashTable *ht = create_hash_table(2);
 
   hash_table_insert(ht, "line", "Here today...\n");
+  hash_table_insert(ht, "newline", "newkey\n");
+  hash_table_insert(ht, "anotherline", "anotherkey\n");
 
   printf("%s", hash_table_retrieve(ht, "line"));
 
   hash_table_remove(ht, "line");
 
-  if (hash_table_retrieve(ht, "line") == NULL) {
+  if (hash_table_retrieve(ht, "line") == NULL)
+  {
     printf("...gone tomorrow. (success)\n");
-  } else {
+  }
+  else
+  {
     fprintf(stderr, "ERROR: STILL HERE\n");
   }
 
