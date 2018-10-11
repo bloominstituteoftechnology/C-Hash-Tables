@@ -67,6 +67,9 @@ unsigned int hash(char *str, int max)
 BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
+  ht = (BasicHashTable *)malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = (Pair**)calloc(capacity, sizeof(Pair));
 
   return ht;
 }
@@ -80,7 +83,12 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  int old = hash(key, ht->capacity);
+  if (ht->storage[old] != 0) {
+    printf("Value overwritten");
+    destroy_pair(ht->storage[old]);
+  }
+  ht->storage[old] = create_pair(key, value);
 }
 
 /****
@@ -90,8 +98,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int old = hash(key, ht->capacity);
+  if (ht->storage[old]) {
+    destroy_pair(ht->storage[old]);
+    ht->storage[old] = NULL;
+  } 
+  printf("Value missing");
 }
+
 
 /****
   Fill this in.
@@ -100,6 +114,10 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int old = hash(key, ht->capacity);
+  if (ht->storage[old]) {
+    return ht->storage[old]->value;
+  }
   return NULL;
 }
 
@@ -110,7 +128,15 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for (int i=0; i< ht->capacity; i++) {
+    if (ht->storage[i] != NULL) {
+      //
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht->storage);
+  //
+  free(ht);
 }
 
 
