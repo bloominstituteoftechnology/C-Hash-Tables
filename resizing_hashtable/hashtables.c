@@ -197,7 +197,7 @@ void destroy_hash_table(HashTable *ht)
 {
   for(int i = 0; i < ht->capacity; i++)
   { 
-    if(ht->storage[i]){
+    if(ht->storage[i] != NULL){
 
       LinkedPair *currentPair = ht->storage[i];
       LinkedPair *previousPair;
@@ -232,18 +232,43 @@ HashTable *hash_table_resize(HashTable *ht)
   new_ht = (HashTable *)malloc(sizeof(HashTable));
   new_ht->capacity = ht->capacity * 2;
   
-  // Doesn't initialize all values to Null, causing errors with destroy_hash_table
+  // Doesn't initialize all values to Null, causing errors with destroy_hash_table. Also seems to retain link to old array, deleting values old array goes out of scope
   // new_ht->storage = (LinkedPair**) realloc(ht->storage, sizeof(LinkedPair*) * new_ht->capacity);
 
   new_ht->storage = (LinkedPair**) calloc(new_ht->capacity, sizeof(LinkedPair*));
 
-  
+  // Create new entries in new_ht for all old entries in ht. This cuts links to old LinkedPair objects
   for(int i = 0; i < ht->capacity; i++)
   {
-    new_ht->storage[i] = ht->storage[i];
-    ht->storage[i] = NULL;
+    if(ht->storage[i]){
+
+      LinkedPair *currentPair = ht->storage[i];
+      hash_table_insert(new_ht, currentPair->key, currentPair->value);
+
+      while(currentPair->next != NULL){
+
+        currentPair = currentPair->next;
+        hash_table_insert(new_ht, currentPair->key, currentPair->value);
+
+      }
+
+      ht->storage[i] = NULL;
+
+    }
+
   }
   
+  // Test to see if values were transferred correctly to new_ht
+  // for(int i = 0; i < ht->capacity; i++)
+  // {
+  //   printf("\n\nTrying to print new_ht->storage[%d]->value\n\n", i);
+  //   printf("value: %s", new_ht->storage[i]->value);
+  //   if(new_ht->storage[i]->next){
+  //     printf("\n\nNext in linked list is...\n\n");
+  //     printf("\n\nnew_ht->storage[i]->next->value: %s\n\n", new_ht->storage[i]->next->value);
+  //   }
+  // }
+
   destroy_hash_table(ht);
 
   return new_ht;
@@ -268,14 +293,21 @@ int main(void)
   int new_capacity = ht->capacity;
 
   printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+
+  printf("%s\n", hash_table_retrieve(ht, "line_1"));
+  printf("%s\n", hash_table_retrieve(ht, "line_2"));
+  printf("%s\n", hash_table_retrieve(ht, "line_3"));
   
   hash_table_insert(ht, "line_4", "line 4\n");
   hash_table_insert(ht, "line_5", "line 5\n");
-  hash_table_insert(ht, "line_6", "line6\n");
+  hash_table_insert(ht, "line_1", "Replace line 1 with another line\n");
 
+  printf("%s\n", hash_table_retrieve(ht, "line_1"));
+  printf("%s\n", hash_table_retrieve(ht, "line_2"));
+  printf("%s\n", hash_table_retrieve(ht, "line_3"));
   printf("%s\n", hash_table_retrieve(ht, "line_4"));
   printf("%s\n", hash_table_retrieve(ht, "line_5"));
-  printf("%s\n", hash_table_retrieve(ht, "line_6"));
+  printf("%s\n", hash_table_retrieve(ht, "line_1"));
 
   destroy_hash_table(ht);
 
