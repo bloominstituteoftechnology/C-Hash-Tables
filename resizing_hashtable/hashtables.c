@@ -68,7 +68,7 @@ HashTable *create_hash_table(int capacity)
 {
   HashTable *ht = malloc(sizeof(HashTable));
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(LinkedPair));
+  ht->storage = calloc(capacity, sizeof(LinkedPair*));
 
   return ht;
 }
