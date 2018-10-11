@@ -90,16 +90,24 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   if(ht->storage[hashed_index])                             // If a LinkdePair already exists for that hashIndex
   {
     LinkedPair *currentPair = ht->storage[hashed_index];
+
     while(currentPair){                       // Loop throught the linked list
+
       if(strcmp(currentPair->key, key) == 0){ // If we've found the key
+
         currentPair->value = value;
-        break;
+        currentPair = NULL;
+
       }
       else if(currentPair->next){         // If theres a next value in the linked list
+
         currentPair = currentPair->next;  // proceed to the next value
+
       }
       else{ 
+
         currentPair->next = create_pair(key,value);
+
       }
     }
     
@@ -120,25 +128,30 @@ void hash_table_remove(HashTable *ht, char *key)
 {
   unsigned int hashed_index = hash(key, ht->capacity);
 
-  if(ht->storage[hashed_index])               // If a LinkdePair already exists for that hashIndex
-  {  
-    LinkedPair *currentPair = ht->storage[hashed_index];
-    while(currentPair){                       // Loop throught the linked list
-      if(strcmp(currentPair->key, key) == 0){ // If we've found the key
-        if(currentPair->next){                // If there's a value after this in the linked list
-          ht->storage[hashed_index] = currentPair->next;
-          destroy_pair(currentPair);
-          currentPair = NULL;
-        }else{                                // If theres no next value in the linked list
-          destroy_pair(currentPair);
-          ht->storage[hashed_index] = NULL;
-        }
-      }
-      currentPair = currentPair->next;
+  LinkedPair *currentPair = ht->storage[hashed_index];
+  LinkedPair *last_pair = currentPair;
+
+  while (currentPair != NULL && strcmp(currentPair->key, key) != 0) {
+
+    last_pair = currentPair;
+    currentPair = last_pair->next;
+
+  }
+  if (currentPair != NULL) {              // If we've found the remove key
+
+    if(currentPair == last_pair){         // If we're deleting the first
+
+      ht->storage[hashed_index] = currentPair->next;  // Reassign the bucket to be the next item in the LL (or NULL if no next item)
+
     }
-  }else{
-    printf("No value found by that index");
-  } 
+
+    last_pair->next = currentPair->next;    // Else we assign the previous LL element's next to be the element after the deleted element (or NULL if no next element)
+    destroy_pair(currentPair);
+
+
+  } else {                                // currentPair at the end of list, no key match
+    
+  }
 }
 
 /****
@@ -151,6 +164,16 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int hashed_index = hash(key, ht->capacity);
+
+  if(ht->storage[hashed_index]){
+    LinkedPair *currentPair = ht->storage[hashed_index];
+
+
+  }else{
+    printf("No value found by that key");
+  }
+
   return NULL;
 }
 

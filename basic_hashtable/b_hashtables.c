@@ -25,9 +25,8 @@ typedef struct BasicHashTable {
 Pair *create_pair(char *key, char *value)
 {
   Pair *pair = malloc(sizeof(Pair));
-  pair->key = key;
-  pair->value = value;
-
+  pair->key = strdup(key);
+  pair->value = strdup(value);
   return pair;
 }
 
@@ -36,7 +35,11 @@ Pair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(Pair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL){
+    free(pair->key);
+    free(pair->value);
+    free(pair);
+  } 
 }
 
 /****
@@ -88,7 +91,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   if(ht->storage[hashed_index])
   {
 
-    printf("Overwriting value");
+    printf("Overwriting value\n");
     destroy_pair(ht->storage[hashed_index]);
 
   }
@@ -113,7 +116,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
   
   }else{
 
-    printf("No value to remove!");
+    printf("No value to remove!\n");
 
   }
 
@@ -141,7 +144,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   
   }else{
 
-    printf("Index not found!");
+    printf("Index not found!\n");
     return NULL;
 
   }
