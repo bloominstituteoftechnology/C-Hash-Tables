@@ -131,6 +131,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
   } else {
     printf("Value does not exist.\n");
   }
+  
 }
 /****
   Fill this in.
