@@ -84,17 +84,13 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  Pair *pair = create_pair(key, value);
-  int index = hash(pair->key, ht->capacity);
-  for(int i = 0; i < ht->capacity; ++i){
-    if(index == i && ht->storage[i] == NULL){
-      ht->storage[index] = value;
-      break;
-    }
-    else {
-
-    }
+  unsigned int index = hash(key, ht->capacity);
+  if (ht->storage[index])
+  {
+    printf("WARNING: EXISTING VALUE OVERWRITTEN!\n");
+    destroy_pair(ht->storage[index]);
   }
+  ht->storage[index] = create_pair(key, value);
 }
 
 /****
@@ -105,9 +101,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   int index = hash(key, ht->capacity);
-  Pair *item = ht->storage[index];
-
-
+  if (ht->storage[index])
+  {
+    destroy_pair(ht->storage[index]);
+    ht->storage[index] = NULL;
+  }
 }
 
 /****
@@ -118,12 +116,14 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
   int index = hash(key, ht->capacity);
-  for(int i = 0; i < ht->capacity; ++i){
-    if(i == index && ht->storage[i] != NULL){
-      return ht->storage[i].value;
-    }
+  if (ht->storage[index])
+  {
+    return ht->storage[index]->value;
   }
-  return NULL;
+  else
+  {
+    return NULL;
+  }
 }
 
 /****
@@ -133,6 +133,14 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; ++i)
+  {
+    if (ht->storage[i])
+    {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht);
 }
 
 #ifndef TESTING
