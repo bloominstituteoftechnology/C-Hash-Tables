@@ -142,13 +142,26 @@ void hash_table_remove(HashTable *ht, char *key)
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
   unsigned int index = hash(key, ht->capacity);
-  if (ht->storage[index] == NULL)
+  LinkedPair *current_pair = ht->storage[index];
+
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0)
   {
-    printf("ERROR: Could not retrieve entry with key %s", key);
-    return NULL;
+    current_pair = current_pair->next;
   }
 
-  return ht->storage[index]->value;
+  if (current_pair != NULL)
+  {
+    return current_pair->value;
+  }
+
+  return NULL;
+  // if (ht->storage[index] == NULL)
+  // {
+  //   printf("ERROR: Could not retrieve entry with key %s", key);
+  //   return NULL;
+  // }
+
+  // return ht->storage[index]->value;
 }
 
 /****
