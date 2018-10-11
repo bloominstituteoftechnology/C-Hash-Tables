@@ -25,9 +25,15 @@ typedef struct BasicHashTable {
 Pair *create_pair(char *key, char *value)
 {
   Pair *pair = malloc(sizeof(Pair));
+
+  // char *new_key = malloc(sizeof(char) * strlen(key) + 1);
+  // char *new_value = malloc(sizeof(char) * strlen(value) + 1);
+
+  // strcpy(new_key, key);
+  // strcpy(new_value, value);
+
   pair->key = key;
   pair->value = value;
-
   return pair;
 }
 
@@ -36,7 +42,11 @@ Pair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(Pair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL){
+    free(pair-> key);
+    free(pair->value);
+    free(pair);
+  }
 }
 
 /****
@@ -66,8 +76,15 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  printf("\n start creating hash table \n");
 
+  struct BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+
+  ht->capacity = capacity;
+
+  ht->storage = calloc(capacity, sizeof(Pair *));
+  
+  
   return ht;
 }
 
@@ -80,6 +97,10 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  int hashed_index = hash(key, ht->capacity);
+  Pair *newPair = create_pair(key, value);
+
+  ht->storage[hashed_index] = newPair;
 
 }
 
@@ -90,7 +111,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int hashed_index = hash(key, ht->capacity);
+  if (ht->storage[hashed_index]){
+    Pair *pair = ht->storage[hashed_index];
+    destroy_pair(pair);
+    ht->storage[hashed_index] = NULL;
+  }
 }
 
 /****
@@ -100,6 +126,10 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int hashed_index = hash(key, ht->capacity);
+  if(ht->storage[hashed_index]){
+    return ht->storage[hashed_index]->value;
+  }
   return NULL;
 }
 
@@ -110,7 +140,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  if (ht != NULL) free(ht);
 }
 
 
