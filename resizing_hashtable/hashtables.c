@@ -118,7 +118,27 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  
+  unsigned int hashed_index = hash(key, ht->capacity);
+
+  if(ht->storage[hashed_index])               // If a LinkdePair already exists for that hashIndex
+  {  
+    LinkedPair *currentPair = ht->storage[hashed_index];
+    while(currentPair){                       // Loop throught the linked list
+      if(strcmp(currentPair->key, key) == 0){ // If we've found the key
+        if(currentPair->next){                // If there's a value after this in the linked list
+          ht->storage[hashed_index] = currentPair->next;
+          destroy_pair(currentPair);
+          currentPair = NULL;
+        }else{                                // If theres no next value in the linked list
+          destroy_pair(currentPair);
+          ht->storage[hashed_index] = NULL;
+        }
+      }
+      currentPair = currentPair->next;
+    }
+  }else{
+    printf("No value found by that index");
+  } 
 }
 
 /****
