@@ -162,6 +162,8 @@ int main(void)
   BasicHashTable *ht = create_hash_table(16);
 
   hash_table_insert(ht, "line", "Here today...\n");
+  // uncomment below to test duplicate inserts
+  // hash_table_insert(ht, "line", "Here today...\n");
   printf("%s", hash_table_retrieve(ht, "line"));
 
   hash_table_remove(ht, "line");
