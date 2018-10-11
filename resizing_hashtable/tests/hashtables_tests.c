@@ -40,7 +40,6 @@ char *basic_hash_table_test()
     return_value = hash_table_retrieve(ht, "key-9");
     mu_assert(strcmp(return_value, "val-9") == 0, "Value is not stored correctly");
 
-
     hash_table_insert(ht, "key-0", "new-val-0");
     hash_table_insert(ht, "key-1", "new-val-1");
     hash_table_insert(ht, "key-2", "new-val-2");
@@ -108,7 +107,8 @@ char *basic_hash_table_test()
     return NULL;
 }
 
-char *hash_table_resizing_test() {
+char *hash_table_resizing_test()
+{
     struct HashTable *ht = create_hash_table(8);
 
     hash_table_insert(ht, "resize-key-0", "resize-val-0");
@@ -119,8 +119,6 @@ char *hash_table_resizing_test() {
     hash_table_insert(ht, "resize-key-5", "resize-val-5");
     hash_table_insert(ht, "resize-key-6", "resize-val-6");
     hash_table_insert(ht, "resize-key-7", "resize-val-7");
-    hash_table_insert(ht, "resize-key-8", "resize-val-8");
-    hash_table_insert(ht, "resize-key-9", "resize-val-9");
 
     ht = hash_table_resize(ht);
     char *return_value = hash_table_retrieve(ht, "resize-key");
@@ -143,22 +141,16 @@ char *hash_table_resizing_test() {
     mu_assert(strcmp(return_value, "resize-val-6") == 0, "Resized hash table did not copy values correctly");
     return_value = hash_table_retrieve(ht, "resize-key-7");
     mu_assert(strcmp(return_value, "resize-val-7") == 0, "Resized hash table did not copy values correctly");
-    return_value = hash_table_retrieve(ht, "resize-key-8");
-    mu_assert(strcmp(return_value, "resize-val-8") == 0, "Resized hash table did not copy values correctly");
-    return_value = hash_table_retrieve(ht, "resize-key-9");
-    mu_assert(strcmp(return_value, "resize-val-9") == 0, "Resized hash table did not copy values correctly");
 
     return NULL;
 }
-
-
-
 
 char *all_tests()
 {
     mu_suite_start();
 
     mu_run_test(basic_hash_table_test);
+    mu_run_test(hash_table_resizing_test);
 
     return NULL;
 }

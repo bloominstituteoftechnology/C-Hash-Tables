@@ -105,8 +105,8 @@ void hash_table_remove(BasicHashTable *ht, char *key)
   if (ht->storage[index] != NULL)
   {
     ht->storage[index] = NULL;
+    destroy_pair(ht->storage[index]);
   }
-  free(ht->storage[index]);
 }
 
 /****
