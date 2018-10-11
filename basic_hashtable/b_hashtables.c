@@ -102,7 +102,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  
+  unsigned int index = hash(key, ht->capacity);
+
+  if (ht->storage[index] == NULL) {
+    printf("Unable to remove entry with key: %s\n", key);
+  } else {
+    destroy_pair(ht->storage[index]);
+    ht->storage[index] = NULL;
+  }
 }
 
 /****
