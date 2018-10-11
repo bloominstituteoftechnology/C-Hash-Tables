@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+// #include <limits.h>
 
 /****
   Basic hash table key/value pair
@@ -9,6 +9,7 @@
 typedef struct Pair {
   char *key;
   char *value;
+  // struct entry_s *next;
 } Pair;
 
 /****
@@ -66,7 +67,19 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = NULL;
+  int i, n = 0;
+
+  if (capacity < 1) return NULL;
+
+  if ((ht = calloc(n, sizeof(BasicHashTable)) ) == NULL) {
+    return NULL;
+  } 
+  for( i=0;i < capacity; i++) {
+    ht->storage[i] = NULL;
+  }
+
+  ht->capacity = capacity;
 
   return ht;
 }
@@ -80,7 +93,52 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  unsigned int hashed_index = hash(key, ht->capacity);
 
+  if(ht->storage[hashed_index] != NULL) {
+
+    printf("Warning: Overwriting value.\n");
+    destroy_pair(ht->storage[hashed_index]);
+
+  }
+
+  ht->storage[hashed_index] = create_pair(key, value);
+
+  // int bin = 0;
+  // Pair *newpair = NULL;
+  // Pair *next = NULL;
+  // Pair *last = NULL;
+
+  // bin = hash(ht, key);
+
+  // next = ht->storage[bin];
+
+  // while( next != NULL && next->key != NULL && strcmp( key, next->key ) > 0 ) {
+  //   last = next;
+  //   next = next->next;
+  // }
+
+  // /* If overwriting a pair, print a warning and replace */
+  // if ( next != NULL && next->key != NULL && strcmp( key, next->key ) == 0 ) {
+  //   free( next->value);
+  //   next->value = strdup(value);
+  // }
+
+  // else {
+  //   newpair = create_pair(key, value);
+
+  //   if (next == ht->storage[bin]) {
+  //     newpair->next = next;
+  //     ht->storage[bin] = newpair;
+  //   } 
+  //   else if(next == NULL) {
+  //     last->next = newpair;
+  //   }
+  //   else {
+  //     newpair->next = next;
+  //     last->next = newpair;
+  //   }
+  // }
 }
 
 /****
@@ -90,7 +148,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int hashed_index = hash(key, ht->capacity);
 
+  if(ht->storage[hashed_index] != NULL) {
+    destroy_pair(ht->storage[hashed_index]);
+    ht->storage[hashed_index] = NULL;
+  } else {
+    printf("Value does not exist.\n");
+  }
 }
 
 /****
@@ -100,8 +165,39 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int hashed_index = hash(key, ht->capacity);
+
+  if(ht->storage[hashed_index] != NULL) {
+    if(strcmp(ht->storage[hashed_index]->key, key) == 0){
+        return ht->storage[hashed_index]->value;
+      } 
+      else {
+        return NULL;
+      }
+    }
+    else {
+        printf("Index not found\n");
+        return NULL;
+    }
 }
+
+  // int bin = 0;
+  // Pair *pair;
+
+  // bin = hash(ht, key);
+
+  // pair = ht->storage[bin];
+  // while( pair != NULL && pair->key != NULL && strcmp(key, pair->key) > 0) {
+  //   pair = pair->next;
+  // }
+
+  // if ( pair == NULL || pair->key == NULL || strcmp(key, pair->key) != 0) {
+  //   return NULL;
+  // }
+  // else {
+  //   return pair->value;
+  // }
+
 
 /****
   Fill this in.
@@ -110,7 +206,16 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++) {
+    if(ht->storage[i] != 0) {
+      destroy_pair(ht->storage[i]);
+    } else {
+      destroy_pair(ht->storage[0]);
+    } 
+  }
 
+  free(ht->storage);
+  free(ht);
 }
 
 
