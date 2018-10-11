@@ -111,7 +111,6 @@ void hash_table_remove(BasicHashTable *ht, char *key)
   {
     destroy_pair(ht->storage[hash_index]);
     ht->storage[hash_index] = NULL;
-    //free(ht->storage[hash_index]);
   } else
   {
     printf("ERROR: Unable to reomve entry with key: %s\n", key);
@@ -159,8 +158,6 @@ void destroy_hash_table(BasicHashTable *ht)
     {
       destroy_pair(ht->storage[i]);
     }
-    // free(ht->storage);
-    // free(ht);
   }
 
   free(ht->storage);
