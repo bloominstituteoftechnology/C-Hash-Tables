@@ -72,7 +72,7 @@ BasicHashTable *create_hash_table(int capacity)
   // set the capacity
   ht->capacity = capacity;
   // initialize storage locations to 0
-  ht->storage = calloc(capacity, sizeof(Pair));
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -159,11 +159,9 @@ void destroy_hash_table(BasicHashTable *ht)
 #ifndef TESTING
 int main(void)
 {
-  struct BasicHashTable *ht = create_hash_table(16);
+  BasicHashTable *ht = create_hash_table(16);
 
   hash_table_insert(ht, "line", "Here today...\n");
-  hash_table_insert(ht, "line", "Here again...\n");
-
   printf("%s", hash_table_retrieve(ht, "line"));
 
   hash_table_remove(ht, "line");
