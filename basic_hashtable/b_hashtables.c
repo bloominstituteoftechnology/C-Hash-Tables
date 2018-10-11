@@ -67,22 +67,25 @@ unsigned int hash(char *str, int max)
 BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
-  ht = NULL;
+  //ht = NULL;
+  ht = malloc(sizeof(BasicHashTable));
 
   if (capacity < 1)
   {
     return NULL;
   }
 
-  if ((ht = calloc(capacity, sizeof(BasicHashTable))) == NULL)
+  if ((ht = calloc(0, sizeof(BasicHashTable))) == NULL)
   {
     return NULL;
   }
 
-  if ((ht->storage = malloc((sizeof(Pair) * capacity))) == NULL)
-  {
-    return NULL;
-  }
+  // if ((ht->storage = malloc((sizeof(Pair) * capacity))) == NULL)
+  // {
+  //   return NULL;
+  // }
+
+   ht->storage = (Pair**) calloc(capacity, sizeof(Pair*)); // 16 Null
 
   for (int i=0; i < capacity; i++)
   {
@@ -103,7 +106,16 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  unsigned int hash_index = hash(key, ht->capacity);
 
+  if (ht->storage[hash_index] != NULL)
+  {
+    printf("WARNING: Index will be overwritten!\n");
+    destroy_pair(ht->storage[hash_index]);
+    //free(ht->storage[hash_index]);
+  }
+
+  ht->storage[hash_index] = create_pair(key, value);
 }
 
 /****
@@ -113,7 +125,17 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int hash_index = hash(key, ht->capacity);
 
+  if (ht->storage[hash_index] != NULL)
+  {
+    destroy_pair(ht->storage[hash_index]);
+    ht->storage[hash_index] = NULL;
+    free(ht->storage[hash_index]);
+  } else
+  {
+    printf("Invalid. Value does not exist\n");
+  }
 }
 
 /****
@@ -123,7 +145,27 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int hash_index = hash(key, ht->capacity);
+
+  if (ht->storage[hash_index] != NULL)
+  {
+    // if (strcmp(ht->storage[hash_index]->key, key) == 1)
+    // {
+    //   return ht->storage[hash_index]->value;
+    // }
+    // else
+    // {
+    //   return NULL;
+    // }
+    return ht->storage[hash_index]->value;
+  }
+  
+  else
+  {
+    printf("Invalid: Index not found \n");
+    return NULL;
+  }
+  
 }
 
 /****
@@ -133,7 +175,19 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for (int i =0; i< ht->capacity; i++)
+  {
+    if (ht->storage[i] != 0)
+    {
+      destroy_pair(ht->storage[i]);
+    } else
+    {
+      destroy_pair(ht->storage[0]);
+    }
+  }
 
+  free(ht->storage);
+  free(ht);
 }
 
 
