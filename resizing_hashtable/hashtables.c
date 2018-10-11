@@ -168,16 +168,24 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 {
   unsigned int hashed_index = hash(key, ht->capacity);
 
-  if(ht->storage[hashed_index]){
-    
-    LinkedPair *currentPair = ht->storage[hashed_index];
+  LinkedPair *currentPair = ht->storage[hashed_index];
 
+  while(currentPair && strcmp(currentPair->key, key) == 0){
 
-  }else{
-    printf("No value found by that key");
+    currentPair = currentPair->next;
+
   }
 
-  return NULL;
+  if(currentPair != NULL){
+
+    return currentPair->value;
+
+  }else{
+
+    return NULL;
+
+  }
+  
 }
 
 /****
@@ -187,6 +195,25 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for(int i = 0; i < ht->capacity; i++)
+  {
+    if(ht->storage[i]){
+
+      LinkedPair *currentPair = ht->storage[i];
+      LinkedPair *previousPair = currentPair;
+
+      while(currentPair){
+
+        currentPair = currentPair->next;
+        destroy_pair(previousPair);
+        previousPair = currentPair;
+
+      }
+    }
+  }
+
+  free(ht->storage);
+  free(ht);
 
 }
 
