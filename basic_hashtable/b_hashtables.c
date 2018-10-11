@@ -102,7 +102,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  
 }
 
 /****
@@ -112,7 +112,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int index = hash(key, ht->capacity);
+
+  if (ht->storage[index] == NULL) {
+    printf("Unable to retrieve entry with key: %s", key);
+    return NULL;
+  }
+  return ht->storage[index]->value;
 }
 
 /****
