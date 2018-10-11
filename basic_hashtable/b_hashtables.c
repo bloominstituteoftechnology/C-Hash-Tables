@@ -76,7 +76,6 @@ BasicHashTable *create_hash_table(int capacity)
   ht->capacity = capacity;
   ht->storage = calloc(capacity, sizeof(Pair *));
 
-
   return ht;
 }
 
@@ -90,9 +89,9 @@ BasicHashTable *create_hash_table(int capacity)
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
 int aIndex = hash(key, ht->capacity);
-printf("new index is %d\n", aIndex);
+// printf("new index is %d\n", aIndex);
 ht->storage[aIndex] = create_pair(key, value);
-printf("value stored is %s\n", ht->storage[aIndex]->value);
+// printf("value stored is %s\n", ht->storage[aIndex]->value);
 
 }
 
@@ -111,9 +110,16 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 
   Should return NULL if the key is not found.
  ****/
-char *hash_table_retrieve(BasicHashTable *ht, char *key)
-{
-  return NULL;
+char *hash_table_retrieve(BasicHashTable *ht, char *key){
+  unsigned int aIndex = hash(key, ht->capacity);
+   if (ht->storage[aIndex] != 0) {
+     if (strcmp(ht->storage[aIndex]->key, key) == 0)
+     {
+      return ht->storage[aIndex]->value;
+     }
+   } else {
+      return NULL;
+   }
 }
 
 /****
