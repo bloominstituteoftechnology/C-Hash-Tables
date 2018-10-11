@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Hash table key/value pair with linked list pointer
  ****/
@@ -66,7 +65,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -82,7 +83,23 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int index = hash(key, ht->capacity);
 
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair;
+
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0) {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
+
+  if (current_pair != NULL) {
+    current_pair->value = value;
+  } else {
+    LinkedPair *new_pair = create_pair(key, value);
+    new_pair->next = ht->storage[index];
+    ht->storage[index] = new_pair;
+  }
 }
 
 /****
@@ -95,6 +112,11 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair;
+
 
 }
 
@@ -108,7 +130,20 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int index = hash(key, ht->capacity);
+
+  LinkedPair *current_pair = ht->storage[index];
+
+  while(current_pair && strcmp(current_pair->key, key) != 0 ) {
+    current_pair = current_pair->next;
+  }
+
+  if(current_pair != NULL && strcmp(current_pair->key, key) == 0) {
+    return current_pair->value;
+  }
+  else {
+    return NULL;
+  }
 }
 
 /****
