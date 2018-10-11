@@ -121,17 +121,22 @@ void hash_table_remove(HashTable *ht, char *key)
 {
   unsigned int index = hash(key, ht->capacity);
   LinkedPair *current_pair = ht->storage[index];
-  LinkedPair *last_pair;
+  LinkedPair *last_pair = NULL;
 
   while (current_pair != NULL && strcmp(current_pair->key, key) != 0)
   {
     last_pair = current_pair;
     current_pair = last_pair->next;
   }
-  if (current_pair != NULL)
+  if (current_pair != NULL && last_pair == NULL) // default of last_pair is set to null, so if we're removing the first element in the linked list, we never enter the while loop, and last_pair remains null.
+  {
+    ht->storage[index] = current_pair->next;
+  }
+  else if (current_pair != NULL) // last_pair (which is our previous node) is not null anymore if we're not removing the first node.
   {
     last_pair->next = current_pair->next;
   }
+  destroy_pair(current_pair); // Destroy the linked list element whether it was at the beginning or not.
 }
 
 /****
@@ -168,10 +173,9 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-  free(ht);
   free(ht->storage);
+  free(ht);
 }
-
 /****
   Fill this in.
 
