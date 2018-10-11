@@ -87,7 +87,15 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   Pair *pair = create_pair(key, value);
   int index = hash(key, ht->capacity);
-  ht->storage[index] = pair;
+  if (ht->storage[index] == NULL)
+  {
+    ht->storage[index] = pair;
+  }
+  else
+  {
+    printf("There is already a value here.");
+    ht->storage[index]->value = value;
+  }
   destroy_pair(pair);
 }
 
@@ -115,7 +123,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   {
     return NULL;
   }
-  return ht->storage[index].value;
+  return ht->storage[index]->value;
 }
 
 /****
