@@ -67,8 +67,8 @@ unsigned int hash(char *str, int max)
 BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
-
-  ht->storage = calloc((size_t)capacity, sizeof(Pair*));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -82,16 +82,16 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  Pair* item = create_pair(key, value);
-  int index = hash(item->key, ht->capacity);
-  Pair* cur_item = ht->storage[index];
-  int i = 1;
-  while (cur_item != NULL) {
-    index = hash(item->key, ht->capacity);
-    cur_item = ht->storage[index];
-    i++;
+  unsigned int index = hash(key, ht->capacity);
+  Pair *stored_pair = ht->storage[index];
+  if (stored_pair != NULL) {
+    if (strcmp(key, stored_pair->key) != 0) {
+          printf("WARNING: Overwriting value: %s, %s with %s, %s\n",
+          stored_pair->key, stored_pair->value, key, value);
+    }
+    destroy_pair(stored_pair);
   }
-  ht->storage[index] = item;
+  ht->storage[index] = create_pair(key, value);
 }
 
 
@@ -103,7 +103,13 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  
+  unsigned int index = hash(key, ht->capacity);
+    if (ht->storage[index] == NULL) {
+      printf("Unable to remove entry with key: %s\n", key);
+    } else {
+      destroy_pair(ht->storage[index]);
+      ht->storage[index] = NULL;
+    } 
 }
 
 /****
@@ -113,7 +119,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int index = hash(key, ht->capacity);
+    if (ht->storage[index] == NULL) {
+      printf("Unable to retrieve entry with key: %s", key);
+      return NULL;
+    }
+  return ht->storage[index]->value;
 }
 
 /****
@@ -124,16 +135,14 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 void destroy_hash_table(BasicHashTable *ht)
 {
   for (int i = 0; i < ht->capacity; i++) {
-    Pair* item = ht->storage[i];
-    if (item != NULL) {
-      hash_table_remove(ht, item->key);
+    if (ht->storage[i] != NULL) {
+      destroy_pair(ht->storage[i]);
     }
   }
   free(ht->storage);
   free(ht);
 }
-
-
+    
 #ifndef TESTING
 int main(void)
 {
@@ -156,3 +165,11 @@ int main(void)
   return 0;
 }
 #endif
+
+
+
+
+
+
+
+
