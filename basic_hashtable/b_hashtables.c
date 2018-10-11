@@ -171,6 +171,11 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line"));
 
   hash_table_remove(ht, "line");
+  // uncomment below to test duplicate removes
+  // hash_table_remove(ht, "line");
+
+  // should return null - uncomment below to test
+  // printf("%s", hash_table_retrieve(ht, "line"));
 
   if (hash_table_retrieve(ht, "line") == NULL)
   {
