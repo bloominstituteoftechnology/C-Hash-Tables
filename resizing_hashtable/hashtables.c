@@ -69,7 +69,7 @@ HashTable *create_hash_table(int capacity)
   HashTable *ht;
   ht = (HashTable *)malloc(sizeof(HashTable));
   ht->capacity = capacity;
-  ht->storage = (LinkedPair**) calloc(capacity, sizeof(LinkedPair));
+  ht->storage = (LinkedPair**) calloc(capacity, sizeof(LinkedPair*));
 
   return ht;
 }
@@ -87,15 +87,25 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   unsigned int hashed_index = hash(key, ht->capacity);
 
-  if(ht->storage[hashed_index] != 0)
+  if(ht->storage[hashed_index])                             // If a LinkdePair already exists for that hashIndex
   {
-
-    printf("Overwriting value");
-    destroy_pair(ht->storage[hashed_index]);
-
+    LinkedPair *currentPair = ht->storage[hashed_index];
+    while(currentPair){                       // Loop throught the linked list
+      if(strcmp(currentPair->key, key) == 0){ // If we've found the key
+        currentPair->value = value;
+        break;
+      }
+      else if(currentPair->next){         // If theres a next value in the linked list
+        currentPair = currentPair->next;  // proceed to the next value
+      }
+      else{ 
+        currentPair->next = create_pair(key,value);
+      }
+    }
+    
+  }else{
+    ht->storage[hashed_index] = create_pair(key, value);
   }
-
-  ht->storage[hashed_index] = create_pair(key, value);
 }
 
 /****
@@ -108,7 +118,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  
 }
 
 /****
