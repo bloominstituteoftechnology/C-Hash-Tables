@@ -160,12 +160,10 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   {
     if (current->key == key)
     {
-
       return current->value;
     }
     else
     {
-
       current = current->next;
     }
   }
