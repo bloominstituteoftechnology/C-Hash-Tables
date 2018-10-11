@@ -67,6 +67,9 @@ unsigned int hash(char *str, int max)
 HashTable *create_hash_table(int capacity)
 {
   HashTable *ht;
+  ht = (HashTable *)malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = (LinkedPair**)calloc(capacity, sizeof(LinkedPair));
 
   return ht;
 }
@@ -82,7 +85,22 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  int hashed = hash(key, ht->capacity);
+  LinkedPair *current_pair = ht->storage[hashed];
+  LinkedPair *last_pair;
+  
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0) {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
 
+  if (current_pair != NULL) {
+    current_pair->value = value;
+  } else {
+    LinkedPair *new_pair = create_pair(key, value);
+    new_pair->next = ht->storage[hashed];
+    ht->storage[hashed] = new_pair;
+  }
 }
 
 /****
@@ -95,7 +113,21 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  int hashed = hash(key, ht->capacity);
+  LinkedPair *current_pair = ht->storage[hashed];
+  LinkedPair *last_pair;
+  
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0) {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
+  if (current_pair != NULL) {
+    destroy_pair(ht->storage[hashed]);
+    current_pair = NULL;
+    last_pair->next = NULL;
+  } else {
+    printf("There is no entry with key: %s\n", key);
+  }
 }
 
 /****
@@ -108,7 +140,20 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  int hashed = hash(key, ht->capacity);
+  LinkedPair *current_pair = ht->storage[hashed];
+  LinkedPair *last_pair;
+  
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0) {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
+  if (current_pair != NULL) {
+    return current_pair->value;
+  } else {
+    printf("There is no entry with key: %s\n", key);
+    return NULL;
+  }
 }
 
 /****
@@ -118,7 +163,13 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for (int i=0; i< ht->capacity; i++) {
+    if (ht->storage[i] != NULL) {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
@@ -132,7 +183,11 @@ void destroy_hash_table(HashTable *ht)
 HashTable *hash_table_resize(HashTable *ht)
 {
   HashTable *new_ht;
-
+  new_ht = (HashTable *)malloc(sizeof(HashTable));
+  new_ht->capacity = (ht->capacity*2);
+  ht->storage = (LinkedPair**)calloc((ht->capacity*2), sizeof(LinkedPair));
+  
+  
   return new_ht;
 }
 
