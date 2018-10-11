@@ -23,7 +23,6 @@ char *basic_hash_table_test()
     return NULL;
 }
 
-
 char *all_tests()
 {
     mu_suite_start();
