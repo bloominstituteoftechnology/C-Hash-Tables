@@ -66,7 +66,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair));
 
   return ht;
 }
@@ -82,7 +84,19 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int hashed = hash(key, ht->capacity);
+    LinkedPair *p = ht->storage[hashed];
 
+    while (p) {
+      if (strcmp(p->key, key) == 0) {
+        p->value = value;
+        return;
+      }
+      p = p->next;
+    }
+    LinkedPair *newPair = create_pair(key, value);
+    newPair->next = ht->storage[hashed];
+    ht->storage[hashed] = newPair;
 }
 
 /****
@@ -95,7 +109,21 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  unsigned int hashed = hash(key, ht->capacity);
+  LinkedPair *p = ht->storage[hashed];
+  LinkedPair *last = NULL;
+  while (p) {
+    if (strcmp(p->key, key) == 0) {
+      if (!last) {
+        ht->storage[hashed] = p->next;
+      } else {
+        last->next = p->next;
+      }
+      destroy_pair(p);
+    }
+    last = p;
+    p = p->next;
+  }
 }
 
 /****
@@ -108,6 +136,14 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int hashed = hash(key, ht->capacity);
+  LinkedPair *p = ht->storage[hashed];
+  while (p) {
+    if (strcmp(p->key, key) == 0) {
+      return p->value;
+    }
+    p = p->next;
+  }
   return NULL;
 }
 
@@ -118,7 +154,15 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  LinkedPair *p;
+  for(int i = 0; i < ht->capacity; i++) {
+    p = ht->storage[i];
+    if (p) {
+      destroy_pair(p);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
@@ -132,6 +176,10 @@ void destroy_hash_table(HashTable *ht)
 HashTable *hash_table_resize(HashTable *ht)
 {
   HashTable *new_ht;
+  new_ht = (HashTable *)malloc(sizeof(HashTable));
+  new_ht->capacity = (ht->capacity*2);
+  ht->storage = (LinkedPair**)calloc((ht->capacity*2), sizeof(LinkedPair));
+
 
   return new_ht;
 }
