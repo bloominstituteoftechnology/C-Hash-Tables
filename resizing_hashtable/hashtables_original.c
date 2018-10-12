@@ -113,20 +113,19 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  int hashed = hash(key, ht->capacity);
-  LinkedPair *current_pair = ht->storage[hashed];
-  LinkedPair *last_pair;
-  
-  while (current_pair != NULL && strcmp(current_pair->key, key) != 0) {
-    last_pair = current_pair;
-    current_pair = last_pair->next;
-  }
-  if (current_pair != NULL) {
-    destroy_pair(ht->storage[hashed]);
-    current_pair = NULL;
-    last_pair->next = NULL;
-  } else {
-    printf("There is no entry with key: %s\n", key);
+  unsigned int hashed = hash(key, ht->capacity);
+  LinkedPair *current = ht->storage[hashed];
+  LinkedPair *last = current;
+  while (current) {
+    if (strcmp(current->key, key) == 0) {
+      if (current == ht->storage[hashed]) {
+        ht->storage[hashed] = current->next;
+      }
+      last->next = current->next;
+      destroy_pair(current);
+    }
+    last = current;
+    current = current->next;
   }
 }
 
@@ -150,10 +149,9 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   }
   if (current_pair != NULL) {
     return current_pair->value;
-  } else {
-    printf("There is no entry with key: %s\n", key);
-    return NULL;
   }
+  printf("There is no entry with key: %s\n", key);
+  return NULL;
 }
 
 /****
@@ -163,8 +161,10 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  LinkedPair *current_pair;
   for (int i=0; i< ht->capacity; i++) {
-    if (ht->storage[i] != NULL) {
+    current_pair = ht->storage[i];
+    if (current_pair != NULL) {
       destroy_pair(ht->storage[i]);
     }
   }
@@ -182,11 +182,16 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-  new_ht = (HashTable *)malloc(sizeof(HashTable));
-  new_ht->capacity = (ht->capacity*2);
-  ht->storage = (LinkedPair**)calloc((ht->capacity*2), sizeof(LinkedPair));
-  
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+  LinkedPair *current;
+  for (int i=0; i<ht->capacity; i++) {
+    current = ht->storage[i];
+    while (current != NULL) {
+      hash_table_insert(new_ht, current->key, current->value);
+      current = current->next;
+    }
+  }
+  destroy_hash_table(ht);
   
   return new_ht;
 }
