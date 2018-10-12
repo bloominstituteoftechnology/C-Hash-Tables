@@ -88,20 +88,16 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   unsigned int index = hash(key, ht->capacity);
   LinkedPair *current = ht->storage[index];
-  LinkedPair *temp = create_pair(key, value);
+  LinkedPair *new = create_pair(key, value);
 
-  while (current != NULL && strcmp(current->key, key) != 0)
+  if (current == NULL)
   {
-    current = current->next;
+    ht->storage[index] = new;
   }
-  if (current != NULL)
+  else if (strcmp(current->key, key) != 0)
   {
-    current->value = value;
-  }
-  else
-  {
-    temp->next = ht->storage[index];
-    ht->storage[index] = temp;
+    new->next = ht->storage[index];
+    ht->storage[index] = new;
   }
 }
 
@@ -123,21 +119,20 @@ void hash_table_remove(HashTable *ht, char *key)
   {
     printf("Unable to retrieve key: %s\n", key);
   }
-
-  while (current != NULL)
+  while (current->next != NULL)
   {
     if (current->key == key)
     {
       if (current->next != NULL)
       {
-        temp = current->next;
+        temp->next = current->next;
       }
-      printf("Successfully removed: %s\n", current->key);
       destroy_pair(current);
       current = temp;
     }
     else
     {
+      temp = current;
       current = current->next;
     }
   }
@@ -229,6 +224,12 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 
+  printf("Removing: Line_2\n");
+  hash_table_remove(ht, "line_2");
+
+  printf("%s", hash_table_retrieve(ht, "line_1"));
+  printf("%s", hash_table_retrieve(ht, "line_2"));
+  printf("%s", hash_table_retrieve(ht, "line_3"));
   // int old_capacity = ht->capacity;
   // ht = hash_table_resize(ht);
   // int new_capacity = ht->capacity;
