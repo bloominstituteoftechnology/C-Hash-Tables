@@ -66,5 +66,13 @@ Due to this performance degradation, most languages, such as Python, will automa
 ## DAY 1
 Your assignment is to implement a basic hash table in the `basic_hash_table` directory. You should be able to insert, read, and delete elements from the hash table. You do not need to handle collisions but should print a warning when you are overwriting an existing value.
 
+Build your code by typing `make` then `./b_hashtable` in the terminal.
+
+Run tests by typing `make tests`.
+
 ## DAY 2
 Your assignment is to upgrade your basic hash table to handle collisions with linked list chaining. You should be able to insert an arbitrary amount of elements into your hash table, regardless of table size, and read them back without any data loss. You should also implement a resizing function that doubles the size of your hash table and copies all elements into the new data structure.
+
+Build your code by typing `make` then `./b_hashtable` in the terminal.
+
+Run tests by typing `make tests`.
