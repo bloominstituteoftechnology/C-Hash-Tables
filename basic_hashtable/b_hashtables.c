@@ -98,7 +98,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
     }
     destroy_pair(stored_pair);
   }
-  ht->storage[index] = pair;
+  ht->storage[index] = create_pair(key, value);
 }
 
 /****
@@ -108,7 +108,15 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  // check for index
+  unsigned int index = hash(key, ht->capacity);
 
+  if (ht->storage[index] == NULL) {
+    printf("Unable to remove entry with key: %s\n", key);
+  } else {
+    destroy_pair(ht->storage[index]);
+    ht->storage[index] = NULL;
+  }
 }
 
 /****
