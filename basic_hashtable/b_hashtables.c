@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Basic hash table key/value pair
  ****/
@@ -25,8 +24,12 @@ typedef struct BasicHashTable {
 Pair *create_pair(char *key, char *value)
 {
   Pair *pair = malloc(sizeof(Pair));
-  pair->key = key;
-  pair->value = value;
+  char *new_key = malloc(sizeof(char) * strlen(key) + 1);
+  char *new_value = malloc(sizeof(char) * strlen(key) + 1);
+  strcpy(new_key->key, key);
+  strcpy(new_value->value, value);
+  pair->key = new_key;
+  pair->value = new_value;
 
   return pair;
 }
@@ -115,7 +118,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int index = hash(key, ht->capacity);
+  if (ht->storage[index] == NULL) {
+    printf("Unable to retrieve entry with key: %s", key);
+    return NULL;
+  }
+  return ht->storage[index]->value;
 }
 
 /****
@@ -133,6 +141,7 @@ void destroy_hash_table(BasicHashTable *ht)
 int main(void)
 {
   struct BasicHashTable *ht = create_hash_table(16);
+  create_pair("TEST_KEY", "TEST_VALUE");
 
   hash_table_insert(ht, "line", "Here today...\n");
 
