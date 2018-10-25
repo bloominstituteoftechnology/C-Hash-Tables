@@ -99,11 +99,13 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   Pair *stored_pair = ht->storage[index];
   if (stored_pair != NULL) {  //a collision is when we're looking in our buckets and the key is different. if the key is the same, then we're just overwriting the key with the same key. 
     if (strcmp(key,stored_pair->key) != 0) {
-      printf("WARNING: Overwriting value: %s, %s with %s, %s\n", stored_pair->key, stored_pair->value, key, value);
+      printf("WARNING: Overwriting value: %s, %s with %s, %s\n", 
+        stored_pair->key, stored_pair->value, key, value);
     }
     destroy_pair(stored_pair);
   }
-  ht->storage[index] = pair; 
+  // ht->storage[index] = pair; 
+  ht->storage[index] = create_pair(key,value);
 }
 
 /****
