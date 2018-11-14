@@ -53,7 +53,7 @@ unsigned int hash(char *str, int max)
   while ((c = *u_str++)) {
     hash = ((hash << 5) + hash) + c;
   }
-
+ 
   return hash % max;
 }
 
