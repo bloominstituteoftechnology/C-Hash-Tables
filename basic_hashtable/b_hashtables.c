@@ -115,7 +115,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+    int hashIndex = hash(key, ht->capacity); 
+  if(ht->storage[hashIndex] != NULL){
+    return ht->storage[hashIndex]->value; 
+  }else{
+    printf("key is not found\n"); 
   return NULL;
+  }
 }
 
 /****
