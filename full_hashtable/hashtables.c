@@ -125,6 +125,17 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int hashed=hash(key,ht->capacity);
+  if (ht->storage[hashed]!=NULL) {
+    LinkedPair *current_node=ht->storage[hashed];
+    while (current_node!=NULL) {
+      if (current_node->key==key) {
+        return current_node->value;
+      } else {
+        current_node=current_node->next;
+      }
+    }
+  }
   return NULL;
 }
 
