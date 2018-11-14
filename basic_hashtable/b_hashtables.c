@@ -105,6 +105,9 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int hashIndex = hash(key, ht->capacity);
+  destroy_pair(ht->storage[hashIndex]);
+  ht->storage[hashIndex] = NULL;
 }
 
 /****
@@ -114,6 +117,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  unsigned int hashIndex = hash(key, ht->capacity);
+  if (ht->storage[hashIndex] != NULL)
+  {
+    return ht->storage[hashIndex]->value;
+  }
+
   return NULL;
 }
 
@@ -124,6 +133,13 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    destroy_pair(ht->storage[i]);
+  }
+
+  free(ht->storage);
+  free(ht);
 }
 
 #ifndef TESTING
