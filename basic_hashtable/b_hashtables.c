@@ -68,7 +68,7 @@ BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
   ht -> capacity = capacity;
-  ht -> storage = mallooc(capacity, sizeof(Pair *));
+  ht -> storage = calloc(capacity, sizeof(Pair *));
   return ht;
 }
 
@@ -81,6 +81,14 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  unsigned int arrayIndex = hash(key, ht -> capacity);
+
+  if (ht -> storage[arrayIndex] != NULL) {
+    perror("About to overrite existing value!!!!\n");
+    destroy_pair(ht -> storage[arrayIndex]);
+  }
+  
+  ht -> storage[arrayIndex] = create_pair(key, value);
 
 }
 
@@ -91,7 +99,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int arrayIndex = hash(key, ht -> capacity);
 
+  if (ht -> storage[arrayIndex] != NULL) {
+    destroy_pair(ht -> storage[arrayIndex]);
+    ht -> storage[arrayIndex] = NULL;
+  } else {
+    perror("There is no such a value.\n");
+  }
 }
 
 /****
@@ -101,7 +116,18 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int arrayIndex = hash(key, ht -> capacity);
+
+  if (ht -> storage[arrayIndex] != NULL) {
+    if (!strcmp(ht -> storage[arrayIndex] -> key, key)) {
+      return ht -> storage[arrayIndex] -> value;
+    } else {
+      return NULL;
+    }
+  } else {
+    perror("No index found.\n");
+    return NULL;
+  }
 }
 
 /****
@@ -111,7 +137,18 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  int i;
 
+  for (i = 0; i < ht -> capacity; i++) {
+    if (ht -> storage[i] != 0) {
+      destroy_pair(ht -> storage[i]);
+    } else {
+      destroy_pair(ht -> storage[0]);
+    }
+  }
+
+  free(ht -> storage);
+  free(ht);
 }
 
 
