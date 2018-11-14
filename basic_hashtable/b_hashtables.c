@@ -84,11 +84,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   int hashed_key;
   Pair *pair = create_pair(key, value);
-  hashed_key = hash(pair->key, ht->capacity);
+  hashed_key = hash(key, ht->capacity);
   if (ht->storage[hashed_key] != NULL) {
     printf("Warning, you have overwritten a previous value \n");
   }
-  ht->storage[hashed_key] = pair->value;
+  ht->storage[hashed_key] = pair;
 }
 
 /****
