@@ -26,12 +26,12 @@ typedef struct BasicHashTable
 Pair *create_pair(char *key, char *value)
 {
   Pair *pair = malloc(sizeof(Pair));
-  char *new_key = malloc(sizeof(char) * strlen(key) + 1);
-  char *new_value = malloc(sizeof(char) * strlen(value) + 1);
-  strcpy(new_key, key);
-  strcpy(new_value, value);
-  pair->key = new_key;
-  pair->value = new_value;
+  // char *new_key = malloc(sizeof(char) * strlen(key) + 1);
+  // char *new_value = malloc(sizeof(char) * strlen(value) + 1);
+  // strcpy(new_key, key);
+  // strcpy(new_value, value);
+  pair->key = strdup(key);
+  pair->value = strdup(value);
 
   return pair;
 }
