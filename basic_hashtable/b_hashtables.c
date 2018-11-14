@@ -67,7 +67,9 @@ unsigned int hash(char *str, int max)
 BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
-  ht->storage = (int *)calloc(capacity, NULL);
+  for(int i=0; i<capacity; i++){
+    ht->storage[i] = NULL;
+  }
   return ht;
 }
 
@@ -82,12 +84,17 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   int hashed = hash(key, ht->capacity);
   int i = 0;
-  if(ht->storage[hashed] == NULL){
-    ht->storage[hashed] = value;
-  } else if (ht->storage[hashed] != NULL){
+  while (ht->storage[hashed] != NULL){
+    hashed = (hashed + 1) & ht->capacity;
+  }
+  if (ht->storage[hashed] != NULL) {
     printf("The value of %s is being overwritten\n", key);
     destroy_pair(ht->storage[hashed]);
-    ht->storage[hashed] = value;
+    ht->storage[hashed]->value = value;
+  } else {
+    Pair *nu_hash = malloc(sizeof(Pair));
+    nu_hash = create_pair(key, value);
+    ht->storage[hashed] = nu_hash;
   }
   return;
 }
@@ -100,11 +107,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   int hashed = hash(key, ht->capacity);
-  if(ht->storage[hashed] != NULL){
+  while (ht->storage[hashed] != NULL){
+    hashed = (hashed + 1) & ht->capacity;
+  }
+  if(ht->storage[hashed]->key == key){
     destroy_pair(ht->storage[hashed]);
-    printf("Item deleted.");
-  } else {
-    printf("That item was not found.");
   }
   return;
 }
@@ -116,6 +123,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int hashed = hash(key, ht->capacity);
+  while (ht->storage[hashed] != NULL){
+    hashed = (hashed + 1) & ht->capacity;
+  }
+  if(ht->storage[hashed]->key == key){
+    return ht->storage[hashed]->value;
+  }
   return NULL;
 }
 
@@ -126,7 +140,9 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for(int i=0; i<ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
 }
 
 
