@@ -66,7 +66,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -80,7 +82,14 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  Pair *newPair = create_pair(key, value);
+  int insertHash = hash(key, ht->capacity);
+  if (ht->storage[insertHash] != NULL) {
+    printf("A value already exists in this location. Data overwrite commencing now ---");
+    destroy_pair(ht->storage[newHash]);
+  }
 
+  ht->storage[insertHash] = newPair;
 }
 
 /****
