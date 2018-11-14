@@ -69,7 +69,7 @@ BasicHashTable *create_hash_table(int capacity)
   BasicHashTable *ht;
   ht->capacity = capacity;
   ht->storage = calloc(capacity, sizeof(Pair *));
-  
+
   return ht;
 }
 
@@ -82,7 +82,13 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  int hashed_key;
+  Pair *pair = create_pair(key, value);
+  hashed_key = hash(pair->key, ht->capacity);
+  if (ht->storage[hashed_key] != NULL) {
+    printf("Warning, you have overwritten a previous value \n");
+  }
+  ht->storage[hashed_key] = pair->value;
 }
 
 /****
