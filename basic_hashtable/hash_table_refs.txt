@@ -1,0 +1,19 @@
+
+HASH Fundamentals:
+
+(concise)
+https://medium.com/@bartobri/hash-crash-the-basics-of-hash-tables-bef82a8ea550
+
+(BaseCS. Lengthy, but detailed and written like a NYtimes op-ed.)
+https://medium.com/basecs/taking-hash-tables-off-the-shelf-139cbf4752f0
+
+(broad overview of Hashtable usage)
+https://www.geeksforgeeks.org/applications-of-hashing/
+
+
+
+Vids:
+
+(13 minutes; spot-on, broad explanation)
+https://www.youtube.com/watch?v=KyUTuwz_b7Q
+
