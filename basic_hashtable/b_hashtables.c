@@ -90,7 +90,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 	}
 
 	ht->storage[index] = create_pair(key, value);
-
+	
 }
 /****
   Fill this in.
