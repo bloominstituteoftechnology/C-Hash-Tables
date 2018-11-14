@@ -66,7 +66,12 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  //ht is the struct we just constructed
+  ht->capacity = capacity;
+  printf("capacity:%d\n", capacity);
+  //put key/value pair from above into storage and allocate enough memory, iniitalizing as NULL with calloc.
+  ht->storage = (Pair**) calloc(capacity, sizeof(Pair*));
 
   return ht;
 }
@@ -80,7 +85,12 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  int index = hash(key, ht->capacity);
+  // if the index of the key is already in the hash table notify to avoid collision
+  if (ht->storage[index]){
+    printf("already in table");
 
+  }
 }
 
 /****
