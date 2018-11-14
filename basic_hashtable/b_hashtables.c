@@ -81,7 +81,18 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  //create a new pointer that is a pair. 
+  Pair *new_pair = create_pair(key, value); 
+  //create an int that takes in the key and capacity
+  int hash_key = hash(key, ht->capacity);
+  //if the value is being overwritten with a different key.
+  if(ht->storage[hash_key] != NULL){
+    printf("Overwriting");
+    destroy_pair(hash_key);
+  }
+  //else the new_pair is added to the storage. 
+  ht->storage[hash_key] = new_pair;
+  return ht;
 }
 
 /****
@@ -91,7 +102,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  //remove a value from the hash table.
 }
 
 /****
@@ -101,6 +112,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  //retrieve a value from the hash table.
   return NULL;
 }
 
