@@ -83,7 +83,24 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int arrayIndex = hash(key, ht -> capacity);
 
+  if (ht -> storage[arrayIndex] != NULL) {
+    LinkedPair *currentPair = ht -> storage[arrayIndex];
+    
+    while (currentPair) {
+      if (!strcmp(currentPair -> key, key)) {
+        currentPair -> value = value;
+        currentPair = NULL;
+      } else if (currentPair -> next) {
+        currentPair = currentPair -> next;
+      } else {
+        currentPair -> next = create_pair(key, value);
+      }
+    }
+  } else {
+    ht -> storage[arrayIndex] = create_pair(key, value);
+  }
 }
 
 /****
