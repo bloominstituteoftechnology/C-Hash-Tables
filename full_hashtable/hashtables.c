@@ -112,7 +112,26 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  int hashed=hash(key,ht->capacity);
+  if (ht->storage[hashed]!=NULL) {
+    LinkedPair *current_node=ht->storage[hashed];
+    LinkedPair *prev_node=NULL;
+    while (current_node!=NULL) {
+      if (current_node->key==key) {
+        if (prev_node==NULL) {
+          ht->storage[hashed]=current_node->next;
+        } else {
+          prev_node->next=current_node->next;
+        }
+        free(current_node);
+        break;
+      } else {
+        prev_node=current_node;
+        current_node=current_node->next;
+      }
+    }
+  }
+  return;
 }
 
 /****
@@ -146,7 +165,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  free(ht);
 }
 
 /****
