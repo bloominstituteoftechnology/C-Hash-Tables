@@ -36,7 +36,9 @@ Pair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(Pair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL) {
+    free(pair);
+  } 
 }
 
 /****
@@ -107,7 +109,9 @@ void hash_table_remove(BasicHashTable *ht, char *key)
     printf("ERROR: There is no value at this index\n");
   } else {
     destroy_pair(ht->storage[index]);
+    ht->storage[index] = NULL;
   }
+
 }
 
 /****
