@@ -128,7 +128,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   //^ create the pair to add to the hash table 
 
   //Get a hash 
-  int hash_index = hash(key, ht->capacity);
+  unsigned int hash_index = hash(key, ht->capacity);
   //Check if the space is taken up already will be NULL due to the use of calloc when creating the hash table storage 
   if (ht->storage[hash_index] != NULL){
     printf("\nERROR potential of losing previous omitted data! Overwriting\n");
@@ -148,7 +148,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   //Get the hash 
-  int hash_index = hash(key, ht->capacity);
+  unsigned int hash_index = hash(key, ht->capacity);
   //Get the pair 
   Pair *pair = ht->storage[hash_index];
   //Destroy the pair and free the memory 
@@ -166,12 +166,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  int hash_index = hash(key, ht->capacity);
-
-  char *value = ht->storage[hash_index]->value;
-  if (value != NULL)
-    return value; 
-
+  unsigned int hash_index = hash(key, ht->capacity);
+  char *value; 
+  if(ht->storage[hash_index] != NULL){
+    return ht->storage[hash_index]->value; 
+  }
+  
   return NULL;
 }
 
@@ -183,7 +183,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 void destroy_hash_table(BasicHashTable *ht)
 {
   //Loop through the storage
-  for(int i = 0; i<ht->capacity; i++){
+  for(unsigned int i = 0; i<ht->capacity; i++){
     //grab each pair 
     Pair *pair = ht->storage[i]; 
     //only if the pair has a value does it need to be destroyed. 
