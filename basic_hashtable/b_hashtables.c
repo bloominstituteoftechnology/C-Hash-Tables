@@ -19,6 +19,9 @@ typedef struct BasicHashTable {
   Pair **storage;
 } BasicHashTable;
 
+
+
+
 /****
   Create a key/value pair to be stored in the hash table.
  ****/
@@ -70,7 +73,6 @@ BasicHashTable *create_hash_table(int capacity)
 
   ht->capacity = capacity; 
 
-
   return ht;
 }
 
@@ -83,7 +85,14 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  
+  int hashCapacity = ht->capacity;
+  int hashKey = hash(*key, hashCapacity);
+  
+  Pair *pair = malloc(sizeof(Pair));
+  pair = create_pair(hashKey, value);
+  ht->storage = pair; 
+  
 }
 
 /****
