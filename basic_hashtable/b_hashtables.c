@@ -82,7 +82,8 @@ BasicHashTable *create_hash_table(int capacity)
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   if (ht->storage[hash(key,ht->capacity)]!=NULL) {
-    printf("Warning you are overwriting a value.");
+    printf("Warning you are overwriting a value.\n");
+    destroy_pair(ht->storage[hash(key,ht->capacity)]);
     ht->storage[hash(key,ht->capacity)]=create_pair(key,value);
   } else {
     ht->storage[hash(key,ht->capacity)]=create_pair(key,value);
