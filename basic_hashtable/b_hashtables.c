@@ -16,6 +16,7 @@ typedef struct Pair {
  ****/
 typedef struct BasicHashTable {
   int capacity;
+  int num_pairs; 
   Pair **storage;
 } BasicHashTable;
 
@@ -72,6 +73,7 @@ BasicHashTable *create_hash_table(int capacity)
   BasicHashTable *ht = calloc(capacity, sizeof(BasicHashTable));
 
   ht->capacity = capacity; 
+  ht->num_pairs = 0;
 
   return ht;
 }
@@ -85,14 +87,15 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  
   int hashCapacity = ht->capacity;
   int hashKey = hash(*key, hashCapacity);
   
   Pair *pair = malloc(sizeof(Pair));
   pair = create_pair(hashKey, value);
-  ht->storage = pair; 
+  ht->storage[ht->num_pairs] = pair; 
+  ht->num_pairs++;
   
+  free(pair);
 }
 
 /****
@@ -102,7 +105,16 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  int hashCapacity = ht->capacity;
+  int hashKey = hash(*key, hashCapacity);
 
+  for(int i; i < ht->capacity; i++){
+    if(ht->storage[i]->key = hashKey){
+      free(ht->storage[i]->key);
+      free(ht->storage[i]->value); 
+      ht->num_pairs--;
+    } 
+  }
 }
 
 /****
@@ -112,7 +124,16 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  int hashCapacity = ht->capacity;
+  int hashKey = hash(*key, hashCapacity);
+
+  for(int i; i < ht->capacity; i++){
+    if(ht->storage[i]->key = hashKey){
+      return ht->storage[i]->value; 
+    } else {
+      return NULL;
+    }
+  }
 }
 
 /****
@@ -122,7 +143,15 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for(int i = 0; i < ht->capacity; i++){
+    if(ht->storage[i] != NULL) {
+      free(ht->storage[i]);
+    }
+  }
 
+  free(ht->capacity);
+  free(ht->storage);
+  free(ht);
 }
 
 
