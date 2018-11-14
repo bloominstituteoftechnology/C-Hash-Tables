@@ -66,7 +66,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -87,6 +89,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
     destroy_pair(ht->storage[new_hash]);
   }
   ht->storage[new_hash] = new_pair;
+  return ht;
 }
 
 /****
@@ -96,7 +99,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int hash_at_key = hash(key, ht->capacity);
+  if (ht->storage[hash_at_key] != NULL){
+    destroy_pair(ht->storage[hash_at_key]);
+    ht->storage[hash_at_key] = NULL;
+  }
+  return ht;
 }
 
 /****
@@ -106,6 +114,10 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int hash_at_key = hash(key, ht-> capacity);
+  if(ht->storage[hash_at_key]){
+    return ht->storage[hash_at_key]->value;
+  }
   return NULL;
 }
 
@@ -116,7 +128,12 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for (int i = 0; i < ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->capacity);
+  free(ht->storage);
+  free(ht);
 }
 
 
