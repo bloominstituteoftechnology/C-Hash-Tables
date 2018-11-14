@@ -136,9 +136,6 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
       printf("\nERROR-The key you previously set doesn't match the new key being set. Overwriting \n");
     }
   }
-
-
-    
   //Overwrite/ set hash to equal the pair. 
   ht->storage[hash_index] = pair; 
 }
@@ -150,7 +147,16 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  //Get the hash 
+  int hash_index = hash(key, ht->capacity);
+  //Get the pair 
+  Pair *pair = ht->storage[hash_index];
+  //Destroy the pair and free the memory 
+  destroy_pair(pair);
+  //Set the space to NULL 
+  // pair = NULL; 
+  //Not sure if the above would do it or the below is required. 
+  ht->storage[hash_index] = NULL; 
 }
 
 /****
