@@ -128,8 +128,15 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  
+  unsigned int result = hash(key, ht->capacity);
+
+  if(ht->storage[result] == NULL){
+  printf("result not found");
   return NULL;
+  }
+  else if(ht->storage[result] != NULL) {
+    return ht->storage[result]->value;
+  }
 }
 
 /****
@@ -139,7 +146,13 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for(int i = 0; i<ht->capacity; i++){
+    if (ht->storage[i] != NULL) {
+      destroy_pair(ht->storage[1]);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
