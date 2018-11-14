@@ -16,10 +16,8 @@ typedef struct Pair {
  ****/
 typedef struct BasicHashTable {
   int capacity;
-  int num_pairs; 
   Pair **storage;
 } BasicHashTable;
-
 
 
 
@@ -75,8 +73,7 @@ BasicHashTable *create_hash_table(int capacity)
   BasicHashTable *ht = calloc(capacity, sizeof(BasicHashTable));
 
   ht->capacity = capacity; 
-  ht->num_pairs = 0;
-
+  
   return ht;
 }
 
@@ -95,7 +92,6 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   Pair *pair = malloc(sizeof(Pair));
   pair = create_pair(key, value);
   ht->storage[hashKey] = pair; 
-  ht->num_pairs++;
   
   free(pair);
 }
@@ -111,9 +107,8 @@ void hash_table_remove(BasicHashTable *ht, char *key)
   unsigned int hashKey = hash(key, hashCapacity);
 
     if((ht->storage[hashKey]) != NULL){
-      free(ht->storage[hashKey]->key);
-      free(ht->storage[hashKey]->value); 
-      ht->num_pairs--;
+      ht->storage[hashKey]->key = NULL;
+      ht->storage[hashKey]->value = NULL;
     } 
 }
 
@@ -143,12 +138,8 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-  for(int i = 0; i < ht->capacity; i++){
-    if((ht->storage[i]) != NULL) {
-      free(ht->storage[i]);
-    }
-  }
 
+  free(ht->storage);
   free(ht);
 }
 
