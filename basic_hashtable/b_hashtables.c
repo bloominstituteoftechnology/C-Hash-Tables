@@ -66,7 +66,10 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable);
+
+  ht->capacity = 53;
+  ht->storage = calloc((size_t)ht->capacity, sizeof(ht->pair));  //size_t is an unsigned integer type of at least 16 bit
 
   return ht;
 }
