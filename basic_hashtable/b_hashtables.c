@@ -88,11 +88,10 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   if(ht->storage[hashIndex] == NULL){
     ht->storage[hashIndex] = pair; 
   }else{
-    printf('There is a value that exists at this index. Rewriting previous value with new pair...');
+    printf('value that exists at this index.');
     destroy_pair(ht->storage[hashIndex]); 
     ht->storage[hashIndex] = pair; 
   }
-
 }
  
 /****
@@ -102,7 +101,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int hashIndex = hash(key, ht->capacity);
+  if(ht->storage[hashIndex] != NULL){
+    destroy_pair(ht->storage[hashIndex]); 
+    ht->storage[hashIndex] = NULL; 
+  }
 }
 
 /****
