@@ -78,13 +78,31 @@ BasicHashTable *create_hash_table(int capacity)
   Fill this in.
 
   If you are overwriting a value with a different key, print a warning.
-
+  
   Don't forget to free any malloc'ed memory!
  ****/
+
+
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
 
+  //create a key value pair using create_pair
+  Pair *pair = create_pair(key, value);
+  //use the hash function to create a result
+  unsigned int result = hash(key, ht->capacity) //is key correct?
+  //check if result is in storage and throw an error
+  if (ht->storage[result] != NULL) {
+    printf("You are overwriting an existing value");
+    ht->storage[result] = pair; // 
+  }
+  //otherwise set the result equal to the pair
+  else if (ht->storage[result] == NULL) {
+    ht->storage[result] = pair;
+  }
+  //remove pair from memory
+  destroy_pair(pair);
 }
+
 
 /****
   Fill this in.
@@ -103,6 +121,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  
   return NULL;
 }
 
