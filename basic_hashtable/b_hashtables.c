@@ -9,7 +9,7 @@
 typedef struct Pair {
   char *key;
   char *value;
-} Pair;
+} Pair; 
 
 /****
   Basic hash table
