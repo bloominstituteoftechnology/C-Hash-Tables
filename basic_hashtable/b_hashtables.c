@@ -80,8 +80,16 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
-  int i = hash(ht->storage->key);
+  int hashed = hash(key, ht->capacity);
+  int i = 0;
+  if(ht->storage[hashed] == NULL){
+    ht->storage[hashed] = value;
+  } else if (ht->storage[hashed] != NULL){
+    printf("The value of %s is being overwritten\n", key);
+    destroy_pair(ht->storage[hashed]);
+    ht->storage[hashed] = value;
+  }
+  return;
 }
 
 /****
@@ -91,7 +99,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int hashed = hash(key, ht->capacity);
+  if(ht->storage[hashed] != NULL){
+    destroy_pair(ht->storage[hashed]);
+    printf("Item deleted.");
+  } else {
+    printf("That item was not found.");
+  }
+  return;
 }
 
 /****
