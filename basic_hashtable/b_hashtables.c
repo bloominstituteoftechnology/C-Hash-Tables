@@ -80,7 +80,11 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  
+  unsigned int hashed = hash(key, ht->capacity);
+  if (ht->storage[hashed]) {
+    perror("WARNING: Existing value being overwritten. \n");
+    destroy_pair(ht->storage[hashed]);
+  }
 }
 
 /****
