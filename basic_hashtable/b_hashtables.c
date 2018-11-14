@@ -89,7 +89,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   //create a key value pair using create_pair
   Pair *pair = create_pair(key, value);
   //use the hash function to create a result
-  unsigned int result = hash(key, ht->capacity) //is key correct?
+  unsigned int result = hash(key, ht->capacity); //is key correct?
   //check if result is in storage and throw an error
   if (ht->storage[result] != NULL) {
     printf("You are overwriting an existing value");
@@ -111,7 +111,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  unsigned int result = hash(key, ht->capacity);
+  if (ht->storage[result] == NULL){
+    printf("That value does not exist");
+  }
+  else if (ht->storage[result] != NULL){
+    destroy_pair(ht->storage[result]);
+    ht->storage[result] = NULL;
+  }
 }
 
 /****
