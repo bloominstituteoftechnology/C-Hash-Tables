@@ -81,20 +81,11 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  for (int i=0; i<ht->capacity; i++) {
-    if (ht->storage[i]!=NULL) {
-      if (ht->storage[i]->key==key) {
-        printf("Warning you are overwriting a value.");
-        ht->storage[i]=create_pair(key,value);
-        return;
-      }
-    } 
-  }
-  for (int j=0; j<ht->capacity; j++) {
-    if (ht->storage[j]==NULL) {
-      ht->storage[j]=create_pair(key,value);
-      return;
-    }
+  if (ht->storage[hash(key,ht->capacity)]!=NULL) {
+    printf("Warning you are overwriting a value.");
+    ht->storage[hash(key,ht->capacity)]=create_pair(key,value);
+  } else {
+    ht->storage[hash(key,ht->capacity)]=create_pair(key,value);
   }
 }
 /****
