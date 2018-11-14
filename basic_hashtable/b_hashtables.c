@@ -86,9 +86,9 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 	if(ht->storage[index]){
 		printf("Key Value pair already exists, overwriting the values\n");
 		destroy_pair(ht->storage[index]);
-
 	}
-		ht->storage[index] = create_pair(key, value);
+
+	ht->storage[index] = create_pair(key, value);
 
 }
 /****
@@ -98,7 +98,8 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+        int index = hash(key, ht->capacity);
+	destroy_pair(ht->storage[index]);
 }
 
 /****
@@ -108,7 +109,8 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  	
+	return NULL;
 }
 
 /****
