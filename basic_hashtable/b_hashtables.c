@@ -92,8 +92,6 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   }
   // insert pair into that index in the storage variable
   ht->storage[index] = pair;
-
-  return pair;
 }
 
 /****
@@ -103,7 +101,13 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
 
+  if (ht->storage[index] == NULL) {
+    printf("ERROR: There is no value at this index\n");
+  } else {
+    destroy_pair(ht->storage[index]);
+  }
 }
 
 /****
@@ -113,6 +117,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+
+  if (ht->storage[index] != NULL) {
+    return ht->storage[index];
+  } 
+
   return NULL;
 }
 
