@@ -167,7 +167,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
   unsigned int hash_index = hash(key, ht->capacity);
-  char *value; 
+   
   if(ht->storage[hash_index] != NULL){
     return ht->storage[hash_index]->value; 
   }
