@@ -80,7 +80,13 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  Pair *new_pair = create_pair(key, value);
+  int new_hash = hash(key, ht->capacity);
+  if (ht->storage[new_hash] != NULL){
+    printf("You are about to overwrite an existing key...\n");
+    destroy_pair(ht->storage[new_hash]);
+  }
+  ht->storage[new_hash] = new_pair;
 }
 
 /****
