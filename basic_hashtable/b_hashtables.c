@@ -120,10 +120,12 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   unsigned int index = hash(key, ht->capacity);
 
   if (ht->storage[index] != NULL) {
-    return ht->storage[index];
-  } 
-
-  return NULL;
+    return ht->storage[index]->value;
+  } else {
+    printf("ERROR: Key not found\n");
+    return NULL;
+  }
+  
 }
 
 /****
@@ -133,7 +135,12 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for(int i = 0; i < ht->capacity - 1; i++) {
+    destroy_pair(ht->storage[i]);
+  }
 
+  free(ht->storage);
+  free(ht);
 }
 
 
