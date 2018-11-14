@@ -40,7 +40,9 @@ Pair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(Pair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL){
+    free(pair);
+  }
 }
 
 /****
@@ -88,11 +90,11 @@ BasicHashTable *create_hash_table(int capacity)
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   int hashCapacity = ht->capacity;
-  int hashKey = hash(*key, hashCapacity);
+  unsigned int hashKey = hash(key, hashCapacity);
   
   Pair *pair = malloc(sizeof(Pair));
-  pair = create_pair(hashKey, value);
-  ht->storage[ht->num_pairs] = pair; 
+  pair = create_pair(key, value);
+  ht->storage[hashKey] = pair; 
   ht->num_pairs++;
   
   free(pair);
@@ -106,16 +108,15 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   int hashCapacity = ht->capacity;
-  int hashKey = hash(*key, hashCapacity);
+  unsigned int hashKey = hash(key, hashCapacity);
 
-  for(int i; i < ht->capacity; i++){
-    if(ht->storage[i]->key = hashKey){
-      free(ht->storage[i]->key);
-      free(ht->storage[i]->value); 
+    if((ht->storage[hashKey]) != NULL){
+      free(ht->storage[hashKey]->key);
+      free(ht->storage[hashKey]->value); 
       ht->num_pairs--;
     } 
-  }
 }
+
 
 /****
   Fill this in.
@@ -125,16 +126,15 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
   int hashCapacity = ht->capacity;
-  int hashKey = hash(*key, hashCapacity);
+  unsigned int hashKey = hash(key, hashCapacity);
 
-  for(int i; i < ht->capacity; i++){
-    if(ht->storage[i]->key = hashKey){
-      return ht->storage[i]->value; 
+    if((ht->storage[hashKey]->key) != NULL){
+      return ht->storage[hashKey]->value; 
     } else {
       return NULL;
-    }
-  }
+      }
 }
+
 
 /****
   Fill this in.
@@ -144,13 +144,11 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 void destroy_hash_table(BasicHashTable *ht)
 {
   for(int i = 0; i < ht->capacity; i++){
-    if(ht->storage[i] != NULL) {
+    if((ht->storage[i]) != NULL) {
       free(ht->storage[i]);
     }
   }
 
-  free(ht->capacity);
-  free(ht->storage);
   free(ht);
 }
 
