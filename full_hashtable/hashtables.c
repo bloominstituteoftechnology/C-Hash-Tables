@@ -83,7 +83,23 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  int hashed=hash(key,ht->capacity);
+  if (ht->storage[hashed]!=NULL) {
+    LinkedPair *current_node=ht->storage[hashed];
+    while (current_node!=NULL) {
+      if (current_node->key==key) {
+        current_node->value=value;
+        break;
+      } else if (current_node->next==NULL) {
+        current_node->next=create_pair(key,value);
+        break;
+      } else {
+        current_node=current_node->next;
+    }
+    }
+  } else {
+    ht->storage[hashed]=create_pair(key,value);
+  }
 }
 
 /****
