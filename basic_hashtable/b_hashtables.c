@@ -183,7 +183,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 void destroy_hash_table(BasicHashTable *ht)
 {
   //Loop through the storage
-  for(unsigned int i = 0; i<ht->capacity; i++){
+  for(int i = 0; i<ht->capacity; i++){
     //grab each pair 
     Pair *pair = ht->storage[i]; 
     //only if the pair has a value does it need to be destroyed. 
