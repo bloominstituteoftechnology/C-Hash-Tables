@@ -93,6 +93,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   destroy_pair(ht->storage[hash(key, ht->capacity)]);
+  ht->storage[hash(key, ht->capacity)] = NULL;
 }
 
 /****
