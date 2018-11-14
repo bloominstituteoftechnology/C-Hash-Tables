@@ -132,7 +132,10 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for(int y = 0; y < ht->capacity; y++){
+    destroy_pair(ht->storage[y]); 
+  }
+  free(ht); 
 }
 
 
