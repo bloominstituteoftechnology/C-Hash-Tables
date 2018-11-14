@@ -4,7 +4,7 @@
 
 
 /****
-  Basic hash table key/value pair
+  Basic hash table key/value pair.
  ****/
 typedef struct Pair {
   char *key;
