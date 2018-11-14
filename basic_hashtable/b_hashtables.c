@@ -93,6 +93,17 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  int hashIndex = hash(key, ht->capacity);
+
+  if (ht->storage[hashIndex])
+  {
+    destroy_pair(ht->storage[hashIndex]);
+    ht->storage[hashIndex] = NULL;
+  }
+  else
+  {
+    printf("No value found for the given key\n");
+  }
 }
 
 /****
@@ -102,6 +113,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+
+  int hashIndex = hash(key, ht->capacity);
+
+  if (ht->storage[hashIndex])
+  {
+    return ht->storage[hashIndex]->value;
+  }
   return NULL;
 }
 
