@@ -81,10 +81,11 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  Pair *new = create_pair(key, value);
+  Pair *new = malloc(sizeof(Pair));
+  new = create_pair(key, value);
   unsigned int newHash = hash(new, ht->capacity);
-  ht->storage = newHash;
-  
+  ht->storage[newHash] = new;
+  free(new);
 }
 
 /****
@@ -94,7 +95,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int long *hash; 
+  for(int i = 0; key[i] != '\0'; i++){
+    hash[i] = key[i];
+  }
+  ht->storage[hash] = NULL;
 }
 
 /****
@@ -104,6 +109,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int i;
+  int hash;
+  while (key[i] != '\0'){
+    hash[i] = key[i];
+    i++;
+  }
+  ht->storage[hash];
   return NULL;
 }
 
@@ -114,7 +126,12 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  int i;
+  while (ht->storage[i] != '\0'){
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
