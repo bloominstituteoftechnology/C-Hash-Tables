@@ -119,11 +119,6 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   {
     ht->storage[index] = linked_pair;
   }
-
-  //while (linkedpaid->next != Null)
-  //{ linkedpaid = linkedpair ->next }
-  //if strcmp(linkedpaid->key, jey) == 0
-  //{}
 }
 
 /****
@@ -136,9 +131,34 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
   //store the parent bc you need to delete it
   //linkedpairparent->next = linkedpair->next
   //destroypair(linkedpair)
+  LinkedPair *stored_pair = ht->storage[index];
+  if (stored_pair = NULL)
+  {
+    printf("Warning: previous index being overwritten");
+  }
+//maybe add else wrapper if needed.
+  if (strcmp(stored_pair->key, key) == 0)
+  {
+    ht->storage[index] = stored_pair->next;
+    destroy_pair(stored_pair);
+  }
+  else
+  {
+    while (stored_pair->next != NULL)
+    {
+      if (strcmp(stored_pair->next->key, key) == 0)
+      {
+        stored_pair->next = stored_pair->next->next;
+        destroy_pair(stored_pair->next);
+        return;
+      }
+      stored_pair = stored_pair->next;
+    }
+  }
 }
 
 /****
