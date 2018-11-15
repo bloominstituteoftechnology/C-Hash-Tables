@@ -71,9 +71,6 @@ BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
 
-// ht->storage[hash] = {key: value}
-// storage = [ NULL, NULL, NULL]
-// capacity = sizeof(Pair)
   ht->capacity = capacity; //indices in an array // value == 3
   ht->storage = calloc(capacity, sizeof(Pair *)); //this size of struct 
   return ht;
@@ -86,14 +83,12 @@ BasicHashTable *create_hash_table(int capacity)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void hash_table_insert(BasicHashTable *ht, char *key, char *value)
+void /*<- This mean this returns nothing */ hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  if(key != ht->storage[hash(key, capacity)]){
 
-  };
-  
-  int hashkey = hash(key, 10);
-  ht->storage[hashkey] = 
+  int hashkey = hash(key, 10); 
+  Pair *pair = create_pair(key, value); 
+  ht->storage[hashkey] = pair;
 
 }
 
@@ -104,7 +99,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  
 }
 
 /****
@@ -114,7 +109,23 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  /*
+  Before we put code on the screen, what's the approach here?
+  
+  - ht->storage->pair[key] ? right direction?
+  -when match return the Pair
+  -if key not found return null
+
+  missing a step?
+  This is a reasonable approach, but what's the Big O of this?
+  O(n)
+  Shouldn't retrieval in a hash table be O(1)?
+  
+
+  */
+
+
+
 }
 
 /****

@@ -29,7 +29,6 @@ LinkedPair *create_pair(char *key, char *value)
   pair->key = key;
   pair->value = value;
   pair->next = NULL;
-
   return pair;
 }
 
