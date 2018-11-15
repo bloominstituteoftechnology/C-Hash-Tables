@@ -84,7 +84,7 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-  int newHash = hash(key, ht->capacity);
+  unsigned int newHash = hash(key, ht->capacity);
   LinkedPair *evalPair = ht->storage[newHash];
 
   if (evalPair == NULL) {
@@ -119,7 +119,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  int checkHash = hash(key, ht->capacity);
+  unsigned int checkHash = hash(key, ht->capacity);
   LinkedPair *evalPair = ht->storage[checkHash];
   LinkedPair *prev;
 
@@ -148,7 +148,7 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  int checkHash = hash(key, ht->capacity);
+  unsigned int checkHash = hash(key, ht->capacity);
   if (ht->storage[checkHash] != NULL) {
     if (strcmp(ht->storage[checkHash]->key, key) == 0) {
       return ht->storage[checkHash]->value;
@@ -194,7 +194,6 @@ HashTable *hash_table_resize(HashTable *ht)
   for(int i = 0; i < ht->capacity; i++){
     new_ht->storage[i] = ht->storage[i];
   }
-  destroy_hash_table(ht);
 
   return new_ht;
 }
