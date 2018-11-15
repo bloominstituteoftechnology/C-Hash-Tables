@@ -26,8 +26,8 @@ typedef struct HashTable {
 LinkedPair *create_pair(char *key, char *value)
 {
   LinkedPair *pair = malloc(sizeof(LinkedPair));
-  pair->key = key;
-  pair->value = value;
+  pair->key = strdup(key);
+  pair->value = strdup(value);
   pair->next = NULL;
 
   return pair;
@@ -38,7 +38,11 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL) {
+    free(pair->key);
+    free(pair->value);
+    free(pair);
+  }
 }
 
 /****
@@ -87,8 +91,9 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   if (ht->storage[hashed]!=NULL) {
     LinkedPair *current_node=ht->storage[hashed];
     while (current_node!=NULL) {
-      if (current_node->key==key) {
-        current_node->value=value;
+      if (strcmp(current_node->key,key)==0){
+        free(current_node->value);
+        current_node->value=strdup(value);
         break;
       } else if (current_node->next==NULL) {
         current_node->next=create_pair(key,value);
@@ -117,7 +122,7 @@ void hash_table_remove(HashTable *ht, char *key)
     LinkedPair *current_node=ht->storage[hashed];
     LinkedPair *prev_node=NULL;
     while (current_node!=NULL) {
-      if (current_node->key==key) {
+      if (strcmp(current_node->key,key)==0){
         if (prev_node==NULL) {
           ht->storage[hashed]=current_node->next;
         } else {
@@ -147,7 +152,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   if (ht->storage[hashed]!=NULL) {
     LinkedPair *current_node=ht->storage[hashed];
     while (current_node!=NULL) {
-      if (current_node->key==key) {
+      if (strcmp(current_node->key,key)==0) {
         return current_node->value;
       } else {
           current_node=current_node->next;
