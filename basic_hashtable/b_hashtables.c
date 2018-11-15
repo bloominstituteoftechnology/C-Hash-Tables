@@ -165,11 +165,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  int index = hash(key, ht->capacity);
 
  if (ht->storage[index] != NULL) {
-   ht->storage->key = NULL;
-   ht->storage->value = NULL;
-   free(ht->storage);
- } else {
-   printf("that pair does not exsist");
+   free(ht->storage[index]);
+   ht->storage[index] = NULL;
+ }
+ else 
+ {
+   printf("That pair does not exist.");
  }
 }
 
@@ -207,6 +208,11 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key) // you're given the str
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  // if (ht->storage[index] != NULL) {
+  //  for(int i = 0, i < ht->capacity, i++) {
+  //  free(ht->storage);
+     
+  //  }
 if (ht != NULL) {
   free(ht->storage);
   free(ht);
@@ -218,13 +224,13 @@ if (ht != NULL) {
 int main(void)
 {
   struct BasicHashTable *ht = create_hash_table(16);
-
+  printf("Hash table created\n");
   hash_table_insert(ht, "line", "Here today...\n");
-
+  printf("Insertion successful\n");
   printf("%s", hash_table_retrieve(ht, "line"));
-
+  printf("Retrieval successful\n");
   hash_table_remove(ht, "line");
-
+  printf("Removal successful");
   if (hash_table_retrieve(ht, "line") == NULL) {
     printf("...gone tomorrow. (success)\n");
   } else {
