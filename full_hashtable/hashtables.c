@@ -125,6 +125,27 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+    //get a hash 
+    unsigned int hash_index = hash(key, ht->capacity);
+    //create a LinkedPair 
+    LinkedPair *new_pair = create_pair(key, value);
+
+    //check if something exists at the hash 
+    if (ht->storage[hash_index] == NULL){
+      //if nothing exists  set the hash to new pair 
+      ht->storage[hash_index] = new_pair;
+    } else {
+      //if something exists  take the pair.next and have equal to new pair 
+      // ht->storage[hash_index]->next = pair; 
+      //^Not as simple as that. What if there is  already a next? and then a next after that. 
+      LinkedPair *linked_pair = ht->storage[hash_index];
+      //create a loop to check for a null value  if null set the new pair else go to the next 
+      while(linked_pair->next != NULL){
+        linked_pair = linked_pair->next; 
+      }
+      linked_pair->next = new_pair; 
+
+    }
 
 }
 
