@@ -131,7 +131,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   printf(" result not found");
   return NULL;
   }
-    return ht->storage[result]->value;
+  return ht->storage[result]->value;
 }
 
 /****
