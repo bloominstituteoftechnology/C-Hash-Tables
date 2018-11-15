@@ -150,10 +150,10 @@ char *hash_table_retrieve(HashTable *ht, char *key)
       if (current_node->key==key) {
         return current_node->value;
       } else {
-        current_node=current_node->next;
+          current_node=current_node->next;
+        } 
       }
     }
-  }
   return NULL;
 }
 
@@ -190,11 +190,16 @@ void destroy_hash_table(HashTable *ht)
 HashTable *hash_table_resize(HashTable *ht)
 {
   HashTable *new_ht=create_hash_table(ht->capacity*2);
-  new_ht->storage=realloc(ht->storage,sizeof(ht->storage)*2);
-  for (int i=ht->capacity; i<new_ht->capacity; i++) {
-    new_ht->storage[i]=NULL;
+  for (int i=0; i<ht->capacity; i++) {
+    LinkedPair *current_node=ht->storage[i];
+    if (current_node!=NULL) {
+      while (current_node!=NULL) {
+        hash_table_insert(new_ht,current_node->key,current_node->value);
+        current_node=current_node->next;
+      }
+    }
   }
-  free(ht);
+  destroy_hash_table(ht);
   return new_ht;
 }
 
@@ -217,7 +222,9 @@ int main(void)
   int new_capacity = ht->capacity;
 
   printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
-
+  printf("%s", hash_table_retrieve(ht, "line_1"));
+  printf("%s", hash_table_retrieve(ht, "line_2"));
+  printf("%s", hash_table_retrieve(ht, "line_3"));
   destroy_hash_table(ht);
 
   return 0;
