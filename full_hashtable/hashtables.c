@@ -66,7 +66,10 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -82,7 +85,27 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  LinkedPair *pair = create_pair(key, value);
 
+  unsigned int index = hash(key, ht->capacity);
+
+  if (ht->storage[index] == NULL) {
+    ht->storage[index] = pair;
+  } else if (ht->storage[index]->key = key) {
+    ht->storage[index] = pair;
+  } else { 
+    LinkedPair *temp = ht->storage[index];
+    while (temp->next != NULL) {
+      if (temp->next->key = key){
+        pair->next = temp->next->next; //pair.next points to next node in LL
+        destroy_pair(temp->next); //destroy old node
+        temp->next = pair; //move pointer to new node
+        return;
+      }
+      temp = temp->next;
+    }
+    temp->next = pair;
+  }
 }
 
 /****

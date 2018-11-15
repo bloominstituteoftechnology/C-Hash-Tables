@@ -25,7 +25,7 @@ typedef struct BasicHashTable {
 Pair *create_pair(char *key, char *value)
 {
   Pair *pair = malloc(sizeof(Pair));
-  pair->key = key;
+  pair->key = key;  // Why don't we have to free storage for key and value??
   pair->value = value;
 
   return pair;
@@ -125,10 +125,8 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 
   if (ht->storage[index] != NULL) {
     return ht->storage[index]->value;
-  } else {
-    printf("ERROR: Key not found\n");
-    return NULL;
   }
+    return NULL;
   
 }
 
