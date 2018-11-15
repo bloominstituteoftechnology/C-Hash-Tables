@@ -84,8 +84,30 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  //create and hash, storage that accesses the has, and
+  //create a pair. All of these are pointers.
 
-}
+  unsigned int index = hash(key, ht->capacity);
+  LinkedPair *stored = ht->storage[index];
+  LinkedPair *new_pair = create_pair(key, value);
+  //check to see is there is anything in the hash
+  if(stored == NULL){
+    //if nothing exists set the hash to new_pair.
+    ht->storage[index] = new_pair;
+    //set up a else where a linked list is created.
+  }else{
+    //if the hash does have items then they will need a
+    // collision preventor. LinkedPair enables the items 
+    //with similar index's to be linked together.
+    LinkedPair *linked = ht->storage[index];
+    //run a while loop that will link the items together
+    while(linked != NULL){
+      linked = linked->next;
+    }
+    linked->next = new_pair;
+    }
+  }
+
 
 /****
   Fill this in.
