@@ -89,7 +89,9 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   Pair *newPair = create_pair(key, value);
   unsigned int newHash = hash(key, ht->capacity);
   if (ht->storage[newHash] != NULL) {
-    printf("Value already exists, overwriting old value...");
+    if (strcmp(ht->storage[newHash]->key, key) != 0){
+      printf("Collision occured, overwriting old pair...\n");
+    }
     destroy_pair(ht->storage[newHash]);
   }
 
@@ -158,6 +160,15 @@ int main(void)
   }
 
   destroy_hash_table(ht);
+
+  struct BasicHashTable *ht2 = create_hash_table(1);
+  hash_table_insert(ht, "line1", "Test Line 1...\n");
+  printf("%s", hash_table_retrieve(ht2, "line1"));
+
+  hash_table_insert(ht2, "line2", "Test Line 2...\n");
+  printf("%s", hash_table_retrieve(ht2, "line2"));
+
+  destroy_hash_table(ht2);
 
   return 0;
 }
