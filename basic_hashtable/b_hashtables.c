@@ -68,7 +68,7 @@ BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(Pair));
+  ht->storage = calloc(capacity, sizeof(Pair *));
   return ht;
 }
 
@@ -128,6 +128,7 @@ void destroy_hash_table(BasicHashTable *ht)
   for(int i = 0; i < ht->capacity; i++) {
     free(ht->storage[i]);
   }
+  free(ht);
 }
 
 
