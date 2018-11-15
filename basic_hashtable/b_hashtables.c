@@ -102,9 +102,9 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
     // Pair *stored_pair = ht->storage[index];
     // if (stored_pair != NULL) 
     // {
-      //if (strcmp(key, key ) != 0) {do linked list shit}
+      //if (strcmp(key, key ) != 0) {do linked list stuff}
     // }
-    // destorypairs(sotoredpaid)
+    // destorypairs(stored_pair)
     // }
     // ht->storage[index]  = create_pair(key, value);
 
