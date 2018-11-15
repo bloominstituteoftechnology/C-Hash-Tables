@@ -121,7 +121,11 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  // First, use hash function with key to find index at which key would be located
+  // While the linked list pair is not NULL, loop through each item and do a string compare for each one
+  // Save previous linked list item
+  // if key is found set the next pair to the previous pair -> next 
+  // then destroy the pair 
 }
 
 /****
