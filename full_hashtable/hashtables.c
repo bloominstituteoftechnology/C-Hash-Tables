@@ -154,6 +154,7 @@ void hash_table_remove(HashTable *ht, char *key)
 
   Return NULL if the key is not found.
  ****/
+
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
   int hashIndex = hash(key, ht-> capacity); 
@@ -186,6 +187,14 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  LinkedPair *previous = NULL; 
+  for(int y = 0; y < ht->capacity; y++ ){
+    while(ht->storage[y]->next){
+      previous = ht->storage[y]; 
+      ht->storage[y] = ht->storage[y]->next; 
+      destroy_pair(previous); 
+    }
+  }
 
 }
 
