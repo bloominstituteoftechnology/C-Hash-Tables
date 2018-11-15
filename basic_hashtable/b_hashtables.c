@@ -107,6 +107,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
   hashKey = hash(key, ht->capacity);
   printf("hash_table_remove: hashKey = %d\n\n", hashKey);
   ht->storage[hash(key, ht->capacity)] = NULL;
+
 }
 
 /****
