@@ -131,7 +131,6 @@ void hash_table_remove(HashTable *ht, char *key)
       }
     }
   }
-  return;
 }
 
 /****

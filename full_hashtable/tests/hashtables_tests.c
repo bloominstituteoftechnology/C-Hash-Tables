@@ -108,7 +108,7 @@ char *basic_hash_table_test()
     return NULL;
 }
 
-/*char *hash_table_resizing_test() {
+char *hash_table_resizing_test() {
     struct HashTable *ht = create_hash_table(8);
 
     hash_table_insert(ht, "resize-key-0", "resize-val-0");
@@ -149,7 +149,7 @@ char *basic_hash_table_test()
     mu_assert(strcmp(return_value, "resize-val-9") == 0, "Resized hash table did not copy values correctly");
 
     return NULL;
-}*/
+}
 
 
 
