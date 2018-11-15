@@ -64,10 +64,18 @@ unsigned int hash(char *str, int max)
   All values in storage should be initialized to NULL
   (hint: look up `calloc`)
  ****/
+/*
+create_hash_table(3);
+*/
 BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
 
+// ht->storage[hash] = {key: value}
+// storage = [ NULL, NULL, NULL]
+// capacity = sizeof(Pair)
+  ht->capacity = capacity; //indices in an array // value == 3
+  ht->storage = calloc(capacity, sizeof(Pair *)); //this size of struct 
   return ht;
 }
 
@@ -80,6 +88,12 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  if(key != ht->storage[hash(key, capacity)]){
+
+  };
+  
+  int hashkey = hash(key, 10);
+  ht->storage[hashkey] = 
 
 }
 
