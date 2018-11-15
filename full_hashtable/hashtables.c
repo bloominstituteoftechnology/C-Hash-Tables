@@ -66,7 +66,11 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
+
+  ht->capacity = capacity; 
 
   return ht;
 }
@@ -82,7 +86,19 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  unsigned int hashKey = hash(key, ht->capacity);
+  
+  if(ht->storage[hashKey] != NULL) {
+      printf("Warning: You are linking due to collision.\n");
+      while(ht->storage[hashKey]->next != NULL) {
+        LinkedPair *nextNode = ht->storage[hashKey]->next;
+          if(nextNode->next == NULL) {
+            nextNode->next = create_pair(key, value);
+          }
+      }
+    } else {
+      ht->storage[hashKey] = create_pair(key, value);
+    }
 }
 
 /****
@@ -95,7 +111,15 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int hashKey = hash(key, ht->capacity);
 
+  if (ht->storage[hashKey] != NULL) {
+    if (ht->storage[hashKey]->key == key){
+      destroy_pair(ht->storage[hashKey]);
+      
+      ht->storage[hashKey]=NULL;
+    }
+  }
 }
 
 /****
@@ -108,6 +132,14 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int hashCapacity = ht->capacity;
+  unsigned int hashKey = hash(key, hashCapacity);
+
+  if (ht->storage[hashKey] != NULL) {
+    if (ht->storage[hashKey]->key == key){
+      return ht->storage[hashKey]->value;
+    }
+  }
   return NULL;
 }
 
@@ -118,7 +150,12 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for(int i = 0; i < ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
 
+  free(ht->storage);
+  free(ht);
 }
 
 /****
@@ -131,7 +168,11 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = malloc(sizeof(HashTable));
+
+  new_ht->storage = calloc(ht->capacity * 2, sizeof(LinkedPair *));
+
+  new_ht->capacity = ht->capacity * 2; 
 
   return new_ht;
 }
