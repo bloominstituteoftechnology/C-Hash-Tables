@@ -67,7 +67,9 @@ unsigned int hash(char *str, int max)
 HashTable *create_hash_table(int capacity)
 {
   HashTable *ht;
-
+ ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity; 
+  ht->storage = calloc(capacity, sizeof(Pair *));
   return ht;
 }
 
@@ -82,7 +84,16 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+int index = hash(key, ht->capacity);
+if (ht->storage[index] != NULL)
+{
+      printf("That spot is already taken!");
+       ht->storage[index] = create_pair(key, value);
+    } 
+    else 
+    {
+      ht->storage[index] = create_pair(key, value);
+}
 }
 
 /****
@@ -95,7 +106,16 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+ int index = hash(key, ht->capacity);
 
+ if (ht->storage[index] != NULL) {
+   free(ht->storage[index]);
+   ht->storage[index] = NULL;
+ }
+ else 
+ {
+   printf("That pair does not exist.");
+ }
 }
 
 /****
@@ -108,7 +128,15 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+   int index = hash(key, ht->capacity);
+   if (ht->storage[index] != NULL)  
+    {
+      printf("this is a label: %s\n" ,ht->storage[index]->value);
+      return ht->storage[index]->value;
+    } 
+    else {
   return NULL;
+}
 }
 
 /****
@@ -118,7 +146,9 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  if (ht->storage[index] != NULL) {
+    for(int i = 0, i < ht->capacity, i++) {
+    free(ht->storage);
 }
 
 /****
