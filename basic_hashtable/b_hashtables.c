@@ -82,7 +82,6 @@ BasicHashTable *create_hash_table(int capacity)
 
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
   //create a key value pair using create_pair
   Pair *pair = create_pair(key, value);
   //use the hash function to create a result
@@ -97,7 +96,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   }
   else {
     destroy_pair(stored_pair);
-  }
+    }
   }
   ht->storage[result] = pair;
 }
@@ -150,7 +149,6 @@ void destroy_hash_table(BasicHashTable *ht)
   free(ht->storage);
   free(ht);
 }
-
 
 #ifndef TESTING
 int main(void)
