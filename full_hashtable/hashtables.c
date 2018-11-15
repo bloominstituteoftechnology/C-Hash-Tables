@@ -156,8 +156,28 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int hashIndex = hash(key, ht-> capacity); 
+  LinkedPair *linked_node = ht-> storage[hashIndex]; 
+  if(linked_node == NULL){
+    return NULL; 
+  }else{
+    while(linked_node != NULL){
+      if(linked_node-> key != key){
+        linked_node = linked_node-> next; 
+      }else{
+        return linked_node-> value; 
+      }
+    }
+  }
   return NULL;
 }
+
+// Implementation similar to the delete, should return key 
+// First, use hash function with key to find index at which key would be located
+// While the linked list pair is not NULL, loop through each item and do a string compare for each one
+// If key is found, then return. Otherwise return NULL
+
+
 
 /****
   Fill this in.
@@ -196,7 +216,7 @@ int main(void)
   hash_table_insert(ht, "line_4", "This should get interesting!\n"); 
   hash_table_insert(ht, "line_5", "Testing to make sure linked list is properly working!\n"); 
 
-  hash_table_remove(ht, "line_3"); 
+  hash_table_remove(ht, "line_4"); 
 
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
