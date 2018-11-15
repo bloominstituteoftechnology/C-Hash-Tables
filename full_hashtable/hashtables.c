@@ -87,17 +87,22 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   
   int hashIndex = hash(key, ht->capacity); 
   LinkedPair *linked_node = ht->storage[hashIndex]; 
-  printf("%s", linked_node); 
   if(linked_node == NULL){
-    printf("linked node created %s %s", key, value); 
+    printf("linked node created in head Index: %d \n", hashIndex); 
     linked_node = create_pair(key, value); 
+    ht->storage[hashIndex] = linked_node; 
   }else{
+    int count = 1; 
     while(linked_node != NULL){
       if(linked_node->next != NULL){
+        count += 1; 
         linked_node = linked_node-> next;
+      }else{
+        break; 
       }
     }
-    printf("linked node created"); 
+    printf("Count %d \n", count); 
+    printf("linked node created in tail Index: %d \n", hashIndex); 
     linked_node-> next = create_pair(key, value); 
   }
 }
@@ -166,6 +171,8 @@ int main(void)
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
+  hash_table_insert(ht, "line_4", "This should get interesting!\n"); 
+  hash_table_insert(ht, "line_5", "Testing to make sure linked list is properly working!\n"); 
 
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
