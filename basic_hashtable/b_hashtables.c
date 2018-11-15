@@ -66,10 +66,16 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-  for(int i=0; i<capacity; i++){
-    ht->storage[i] = NULL;
-  }
+  printf("Inside create hT\n");
+  printf("cap >>>>> %d\n", capacity);
+  BasicHashTable *ht = NULL;
+  ht = malloc(sizeof(BasicHashTable));
+  ht->storage = (Pair *)calloc(capacity, sizeof(Pair));
+  ht->capacity = capacity;
+  // for(int i=0; i < ht->capacity; i++){
+  //   ht->storage[i] = NULL;
+  // }
+  
   return ht;
 }
 
@@ -82,10 +88,11 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  printf("cap >>>>> %d", ht->capacity);
   int hashed = hash(key, ht->capacity);
-  int i = 0;
   while (ht->storage[hashed] != NULL){
-    hashed = (hashed + 1) & ht->capacity;
+    printf("index >> %d", hashed);
+    hashed = (hashed + 1) % ht->capacity;
   }
   if (ht->storage[hashed] != NULL) {
     printf("The value of %s is being overwritten\n", key);
@@ -146,25 +153,26 @@ void destroy_hash_table(BasicHashTable *ht)
 }
 
 
-#ifndef TESTING
+// #ifndef TESTING
 int main(void)
 {
+  // printf("WHAT????????\n");
   struct BasicHashTable *ht = create_hash_table(16);
+  printf("Capacity >>>>>> %d", ht->capacity);
+  // hash_table_insert(ht, "line", "Here today...\n");
 
-  hash_table_insert(ht, "line", "Here today...\n");
+  // printf("%s", hash_table_retrieve(ht, "line"));
 
-  printf("%s", hash_table_retrieve(ht, "line"));
+  // hash_table_remove(ht, "line");
 
-  hash_table_remove(ht, "line");
+  // if (hash_table_retrieve(ht, "line") == NULL) {
+  //   printf("...gone tomorrow. (success)\n");
+  // } else {
+  //   fprintf(stderr, "ERROR: STILL HERE\n");
+  // }
 
-  if (hash_table_retrieve(ht, "line") == NULL) {
-    printf("...gone tomorrow. (success)\n");
-  } else {
-    fprintf(stderr, "ERROR: STILL HERE\n");
-  }
-
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
 
   return 0;
 }
-#endif
+// #endif
