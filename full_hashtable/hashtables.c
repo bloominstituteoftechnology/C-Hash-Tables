@@ -189,8 +189,10 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-
+  HashTable *new_ht=malloc(sizeof(HashTable));
+  new_ht->capacity=ht->capacity*2;
+  ht->storage=realloc(ht->storage,new_ht->capacity*sizeof(LinkedPair *));
+  destroy_hash_table(ht);
   return new_ht;
 }
 
@@ -213,7 +215,7 @@ int main(void)
   int new_capacity = ht->capacity;
 
   printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
-  
+
   destroy_hash_table(ht);
 
   return 0;
