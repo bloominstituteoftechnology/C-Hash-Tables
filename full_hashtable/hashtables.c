@@ -66,8 +66,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair));
   return ht;
 }
 
@@ -82,7 +83,28 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int hashvalue = hash(key,ht->capacity);
+  LinkedPair *compareval = ht->storage[hashvalue];
 
+  if(compareval == 0){
+    compareval = create_pair(key,value);
+    return;
+  };
+  if(strcmp(compareval->key, key) == 0){
+    compareval->value = value;
+  }
+  else{
+    LinkedPair *nextup =  compareval->next;
+    while(nextup != NULL){
+      if(strcmp(nextup->key, key) == 0){
+        nextup->value = value;
+        return;
+      }   
+      nextup = nextup->next;
+    }
+    nextup->next = create_pair(key,value);
+  }
+  
 }
 
 /****
@@ -95,7 +117,38 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int hashvalue = hash(key,ht->capacity);
+  LinkedPair *compareval = ht->storage[hashvalue];
 
+  if(compareval == 0){
+    printf("This key doesn't excist");
+  };
+  if(strcmp(compareval->key, key) == 0){
+    if(compareval->next != NULL){
+      LinkedPair *temp = compareval->next;
+      destroy_pair(compareval);
+      compareval = temp; 
+    }
+    else{
+      destroy_pair(compareval);
+      compareval = 0;
+    }
+  }
+  else{
+    LinkedPair *nextup =  compareval->next;
+    LinkedPair *prev;
+    while(nextup != NULL){
+      
+      if(strcmp(nextup->key, key) == 0){
+        LinkedPair *temp = nextup->next;
+        destroy_pair(nextup);
+        nextup = temp;
+        prev->next = nextup; 
+      }
+      prev = nextup;
+      nextup = nextup->next;
+    }
+  }
 }
 
 /****
@@ -108,6 +161,22 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int hashvalue = hash(key,ht->capacity);
+  LinkedPair *compareval = ht->storage[hashvalue];
+  
+  if(strcmp(compareval->key, key) == 0){
+    return compareval->value;
+  }
+  LinkedPair *nextup =  compareval->next;
+  while(nextup != NULL){
+     if(strcmp(nextup->key, key) == 0){
+       return nextup->value;
+     }
+     else{
+       nextup = nextup->next;
+     }
+  }
+
   return NULL;
 }
 
@@ -118,8 +187,22 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
-}
+   for(int i = 0; i < ht->capacity; i++)
+  {
+    if(ht->storage != 0){
+      LinkedPair *nextup =  ht->storage[i]->next;
+      while(nextup != NULL){
+        LinkedPair *temp = nextup->next;
+        destroy_pair(nextup); 
+        nextup = temp;
+      
+    };
+    destroy_pair(ht->storage[i]);
+  };
+  if(ht != 0){
+    free(ht);
+  };
+}}
 
 /****
   Fill this in.
@@ -131,8 +214,18 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-
+  HashTable *new_ht = calloc((ht->capacity * 2), sizeof(LinkedPair));
+  for(int i = 0; i < ht->capacity; i++){
+    if(ht->storage[i] != 0){
+      hash_table_insert(new_ht,ht->storage[i]->key,ht->storage[i]->value);
+      LinkedPair *nextup =  ht->storage[i]->next;
+      while(nextup != NULL){
+        hash_table_insert(new_ht,nextup->key,nextup->value);
+        nextup=nextup->next;
+      }
+    }
+  }
+  destroy_hash_table(ht);
   return new_ht;
 }
 
