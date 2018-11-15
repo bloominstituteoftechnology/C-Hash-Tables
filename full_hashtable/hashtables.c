@@ -66,6 +66,7 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
+  //very similar to the basic hash table set up.
   HashTable *ht = malloc(sizeof(HashTable));
   ht->capacity = capacity;
   ht->storage = calloc(capacity, sizeof(LinkedPair *));
@@ -119,7 +120,13 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+  LinkedPair *stored = ht->storage[index];
 
+  if(stored != NULL){
+    destroy_pair(stored);
+    stored = NULL;
+  }
 }
 
 /****
@@ -142,7 +149,11 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
