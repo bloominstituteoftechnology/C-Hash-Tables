@@ -82,12 +82,13 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  if (ht->storage[hash(key,ht->capacity)]!=NULL) {
+  int hashed=hash(key,ht->capacity);
+  if (ht->storage[hashed]!=NULL) {
     printf("Warning you are overwriting a value.\n");
-    destroy_pair(ht->storage[hash(key,ht->capacity)]);
-    ht->storage[hash(key,ht->capacity)]=create_pair(key,value);
+    destroy_pair(ht->storage[hashed]);
+    ht->storage[hashed]=create_pair(key,value);
   } else {
-    ht->storage[hash(key,ht->capacity)]=create_pair(key,value);
+    ht->storage[hashed]=create_pair(key,value);
   }
 }
 /****
@@ -97,10 +98,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  if (ht->storage[hash(key,ht->capacity)]!=NULL) {
-    if (ht->storage[hash(key,ht->capacity)]->key==key){
-      destroy_pair(ht->storage[hash(key,ht->capacity)]);
-      ht->storage[hash(key,ht->capacity)]=NULL;
+  int hashed=hash(key,ht->capacity);
+  if (ht->storage[hashed]!=NULL) {
+    if (ht->storage[hashed]->key==key){
+      destroy_pair(ht->storage[hashed]);
+      ht->storage[hashed]=NULL;
     }
   }
 }
@@ -112,9 +114,10 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  if (ht->storage[hash(key,ht->capacity)]!=NULL) {
-    if (ht->storage[hash(key,ht->capacity)]->key==key){
-      return ht->storage[hash(key,ht->capacity)]->value;
+  int hashed=hash(key,ht->capacity);
+  if (ht->storage[hashed]!=NULL) {
+    if (ht->storage[hashed]->key==key){
+      return ht->storage[hashed]->value;
     }
   }
   return NULL;
