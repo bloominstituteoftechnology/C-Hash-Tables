@@ -123,10 +123,10 @@ char *hash_table_resizing_test() {
     hash_table_insert(ht, "resize-key-9", "resize-val-9");
 
     ht = hash_table_resize(ht);
-    char *return_value = hash_table_retrieve(ht, "resize-key");
+
 
     mu_assert(ht->capacity == 16, "Resized hash table did not double capacity");
-
+    char *return_value = hash_table_retrieve(ht, "resize-key");
     return_value = hash_table_retrieve(ht, "resize-key-0");
     mu_assert(strcmp(return_value, "resize-val-0") == 0, "Resized hash table did not copy values correctly");
     return_value = hash_table_retrieve(ht, "resize-key-1");
@@ -159,7 +159,7 @@ char *all_tests()
     mu_suite_start();
 
     mu_run_test(basic_hash_table_test);
-    
+    mu_run_test(hash_table_resizing_test);
     return NULL;
 }
 
