@@ -68,7 +68,7 @@ BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(Pair));
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -80,13 +80,18 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  Pair *pair = create_pair(key, value);
-  ht->storage[hash(key, ht->capacity)] = pair;
+  unsigned int index = hash(key, ht->capacity);
 
-  // if (pair != NULL) {
-  //   perror("WARNING: Existing value being overwritten. \n");
-  //   free(ht);
-  // }
+  Pair *stored_pair = ht->storage[index];
+  if(stored_pair == NULL) {
+    ht->storage[index] = create_pair(key, value);
+  } else {
+    if (strcmp(key, stored_pair->key) != 0) {
+      perror("WARNING: Hash Table Collision. \n");
+    }
+    destroy_pair(stored_pair);
+    ht->storage[index] = create_pair(key, value);
+  }
 }
 
 /****
@@ -96,8 +101,17 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  destroy_pair(ht->storage[hash(key, ht->capacity)]);
-  ht->storage[hash(key, ht->capacity)] = NULL;
+  unsigned int index = hash(key, ht->capacity);
+
+  Pair *stored_pair = ht->storage[index];
+
+  if (stored_pair != NULL) {
+    destroy_pair(stored_pair);
+    free(ht->storage);
+    ht->storage[index] = NULL;
+  } else {
+    perror("ERROR: There is nothing stored. \n");
+  }
 }
 
 /****
@@ -123,10 +137,9 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 void destroy_hash_table(BasicHashTable *ht)
 {
   for (int i = 0; i < ht->capacity; i++) {
-    if (ht->storage[i] != NULL) {
-      free(ht->storage[i]);
-    }
+    destroy_pair(ht->storage[i]);
   }
+  free(ht->storage);
   free(ht);
 }
 
