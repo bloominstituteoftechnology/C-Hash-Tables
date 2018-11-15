@@ -202,7 +202,24 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  // get hash 
+  unsigned int hash_index = hash(key, ht->capacity);
+
+  //check if null else start loop 
+
+  LinkedPair *current = NULL;
+  char *value = NULL; 
+  if(ht->storage[hash_index] == NULL){
+    // printf("ERROR: key does not exsit");
+    return value; 
+  } else {
+    while(strcmp(current->key, key) != 0 && current->next != NULL){
+      current = current->next; 
+    }
+    value = current->value; 
+  }
+
+  return value; 
 }
 
 /****
