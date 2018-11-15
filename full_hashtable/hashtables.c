@@ -198,7 +198,13 @@ HashTable *hash_table_resize(HashTable *ht)
 
   new_ht->storage = calloc(ht->capacity * 2, sizeof(LinkedPair *));
 
-  new_ht->capacity = ht->capacity * 2; 
+  new_ht->capacity = ht->capacity * 2;
+
+  for(int i = 0; i < ht->capacity; i++){
+    hash_table_insert(new_ht, ht->storage[i]->key, ht->storage[i]->value);
+  }
+
+  destroy_hash_table(ht);
 
   return new_ht;
 }
