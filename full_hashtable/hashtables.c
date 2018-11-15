@@ -84,8 +84,23 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-  LinkedPair *linkedPair = create_pair(key, value); 
+  
   int hashIndex = hash(key, ht->capacity); 
+  LinkedPair *linked_node = ht->storage[hashIndex]; 
+  printf("%s", linked_node); 
+  if(linked_node == NULL){
+    printf("linked node created %s %s", key, value); 
+    linked_node = create_pair(key, value); 
+  }else{
+    while(linked_node != NULL){
+      if(linked_node->next != NULL){
+        linked_node = linked_node-> next;
+      }
+    }
+    printf("linked node created"); 
+    linked_node-> next = create_pair(key, value); 
+  }
+}
   // if the storage at the hash index is NULL, then the pair can go into the linked list, resembling both the head and tail which points to NULL
   // if the storage at the hash index is not NULL, then need to loop through each item, check if the next is NULL
   // if next is not NULL then move to the next linked list pair
