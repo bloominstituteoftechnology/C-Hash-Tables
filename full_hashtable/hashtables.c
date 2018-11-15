@@ -92,6 +92,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   } else {
     while (pair) {
       if(!strcmp(pair->key, key)) {
+        free(pair->value);
         pair->value = strdup(value);
         return;
       }
@@ -130,6 +131,7 @@ void hash_table_remove(HashTable *ht, char *key)
   if(pair) {
     prev->next = pair->next;
   }
+  destroy_pair(pair);
 }
 
 /****
