@@ -96,6 +96,18 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 
   //insert pair at hash index
   ht->storage[hashIndex] = pair;
+
+  //BRADY SOLUTION
+    // unsigned int index = hash(key, ht->capacity);
+    // Pair *stored_pair = ht->storage[index];
+    // if (stored_pair != NULL) 
+    // {
+      //if (strcmp(key, key ) != 0) {do linked list shit}
+    // }
+    // destorypairs(sotoredpaid)
+    // }
+    // ht->storage[index]  = create_pair(key, value);
+
 }
 
 /****

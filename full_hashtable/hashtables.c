@@ -66,7 +66,10 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -82,7 +85,10 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+//while (linkedpaid->next != Null)
+//{ linkedpaid = linkedpair ->next }
+//if strcmp(linkedpaid->key, jey) == 0
+//{}
 }
 
 /****
@@ -95,7 +101,9 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+//store the parent bc you need to delete it
+//linkedpairparent->next = linkedpair->next
+//destroypair(linkedpair)
 }
 
 /****
