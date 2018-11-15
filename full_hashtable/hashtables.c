@@ -66,7 +66,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -82,6 +84,27 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  // take code from basic hashtables and copy it over 
+  // change all structs change pairs to linked pairs
+  // linked list operations
+  LinkedPair *pair = create_pair(key, value);
+  current_pair *pair;
+  int hasassigned = 0;
+  if (ht->storage[hash(key, ht->capacity)] != NULL) {
+    current_pair = ht->storage[hash(key, ht->capacity);
+    while (current_pair->next != NULL) {
+      if (strcmp(current_pair->key, key) == 0) {
+        current_pair = pair;
+        hasassigned = 1;
+      }
+      current_pair = current_pair->next;
+    }
+    if (hasassigned == 0) {
+      current_pair->next = pair;
+    }
+  } else {
+  ht->storage[hash(key, ht->capacity)] = pair;
+}
 
 }
 
@@ -95,6 +118,18 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  LinkedPair *pair = create_pair(key, NULL);
+  current_pair *pair;
+  for ( int i = 0; i < ht->capacity ; i++) {
+    current_pair = ht->storage[i];
+    while (current_pair->next != NULL) {
+      if (strcmp(current_pair->key , key) == 0) {
+      current_pair = pair;
+      }
+      current_pair = current_pair->next;
+    }
+  }
+
 
 }
 
@@ -108,8 +143,19 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  current_pair *pair;
+  for ( int i = 0; i < ht->capacity ; i++) {
+    current_pair = ht->storage[i];
+    while (current_pair->next != NULL) {
+      if (strcmp(current_pair->key , key) == 0) {
+      return current_pair->value;
+      }
+      current_pair = current_pair->next;
+    }
+  }
   return NULL;
 }
+
 
 /****
   Fill this in.
@@ -118,6 +164,11 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++) {
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->storage);
+  free(ht);
 
 }
 
@@ -131,7 +182,18 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = malloc(sizeof(HashTable));
+  new_ht->capacity = ht->capacity * 2;
+  new_ht->storage = calloc(new_ht->capacity, sizeof(LinkedPair *));
+  current_pair *pair;
+  for ( int i = 0; i < ht->capacity ; i++) {
+    current_pair = ht->storage[i];
+    while (current_pair->next != NULL) {
+      hash_table_insert(new_ht, current_pair->key, current_pair->value);
+      current_pair = current_pair->next;
+    }
+  }
+
 
   return new_ht;
 }
