@@ -136,7 +136,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   //NOT DOING ALL OF THIS YET! I'm trying to see if the key we are passing the insert is the same as the key in the basicHashtable @ that index so I was trying to 
   //hash the new key because it's the same number which would give you the same index so you would know which key to compare it with.
   // Gimme a minute. You can come into the zoom if I take forever
-    int index = hash(ht[key], capacity);  // before you continue on this, make sure BasicHashTable is done
+    int index = hash(key, ht->capacity);  // before you continue on this, make sure BasicHashTable is done
     // R: what's the ht[] around the hash function call doing? the not anything I want it to be doing
     // R: Ok sweet. hash returns an int, which you're saving into an int variable "index"
     if (ht->storage[index] != NULL) // <- where's your array in the `ht` structure? Yessir this is looking less foreign 
@@ -162,7 +162,15 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+ int index = hash(key, ht->capacity);
 
+ if (ht->storage[index] != NULL) {
+   ht->storage->key = NULL;
+   ht->storage->value = NULL;
+   free(ht->storage);
+ } else {
+   printf("that pair does not exsist");
+ }
 }
 
 /****
@@ -170,9 +178,26 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 
   Should return NULL if the key is not found.
  ****/
-char *hash_table_retrieve(BasicHashTable *ht, char *key)
+char *hash_table_retrieve(BasicHashTable *ht, char *key) // you're given the string key to look for already up here
 {
-  return NULL;
+  int index = hash(key, ht->capacity);
+
+  // a hash converts a string key to a number. you should therefore be passing a string 
+  //okay yeah because the key is getting passed in and that's all we have to search by is the hash of they key. I started to over think it. :+1:
+  // is it ht[key] or ht->storage[key]? I know that's an array of pointers though so maybe it won't expect an int ht[key] is
+  if (ht->storage[index] != NULL)  
+    {
+      printf("this is a label: %s\n" ,ht->storage[index]->value);
+      return ht->storage[index]->value; // it's not that easy is it? because I mean value is in pair in storage but idk if these arrows work like this. 
+      //but then again storage is a array of pointers of pairs so maybe it's just storage[index]-> value
+      // if ht->storage[index] isn't NULL, it should already be a pair struct, right? because that's what you insert at each index
+      // e.g. you don't need ->pair. ht->storage[index] is already a pair but would ht->storage[index]->value grab what I want? which is the value 
+    } 
+  else 
+  {
+    return NULL;
+  }
+    
 }
 
 /****
@@ -182,7 +207,10 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+if (ht != NULL) {
+  free(ht->storage);
+  free(ht);
+} 
 }
 
 
