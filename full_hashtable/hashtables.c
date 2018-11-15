@@ -90,15 +90,22 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   
   if(ht->storage[hashKey] != NULL) {
       printf("Warning: You are linking due to collision.\n");
-      while(ht->storage[hashKey]->next != NULL) {
-        LinkedPair *nextNode = ht->storage[hashKey]->next;
-          if(nextNode->next == NULL) {
-            nextNode->next = create_pair(key, value);
+      if(ht->storage[hashKey]->next == NULL) {
+        ht->storage[hashKey]->next = create_pair(key, value);
+      } else {
+          LinkedPair *currentNode = ht->storage[hashKey];  
+          LinkedPair *nextNode = ht->storage[hashKey]->next; 
+          while(currentNode->next != NULL) {
+            currentNode = nextNode; 
+            if(currentNode->next == NULL) {
+              currentNode->next = create_pair(key, value);
+              break;
+            }
           }
-      }
+        }
     } else {
-      ht->storage[hashKey] = create_pair(key, value);
-    }
+        ht->storage[hashKey] = create_pair(key, value);
+      }
 }
 
 /****
