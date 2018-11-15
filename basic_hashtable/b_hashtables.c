@@ -82,10 +82,10 @@ BasicHashTable *create_hash_table(int capacity)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void /*<- This mean this returns nothing */ hash_table_insert(BasicHashTable *ht, char *key, char *value)
+void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
 
-  int hashkey = hash(key, 10); 
+  int hashkey = hash(key, ht->capacity); 
   Pair *pair = create_pair(key, value); 
   ht->storage[hashkey] = pair;
 
@@ -98,7 +98,12 @@ void /*<- This mean this returns nothing */ hash_table_insert(BasicHashTable *ht
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  if(ht != NULL) free(ht);
+  if(ht->storage[hash(key, ht->capacity)] != NULL ) {
+    free(ht->storage[hash(key, ht->capacity)]);
+    
+    ht->storage[hash(key, ht->capacity)] = NULL;
+  } 
+
 }
 
 /****

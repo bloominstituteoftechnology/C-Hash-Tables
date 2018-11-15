@@ -10,6 +10,7 @@ typedef struct LinkedPair {
   char *key;
   char *value;
   struct LinkedPair *next;
+  int *length;
 } LinkedPair;
 
 /****
@@ -29,6 +30,7 @@ LinkedPair *create_pair(char *key, char *value)
   pair->key = key;
   pair->value = value;
   pair->next = NULL;
+  pair->length = 0;
   return pair;
 }
 
@@ -66,7 +68,6 @@ unsigned int hash(char *str, int max)
 HashTable *create_hash_table(int capacity)
 {
   HashTable *ht = malloc(sizeof(HashTable));
-  ht->storage = NULL; 
   return ht;
 }
 
