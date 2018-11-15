@@ -98,7 +98,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   int ind = hash(key, ht->capacity);
-  ht->storage[ind] = NULL;
+  if (ht->storage[ind] != 0) {
+    ht->storage[ind] = NULL;
+  } else {
+    printf("That key doesn't exist!\n");
+  }
 }
 
 /****
@@ -125,6 +129,7 @@ void destroy_hash_table(BasicHashTable *ht)
   for (int i = 0; i < ht->capacity; i++) {
     destroy_pair(ht->storage[i]);
   }
+  free(ht->storage);
   free(ht);
 }
 
@@ -137,6 +142,7 @@ int main(void)
   hash_table_insert(ht, "line", "Here today...\n");
 
   printf("%s", hash_table_retrieve(ht, "line"));
+  hash_table_remove(ht, "liner");
 
   hash_table_remove(ht, "line");
 
