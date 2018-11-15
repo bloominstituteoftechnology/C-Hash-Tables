@@ -132,7 +132,6 @@ void destroy_hash_table(BasicHashTable *ht)
   for(int i = 0; i < ht->capacity; i++){
     destroy_pair(ht->storage[i]);
   }
-  free(ht->capacity);
   free(ht->storage);
   free(ht);
 }
