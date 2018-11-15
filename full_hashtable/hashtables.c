@@ -86,8 +86,10 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   LinkedPair *linkedPair = create_pair(key, value); 
   int hashIndex = hash(key, ht->capacity); 
-  
-}
+  // if the storage at the hash index is NULL, then the pair can go into the linked list, resembling both the head and tail which points to NULL
+  // if the storage at the hash index is not NULL, then need to loop through each item, check if the next is NULL
+  // if next is not NULL then move to the next linked list pair
+  // when next is NULL, set the linked pair to the next linked list value. 
 
 /****
   Fill this in.
