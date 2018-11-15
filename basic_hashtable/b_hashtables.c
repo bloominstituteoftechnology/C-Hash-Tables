@@ -82,13 +82,14 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  int hashed_key;
-  Pair *pair = create_pair(key, value);
-  hashed_key = hash(key, ht->capacity);
+  // int hashed_key;
+  // Pair *pair = create_pair(key, value);
+  unsigned int hashed_key = hash(key, ht->capacity);
   if (ht->storage[hashed_key] != NULL) {
     printf("Warning, you have overwritten a previous value \n");
+    destroy_pair(ht->storage[hashed_key]);
   }
-  ht->storage[hashed_key] = pair;
+  ht->storage[hashed_key] = create_pair(key, value);
 }
 
 /****
@@ -99,8 +100,6 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   int index = hash(key, ht->capacity);
-  // Pair *pair = create_pair(NULL, NULL);
-  // ht->storage[index] = pair;
   destroy_pair(ht->storage[index]);
   ht->storage[index] = NULL;
 }
@@ -113,6 +112,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
   int index = hash(key, ht->capacity);
+  
   if (ht->storage[index] == NULL) {
     printf("Your key opens nothing here...\n");
     return NULL;
@@ -134,7 +134,7 @@ void destroy_hash_table(BasicHashTable *ht)
   destroy_pair(ht->storage[i]);
   }
   // Free state machine
-  // free(ht->storage);
+  free(ht->storage);
   free(ht);
 }
 
