@@ -84,18 +84,19 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-  // take code from basic hashtables and copy it over 
-  // change all structs change pairs to linked pairs
-  // linked list operations
   LinkedPair *pair = create_pair(key, value);
-  current_pair *pair;
+  LinkedPair *current_pair;
+  unsigned int index = hash(key, ht->capacity);
+  printf("Index to insert into: %d\n", index);
   int hasassigned = 0;
-  if (ht->storage[hash(key, ht->capacity)] != NULL) {
-    current_pair = ht->storage[hash(key, ht->capacity);
+  if (ht->storage[index] != NULL) {
+    current_pair = ht->storage[index];
+    printf("%s\n", current_pair->key);
     while (current_pair->next != NULL) {
       if (strcmp(current_pair->key, key) == 0) {
-        current_pair = pair;
+        current_pair->value = value;
         hasassigned = 1;
+        break;
       }
       current_pair = current_pair->next;
     }
@@ -103,8 +104,8 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
       current_pair->next = pair;
     }
   } else {
-  ht->storage[hash(key, ht->capacity)] = pair;
-}
+      ht->storage[index] = pair;
+  }
 
 }
 
@@ -119,7 +120,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 void hash_table_remove(HashTable *ht, char *key)
 {
   LinkedPair *pair = create_pair(key, NULL);
-  current_pair *pair;
+  LinkedPair *current_pair;
   for ( int i = 0; i < ht->capacity ; i++) {
     current_pair = ht->storage[i];
     while (current_pair->next != NULL) {
@@ -143,15 +144,18 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  current_pair *pair;
-  for ( int i = 0; i < ht->capacity ; i++) {
+  LinkedPair *current_pair;
+  for (int i = 0; i < ht->capacity; i++) {
     current_pair = ht->storage[i];
     while (current_pair->next != NULL) {
-      if (strcmp(current_pair->key , key) == 0) {
+      if (strcmp(current_pair->key, key) == 0) {
       return current_pair->value;
       }
       current_pair = current_pair->next;
     }
+    if (strcmp(current_pair->key, key) == 0) {
+      return current_pair->value;
+      }
   }
   return NULL;
 }
@@ -185,7 +189,7 @@ HashTable *hash_table_resize(HashTable *ht)
   HashTable *new_ht = malloc(sizeof(HashTable));
   new_ht->capacity = ht->capacity * 2;
   new_ht->storage = calloc(new_ht->capacity, sizeof(LinkedPair *));
-  current_pair *pair;
+  LinkedPair *current_pair;
   for ( int i = 0; i < ht->capacity ; i++) {
     current_pair = ht->storage[i];
     while (current_pair->next != NULL) {
