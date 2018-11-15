@@ -36,7 +36,10 @@ Pair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(Pair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL) {
+    free(pair);
+  }
+  
 }
 
 /****
@@ -109,8 +112,10 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  if ((ht->storage[hash(key,ht->capacity)]!=NULL)){
-    return ht->storage[hash(key,ht->capacity)]->value;
+  if (ht->storage[hash(key,ht->capacity)]!=NULL) {
+    if (ht->storage[hash(key,ht->capacity)]->key==key){
+      return ht->storage[hash(key,ht->capacity)]->value;
+    }
   }
   return NULL;
 }
