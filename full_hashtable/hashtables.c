@@ -128,24 +128,30 @@ void hash_table_remove(HashTable *ht, char *key)
     if(compareval->next != NULL){
       LinkedPair *temp = compareval->next;
       destroy_pair(compareval);
-      compareval = temp; 
+      ht->storage[hashvalue] = temp; 
+      return;
     }
     else{
       destroy_pair(compareval);
-      compareval = 0;
+      ht->storage[hashvalue] = NULL;
+      return;
     }
   }
   else{
     LinkedPair *nextup =  compareval->next;
-    LinkedPair *prev;
+    LinkedPair *prev = compareval;
     while(nextup != NULL){
-      prev = nextup;
       if(strcmp(nextup->key, key) == 0){
-        LinkedPair *temp = nextup->next;
+        if(nextup->next==NULL){
+          prev->next = NULL;
+        }
+        else{
+          prev->next = nextup->next;
+        }
         destroy_pair(nextup);
-        nextup = temp;
-        prev->next = nextup; 
+        return;
       }
+      prev = nextup;
       nextup = nextup->next;
     }
   }
