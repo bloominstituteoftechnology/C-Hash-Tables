@@ -88,7 +88,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   if(ht->storage[hashIndex] == NULL){
     ht->storage[hashIndex] = pair; 
   }else{
-    printf("value that exists at this index.\n");
+    printf("value exists at this index.\n");
     destroy_pair(ht->storage[hashIndex]); 
     ht->storage[hashIndex] = pair; 
   }
