@@ -3,26 +3,25 @@
 #include <string.h>
 //https://repl.it/@codejoncode/Full-Hash-Table
 
-/*Structures  Begin*/
-/****
-  Hash table key/value pair with linked list pointer
- ****/
+//Structures  Begin
+// Hash table key/value pair with linked list pointer
+
 typedef struct LinkedPair {
   char *key;
   char *value;
   struct LinkedPair *next;
 } LinkedPair;
 
-/****
-  Hash table with linked pairs
- ****/
+
+// Hash table with linked pairs
+
 typedef struct HashTable {
   int capacity;
   LinkedPair **storage;
 } HashTable;
-/*Structures End*/
+// Structures End
 
-/*Prototypes Begin*/
+// Prototypes Begin
 LinkedPair *create_pair(char *key, char *value);
 void destroy_pair(LinkedPair *pair); 
 unsigned int hash(char *str, int max);
@@ -33,7 +32,7 @@ char *hash_table_retrieve(HashTable *ht, char *key);
 void destroy_hash_table(HashTable *ht);
 HashTable *hash_table_resize(HashTable *ht);
 
-/*Prototypes End*/
+// Prototypes End
 
 #ifndef TESTING
 int main(void)
@@ -60,9 +59,9 @@ int main(void)
 }
 #endif
 
-/****
-  Create a key/value linked pair to be stored in the hash table.
- ****/
+
+  // Create a key/value linked pair to be stored in the hash table.
+ 
 LinkedPair *create_pair(char *key, char *value)
 {
   LinkedPair *pair = malloc(sizeof(LinkedPair));
@@ -73,19 +72,19 @@ LinkedPair *create_pair(char *key, char *value)
   return pair;
 }
 
-/****
-  Use this function to safely destroy a hashtable pair.
- ****/
+
+// Use this function to safely destroy a hashtable pair.
+
 void destroy_pair(LinkedPair *pair)
 {
   if (pair != NULL) free(pair);
 }
 
-/****
-  djb2 hash function
 
-  Do not modify this!
- ****/
+  // djb2 hash function
+
+  // Do not modify this!
+
 unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
@@ -99,11 +98,11 @@ unsigned int hash(char *str, int max)
   return hash % max;
 }
 
-/****
-  Fill this in.
 
-  All values in storage should be initialized to NULL
- ****/
+  // Fill this in.
+
+  // All values in storage should be initialized to NULL
+
 HashTable *create_hash_table(int capacity)
 {
   HashTable *ht = malloc(sizeof(HashTable)); 
@@ -114,15 +113,15 @@ HashTable *create_hash_table(int capacity)
   return ht;
 }
 
-/****
-  Fill this in.
 
-  Inserting values to the same index with different keys should be
-  added to the corresponding LinkedPair list.
+  // Fill this in.
 
-  Inserting values to the same index with existing keys can overwrite
-  the value in th existing LinkedPair list.
- ****/
+  // Inserting values to the same index with different keys should be
+  // added to the corresponding LinkedPair list.
+
+  // Inserting values to the same index with existing keys can overwrite
+  // the value in th existing LinkedPair list.
+ 
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
     //get a hash 
@@ -149,14 +148,13 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
 }
 
-/****
-  Fill this in.
+  // Fill this in.
 
-  Should search the entire list of LinkedPairs for existing
-  keys and remove matching LinkedPairs safely.
+  // Should search the entire list of LinkedPairs for existing
+  // keys and remove matching LinkedPairs safely.
 
-  Don't forget to free any malloc'ed memory!
- ****/
+  // Don't forget to free any malloc'ed memory!
+ 
 void hash_table_remove(HashTable *ht, char *key)
 {
   //get hash 
@@ -192,14 +190,13 @@ void hash_table_remove(HashTable *ht, char *key)
   }
 }
 
-/****
-  Fill this in.
+  // Fill this in.
 
-  Should search the entire list of LinkedPairs for existing
-  keys.
+  // Should search the entire list of LinkedPairs for existing
+  // keys.
 
-  Return NULL if the key is not found.
- ****/
+  // Return NULL if the key is not found.
+ 
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
   // get hash 
@@ -222,11 +219,10 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   return value; 
 }
 
-/****
-  Fill this in.
+  // Fill this in.
 
-  Don't forget to free any malloc'ed memory!
- ****/
+  // Don't forget to free any malloc'ed memory!
+
 void destroy_hash_table(HashTable *ht)
 {
   for(int i = 0; i< ht->capacity; i++){
@@ -238,17 +234,25 @@ void destroy_hash_table(HashTable *ht)
   free(ht); 
 }
 
-/****
-  Fill this in.
 
-  Should create a new hash table with double the capacity
-  of the original and copy all elements into the new hash table.
+  // Fill this in.
 
-  Don't forget to free any malloc'ed memory!
- ****/
+  // Should create a new hash table with double the capacity
+  // of the original and copy all elements into the new hash table.
+
+  // Don't forget to free any malloc'ed memory!
+ 
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht = create_hash_table(ht->capacity *2); 
+  int new_capacity = 0; 
+  for (int i = 0; i<ht->capacity; i++){
+    new_capacity++;
+  } 
+  for (int i = 0; i<ht->capacity; i++){
+    new_capacity++;
+  } 
+
+  HashTable *new_ht = create_hash_table(new_capacity); 
   
   for(int i = 0; i<ht->capacity; i++){
 
