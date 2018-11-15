@@ -69,9 +69,8 @@ create_hash_table(3);
 */
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-
-  ht->capacity = capacity; //indices in an array // value == 3
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity; //indices in an array
   ht->storage = calloc(capacity, sizeof(Pair *)); //this size of struct 
   return ht;
 }
@@ -99,7 +98,7 @@ void /*<- This mean this returns nothing */ hash_table_insert(BasicHashTable *ht
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  
+  if(ht != NULL) free(ht);
 }
 
 /****
@@ -109,22 +108,15 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  /*
-  Before we put code on the screen, what's the approach here?
+
+  int indexVal = hash(key, ht->capacity);
+
+  if(ht->storage[indexVal] == NULL) {
+    return NULL;
+  }else{
+    return ht->storage[indexVal]->value;
+  }
   
-  - ht->storage->pair[key] ? right direction?
-  -when match return the Pair
-  -if key not found return null
-
-  missing a step?
-  This is a reasonable approach, but what's the Big O of this?
-  O(n)
-  Shouldn't retrieval in a hash table be O(1)?
-  
-
-  */
-
-
 
 }
 
@@ -135,29 +127,35 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  if (ht != NULL) free(ht);
 }
 
 
 #ifndef TESTING
 int main(void)
 {
+  printf("about to create Ht table\n");
   struct BasicHashTable *ht = create_hash_table(16);
+  printf("created the table\n");
 
   hash_table_insert(ht, "line", "Here today...\n");
+  printf("inserted into the table\n");
 
   printf("%s", hash_table_retrieve(ht, "line"));
-
+  printf("retrieved the value from the ht\n");
+  
   hash_table_remove(ht, "line");
-
+  printf("removed from the hashtable\n");
+  
   if (hash_table_retrieve(ht, "line") == NULL) {
     printf("...gone tomorrow. (success)\n");
   } else {
     fprintf(stderr, "ERROR: STILL HERE\n");
   }
-
+  printf("retreive from the tables\n");
+  
   destroy_hash_table(ht);
-
+  printf("destroyed the table\n");
   return 0;
 }
 #endif
