@@ -83,10 +83,10 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   Pair *pair = create_pair(key, value);
   ht->storage[hash(key, ht->capacity)] = pair;
 
-  if (pair) {
-    perror("WARNING: Existing value being overwritten. \n");
-    destroy_pair(pair);
-  }
+  // if (pair != NULL) {
+  //   perror("WARNING: Existing value being overwritten. \n");
+  //   free(ht);
+  // }
 }
 
 /****
@@ -107,7 +107,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  Pair *pair = ht->storage[hash(key, ht->capacity)];
+  if (pair != NULL) {
+    return pair->value;
+  } else {
+    return NULL;
+  }
 }
 
 /****
@@ -117,6 +122,11 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++) {
+    if (ht->storage[i] != NULL) {
+      free(ht->storage[i]);
+    }
+  }
   free(ht);
 }
 
