@@ -102,13 +102,16 @@ BasicHashTable *create_hash_table(int capacity)
   */ 
   BasicHashTable *ht;
   ht = malloc(sizeof(BasicHashTable));
-  calloc(capacity, sizeof(Pair *)); // for example, this will hold 16 numbers so that it's not a static value would it be looking for a variable there?
-  // but what is it supposed to be holding. just strings?  
-  // look at line 68. what do you see up there? `numOfHashesPassedThru`?  there you go
+  ht->capacity = capacity; 
+  ht->storage = calloc(capacity, sizeof(Pair *)); // for example, this will hold 16 numbers so that it's not a static value would it be looking for a variable there?
+  // but what is it supposed to be holding. just strings?  Hint: Look at the struct definition of where this calloc is supposed to be assigned to
+  // as for what it's holding, it's (going to) hold pointers to Pairs, hence `sizeof(Pair *)` as the second argument of calloc
+  // R: so right now you are reassigning ht to a different block of memory. But line 104 is perfectly fine.
+  // R: Remember, you have to now build out this structure you just carved some space in memory for
   /*
   typedef struct BasicHashTable {
-    int capacity;
-    Pair **storage;
+    int capacity; // an integer representing how many indices in the array
+    Pair **storage; // the array itself. literally nulled allocated storage to stick stuff into
   } BasicHashTable;
   */
   return ht;
@@ -133,7 +136,23 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   //NOT DOING ALL OF THIS YET! I'm trying to see if the key we are passing the insert is the same as the key in the basicHashtable @ that index so I was trying to 
   //hash the new key because it's the same number which would give you the same index so you would know which key to compare it with.
   // Gimme a minute. You can come into the zoom if I take forever
-  ht[hash(ht[key], capacity)] = 
+    int index = hash(ht[key], capacity);  // before you continue on this, make sure BasicHashTable is done
+    // R: what's the ht[] around the hash function call doing? the not anything I want it to be doing
+    // R: Ok sweet. hash returns an int, which you're saving into an int variable "index"
+    if (ht->storage[index] != NULL) // <- where's your array in the `ht` structure? Yessir this is looking less foreign 
+    {
+      printf("That spot is already taken!");
+       ht->storage[index] = create_pair(key, value);
+    } 
+    else 
+    {
+      // does this make sense when ht->storage[index] is NULL or when it is not NULL?  oh no  lol what? I need to swap because if it's not null then it's taken then i'm creating the pair for the spot
+      // and if it is null then we just do it. In either case, you're going to stick it in there. The only thing is you print a warning if you overwrite. This looks good I think k onto the next one
+      ht->storage[index] = create_pair(key, value);
+    }
+    // the only thing now is that the spec allows you to overwrite an existing value in the index, but you have to print a little warning
+    // before you do
+    // so you just have to rearrange this logic around and put a print statement before you overwrite if something already exists in that index
 }
 
 /****
