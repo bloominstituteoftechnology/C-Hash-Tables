@@ -71,7 +71,7 @@ BasicHashTable *create_hash_table(int capacity)
   ht->capacity = capacity;
   printf("capacity:%d\n", capacity);
   //put key/value pair from above into storage and allocate enough memory, iniitalizing as NULL with calloc.
-  ht->storage = (Pair**) calloc(capacity, sizeof(Pair*));
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -105,10 +105,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   int index = hash(key, ht->capacity);
-  destroy_pair(ht->storage[index]);
+  if(ht->storage[index] != NULL){
+      destroy_pair(ht->storage[index]);
+      ht->storage[index] = NULL;
+  }
+
   //free
-  free(ht->storage[index]);
-  free(ht);
+  // free(ht->storage[index]);
+  // free(ht);
   // could also ht->storage[index] = NULL; but I think this is better practice.
 }
 

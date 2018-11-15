@@ -66,7 +66,11 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  //construct da struct! sotrage initialized to 0/NULL
+  ht->capacity=capacity; // the input var
+  ht->storage=calloc(capacity,sizeof(LinkedPair *)); //capacity is the number of blocks and the
+  //LinkedPairs are the key values which each block needs to fit
 
   return ht;
 }
@@ -82,7 +86,22 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  int hashed_index = hash(key,ht->capacity);
+  if(ht->storage[hashed_index] !=NULL){
+    LinkedPair *current_index = ht->storage[hashed_index];
+    while(current_index != NULL){
+      if(current_index->key == key){
+        current_index->value = value;
+      }else if(current_index->next == NULL){
+        current_index->next = create_pair(key,value);
+      }else{
+        // if the struct is empty
+        current_index = current_index->next;
+      }
+    }
+  }else{
+    ht->storage[hashed_index] = create_pair(key,value);
+  }
 }
 
 /****
@@ -95,7 +114,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  // need to keep track of previous and current indices for removal
 }
 
 /****
