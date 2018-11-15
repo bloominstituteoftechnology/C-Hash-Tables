@@ -66,16 +66,12 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  printf("Inside create hT\n");
-  printf("cap >>>>> %d\n", capacity);
+  
   BasicHashTable *ht = NULL;
   ht = malloc(sizeof(BasicHashTable));
-  ht->storage = (Pair *)calloc(capacity, sizeof(Pair));
+  ht->storage = calloc(capacity, sizeof(Pair));
   ht->capacity = capacity;
-  // for(int i=0; i < ht->capacity; i++){
-  //   ht->storage[i] = NULL;
-  // }
-  
+  printf("allocated storage >> %d", ht->storage);
   return ht;
 }
 
