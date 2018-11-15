@@ -159,7 +159,37 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  //get hash 
+  unsigned int  hash_index = hash(key, ht->capacity);
+  //create parent  if not null 
+  LinkedPair *parent = NULL; 
 
+  //Check if the index point of the storarage is null 
+  if(ht->storage[hash_index] == NULL){
+    printf("ERROR: The item is not in the hash table");
+  }else {
+    parent = ht->storage[hash_index]; 
+  }
+
+  //loop through checking for the next node's key, 
+  //if it matches we have the item we plan to delete 
+  while(strcmp(parent->next->key, key) != 0 && parent->next != NULL){
+      parent = parent->next; 
+  }
+
+  if(parent->next != NULL){
+    LinkedPair *deleting = parent->next; 
+    LinkedPair *next_next = NULL; 
+    if(deleting->next != NULL){
+      next_next = deleting->next; 
+    }
+
+    parent->next = next_next; 
+    destroy_pair(deleting);
+    
+  } else {
+    printf("ERROR  ITEM NOT FOUND"); 
+  }
 }
 
 /****
