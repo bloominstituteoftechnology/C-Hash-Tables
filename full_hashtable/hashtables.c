@@ -91,14 +91,14 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   };
   LinkedPair *compareval = ht->storage[hashvalue];
   if(strcmp(compareval->key, key) == 0){
-    compareval->value = value;
+    compareval->value = strdup(value);
   }
   else{
     LinkedPair *nextup =  compareval->next;
     LinkedPair *prev = compareval;
     while(nextup != NULL){
       if(strcmp(nextup->key, key) == 0){
-        nextup->value = value;
+        nextup->value = strdup(value);
         return;
       }
       prev = nextup;
