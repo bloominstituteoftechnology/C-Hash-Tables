@@ -213,7 +213,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
     // printf("ERROR: key does not exsit");
     return value; 
   } else {
-    while(strcmp(current->key, key) != 0 && current->next != NULL){
+    while(strcmp(current->key, key) != 0 && current != NULL){
       current = current->next; 
     }
     value = current->value; 
@@ -229,7 +229,13 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for(int i = 0; i< ht->capacity; i++){
+    if(ht->storage[i] != NULL){
+      destroy_pair(ht->storage[i]); 
+    }
+  }
+  free(ht->storage);
+  free(ht); 
 }
 
 /****
@@ -242,7 +248,24 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table(ht->capacity *2); 
+  
+  for(int i = 0; i<ht->capacity; i++){
+
+    LinkedPair *current = NULL; 
+    if(ht->storage[i] != NULL){
+      current = ht->storage[i];
+      do {
+        hash_table_insert(new_ht, current->key, current->value);
+        current = current->next;
+      }
+      while(current != NULL); 
+    }
+  }
+
+  //destroy after we are done
+  destroy_hash_table(ht); 
+
 
   return new_ht;
 }
