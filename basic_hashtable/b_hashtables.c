@@ -25,7 +25,7 @@ typedef struct BasicHashTable {
 Pair *create_pair(char *key, char *value)
 {
   Pair *pair = malloc(sizeof(Pair));
-  pair->key = key;  // Why don't we have to free storage for key and value??
+  pair->key = key;  // key and value go into temporary storage
   pair->value = value;
 
   return pair;
@@ -46,7 +46,7 @@ void destroy_pair(Pair *pair)
 
   Do not modify this!
  ****/
-unsigned int hash(char *str, int max)
+unsigned int hash(char *str, int max) // unsigned int - postive numbers only
 {
   unsigned long hash = 5381;
   int c;
@@ -109,9 +109,8 @@ void hash_table_remove(BasicHashTable *ht, char *key)
     printf("ERROR: There is no value at this index\n");
   } else {
     destroy_pair(ht->storage[index]);
-    ht->storage[index] = NULL;
+    ht->storage[index] = NULL; // without setting to NULL, the index points to garbage
   }
-
 }
 
 /****
@@ -127,7 +126,6 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
     return ht->storage[index]->value;
   }
     return NULL;
-  
 }
 
 /****
