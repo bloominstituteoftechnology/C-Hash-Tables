@@ -68,6 +68,7 @@ HashTable *create_hash_table(int capacity)
 {
   HashTable *ht = malloc(sizeof(HashTable));
   ht->capacity = capacity;
+  // LinkedPair* ?
   ht->storage = calloc(capacity, sizeof(LinkedPair));
   return ht;
 }
@@ -83,7 +84,20 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  unsigned int index = hash(key, ht->capacity);
+  LinkedPair *curr_pair = ht->storage[index];
+  LinkedPair *last_pair;
+  while (curr_pair != NULL && strcmp(curr_pair->key, key) != 0) {
+    last_pair = curr_pair;
+    curr_pair = last_pair->next;
+  }
+  if (curr_pair != NULL) {
+    curr_pair->value = value;
+  } else {
+    LinkedPair *new_pair = create_pair(key, value);
+    new_pair->next = ht->storage[index];
+    ht->storage[index] = new_pair;
+  }
 }
 
 /****
@@ -119,7 +133,8 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  free(ht->storage);
+  free(ht);
 }
 
 /****
