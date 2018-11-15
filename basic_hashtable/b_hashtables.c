@@ -105,7 +105,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
     destroy_pair(ht -> storage[arrayIndex]);
     ht -> storage[arrayIndex] = NULL;
   } else {
-    perror("There is no such a value.\n");
+    perror("There is no such value.\n");
   }
 }
 
