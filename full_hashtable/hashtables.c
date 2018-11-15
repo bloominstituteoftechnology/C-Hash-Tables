@@ -42,6 +42,26 @@ void destroy_pair(LinkedPair *pair)
 }
 
 /****
+function to find items - use for remove
+****/
+int find(LinkedPair *pair, char *key)
+{
+  int item = 0;
+  LinkedPair *temp = pair;
+  while(temp != NULL)
+  {
+    if(temp->key == key)
+    {
+      return item;
+    }
+    temp = temp->next;
+    item++;
+  }
+  return NULL;
+}
+
+
+/****
   djb2 hash function
 
   Do not modify this!
@@ -97,11 +117,12 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   if (current_pair != NULL) {
     current_pair->value = value;
   }else{
-    LinkedPair *new_pair = create_pair(key,value);
+    LinkedPair *new_pair = create_pair(key, value);
     new_pair->next = ht->storage[index];
     ht->storage[index] = new_pair;
   }
 }
+
 
 /****
   Fill this in.
@@ -113,13 +134,29 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
 
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair;
+
+  while (current_pair !=NULL && strcmp(current_pair->key, key) != 0) {
+  last_pair = current_pair;
+  current_pair = last_pair->next;
+  }
+
+  if(current_pair == NULL){
+    printf("That key does not exist\n");
+  } 
+  else {
+    destroy_pair(current_pair);
+    current_pair = NULL;
+  }
 }
 
 /****
   Fill this in.
 
-  Should search the entire list of LinkedPairs for existing
+  --> TODO:  Should search the entire list of LinkedPairs for existing
   keys.
 
   Return NULL if the key is not found.
@@ -128,11 +165,19 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 {
   unsigned int index = hash(key, ht->capacity);
 
-  if(ht->storage[index] == NULL){
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair;
+
+  while (current_pair !=NULL && strcmp(current_pair->key, key) != 0) {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
+
+  if(current_pair == NULL){
     printf(" result not found");
     return NULL;
   }
-  return ht->storage[index]->value;
+  return current_pair->value;
 }
 
 /****
@@ -144,12 +189,11 @@ void destroy_hash_table(HashTable *ht)
 {
   for(int i = 0; i<ht->capacity; i++){
   if (ht->storage[i] != NULL) {
-      destroy_pair(ht->storage[1]);
+      destroy_pair(ht->storage[i]);
     }
   }
   free(ht->storage);
   free(ht);
-
 }
 
 /****
@@ -162,9 +206,11 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-
+  HashTable *new_ht = malloc(sizeof(HashTable));
+  new_ht->capacity = ht->capacity * 2;
+  new_ht->storage = calloc(new_ht->capacity, sizeof(LinkedPair *));
   return new_ht;
+
 }
 
 #ifndef TESTING
@@ -181,7 +227,7 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
-  printf("\n------all test retrievals successful------\n");
+  printf("------all test retrievals successful------\n");
 
   // int old_capacity = ht->capacity;
   // ht = hash_table_resize(ht);
@@ -189,8 +235,8 @@ int main(void)
 
   // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  // destroy_hash_table(ht);
-  // printf("------hash table destroyed------\n");
+  destroy_hash_table(ht);
+  printf("------hash table destroyed------\n");
 
   return 0;
 }
