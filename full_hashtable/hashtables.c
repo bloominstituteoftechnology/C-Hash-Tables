@@ -189,10 +189,12 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht=malloc(sizeof(HashTable));
-  new_ht->capacity=ht->capacity*2;
-  ht->storage=realloc(ht->storage,new_ht->capacity*sizeof(LinkedPair *));
-  destroy_hash_table(ht);
+  HashTable *new_ht=create_hash_table(ht->capacity*2);
+  new_ht->storage=realloc(ht->storage,sizeof(ht->storage)*2);
+  for (int i=ht->capacity; i<new_ht->capacity; i++) {
+    new_ht->storage[i]=NULL;
+  }
+  free(ht);
   return new_ht;
 }
 

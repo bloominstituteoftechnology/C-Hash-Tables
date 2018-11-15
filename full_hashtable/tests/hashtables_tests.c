@@ -158,7 +158,6 @@ char *all_tests()
     mu_suite_start();
 
     mu_run_test(basic_hash_table_test);
-
     return NULL;
 }
 
