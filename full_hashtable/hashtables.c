@@ -123,7 +123,7 @@ void hash_table_remove(HashTable *ht, char *key)
         } else {
           prev_node->next=current_node->next;
         }
-        free(current_node);
+        destroy_pair(current_node);
         break;
       } else {
         prev_node=current_node;
@@ -164,8 +164,20 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for (int i=0; i<ht->capacity; i++) {
+    if (ht->storage[i]!=NULL) {
+      LinkedPair *next_node=ht->storage[i]->next;
+      while (next_node!=NULL) {
+        free(ht->storage[i]);
+        ht->storage[i]=next_node;
+        next_node=ht->storage[i]->next;
+      }
+    } 
+  }
+  free(ht->storage);
   free(ht);
 }
+
 
 /****
   Fill this in.
@@ -195,13 +207,13 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
-
+  
   int old_capacity = ht->capacity;
   ht = hash_table_resize(ht);
   int new_capacity = ht->capacity;
 
   printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
-
+  
   destroy_hash_table(ht);
 
   return 0;
