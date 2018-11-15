@@ -123,9 +123,19 @@ void hash_table_remove(HashTable *ht, char *key)
   if (ht->storage[hashKey] != NULL) {
     if (ht->storage[hashKey]->key == key){
       destroy_pair(ht->storage[hashKey]);
-      
-      ht->storage[hashKey]=NULL;
-    }
+      ht->storage[hashKey] = NULL;
+    } else {
+          LinkedPair *currentNode = ht->storage[hashKey];  
+          LinkedPair *nextNode = ht->storage[hashKey]->next; 
+          while(currentNode->key != key) {
+            currentNode = nextNode; 
+            if(currentNode->key == key) {
+              destroy_pair(currentNode);
+              currentNode = NULL;
+              break;
+            }
+          }
+      }
   }
 }
 
@@ -139,12 +149,21 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  int hashCapacity = ht->capacity;
-  unsigned int hashKey = hash(key, hashCapacity);
+  unsigned int hashKey = hash(key, ht->capacity);
 
   if (ht->storage[hashKey] != NULL) {
     if (ht->storage[hashKey]->key == key){
       return ht->storage[hashKey]->value;
+    } else {
+          LinkedPair *currentNode = ht->storage[hashKey];  
+          LinkedPair *nextNode = ht->storage[hashKey]->next; 
+          while(currentNode->key != key) {
+            currentNode = nextNode; 
+            if(currentNode->key == key) {
+              return currentNode->value;
+              break;
+            }
+          }
     }
   }
   return NULL;
