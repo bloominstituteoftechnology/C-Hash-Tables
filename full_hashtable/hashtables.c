@@ -210,6 +210,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
     // printf("ERROR: key does not exsit");
     return value; 
   } else {
+    current = ht->storage[hash_index]; 
     while(strcmp(current->key, key) != 0 && current != NULL){
       current = current->next; 
     }
@@ -261,7 +262,10 @@ HashTable *hash_table_resize(HashTable *ht)
       current = ht->storage[i];
       do {
         hash_table_insert(new_ht, current->key, current->value);
-        current = current->next;
+        if(current->next != NULL){
+          current = current->next;
+        }
+        
       }
       while(current != NULL); 
     }
