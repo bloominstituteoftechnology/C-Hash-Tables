@@ -90,15 +90,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   int hashCapacity = ht->capacity;
   unsigned int hashKey = hash(key, hashCapacity);
-
-  if(ht->storage[hashKey] != NULL){
-    printf("Error: You are overwriting an existing pair.");
-  }
-
-  Pair *pair = create_pair(key, value);
-  ht->storage[hashKey] = pair; 
-
-  free(pair);
+  
+  if(ht->storage[hashKey] != NULL) {
+      printf("Warning: You are overwriting an existing value.\n");
+      destroy_pair(ht->storage[hashKey]);
+      ht->storage[hashKey] = create_pair(key, value);
+    } else {
+      ht->storage[hashKey] = create_pair(key, value);
+    }
 }
 
 /****
@@ -111,9 +110,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
   int hashCapacity = ht->capacity;
   unsigned int hashKey = hash(key, hashCapacity);
 
-    if((ht->storage[hashKey]) != NULL){
-      ht->storage[hashKey]->value = NULL;
+  if (ht->storage[hashKey] != NULL) {
+    if (ht->storage[hashKey]->key == key){
+      destroy_pair(ht->storage[hashKey]);
+      
+      ht->storage[hashKey]=NULL;
     }
+  }
 }
 
 
@@ -127,11 +130,12 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   int hashCapacity = ht->capacity;
   unsigned int hashKey = hash(key, hashCapacity);
 
-    if((ht->storage[hashKey]->key) != NULL){
-      return ht->storage[hashKey]->value; 
-    } else {
-      return NULL;
-      }
+  if (ht->storage[hashKey] != NULL) {
+    if (ht->storage[hashKey]->key == key){
+      return ht->storage[hashKey]->value;
+    }
+  }
+  return NULL;
 }
 
 
@@ -142,6 +146,9 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for(int i = 0; i < ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
 
   free(ht->storage);
   free(ht);
