@@ -84,27 +84,28 @@ HashTable *create_hash_table(int capacity)
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   unsigned int hashvalue = hash(key,ht->capacity);
-  LinkedPair *compareval = ht->storage[hashvalue];
 
-  if(compareval == 0){
-    compareval = create_pair(key,value);
+  if(ht->storage[hashvalue] == 0){
+    ht->storage[hashvalue] = create_pair(key,value);
     return;
   };
+  LinkedPair *compareval = ht->storage[hashvalue];
   if(strcmp(compareval->key, key) == 0){
     compareval->value = value;
   }
   else{
     LinkedPair *nextup =  compareval->next;
+    LinkedPair *prev = compareval;
     while(nextup != NULL){
       if(strcmp(nextup->key, key) == 0){
         nextup->value = value;
         return;
-      }   
+      }
+      prev = nextup;
       nextup = nextup->next;
     }
-    nextup->next = create_pair(key,value);
+    prev->next = create_pair(key,value);
   }
-  
 }
 
 /****
@@ -138,14 +139,13 @@ void hash_table_remove(HashTable *ht, char *key)
     LinkedPair *nextup =  compareval->next;
     LinkedPair *prev;
     while(nextup != NULL){
-      
+      prev = nextup;
       if(strcmp(nextup->key, key) == 0){
         LinkedPair *temp = nextup->next;
         destroy_pair(nextup);
         nextup = temp;
         prev->next = nextup; 
       }
-      prev = nextup;
       nextup = nextup->next;
     }
   }
@@ -162,8 +162,9 @@ void hash_table_remove(HashTable *ht, char *key)
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
   unsigned int hashvalue = hash(key,ht->capacity);
+  if(ht->storage[hashvalue] != NULL){
   LinkedPair *compareval = ht->storage[hashvalue];
-  
+
   if(strcmp(compareval->key, key) == 0){
     return compareval->value;
   }
@@ -176,7 +177,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
        nextup = nextup->next;
      }
   }
-
+  }
   return NULL;
 }
 
