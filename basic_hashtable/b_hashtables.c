@@ -19,6 +19,8 @@ typedef struct BasicHashTable {
   Pair **storage;
 } BasicHashTable;
 
+
+
 /****
   Create a key/value pair to be stored in the hash table.
  ****/
@@ -36,7 +38,9 @@ Pair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(Pair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL){
+    free(pair);
+  }
 }
 
 /****
@@ -66,7 +70,11 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+
+  ht->storage = calloc(capacity, sizeof(Pair *));
+
+  ht->capacity = capacity; 
 
   return ht;
 }
@@ -80,7 +88,16 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  int hashCapacity = ht->capacity;
+  unsigned int hashKey = hash(key, hashCapacity);
+  
+  if(ht->storage[hashKey] != NULL) {
+      printf("Warning: You are overwriting an existing value.\n");
+      destroy_pair(ht->storage[hashKey]);
+      ht->storage[hashKey] = create_pair(key, value);
+    } else {
+      ht->storage[hashKey] = create_pair(key, value);
+    }
 }
 
 /****
@@ -90,8 +107,18 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  int hashCapacity = ht->capacity;
+  unsigned int hashKey = hash(key, hashCapacity);
 
+  if (ht->storage[hashKey] != NULL) {
+    if (ht->storage[hashKey]->key == key){
+      destroy_pair(ht->storage[hashKey]);
+      
+      ht->storage[hashKey]=NULL;
+    }
+  }
 }
+
 
 /****
   Fill this in.
@@ -100,8 +127,17 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int hashCapacity = ht->capacity;
+  unsigned int hashKey = hash(key, hashCapacity);
+
+  if (ht->storage[hashKey] != NULL) {
+    if (ht->storage[hashKey]->key == key){
+      return ht->storage[hashKey]->value;
+    }
+  }
   return NULL;
 }
+
 
 /****
   Fill this in.
@@ -110,7 +146,12 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for(int i = 0; i < ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
 
+  free(ht->storage);
+  free(ht);
 }
 
 

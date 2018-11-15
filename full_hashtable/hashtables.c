@@ -66,7 +66,11 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
+
+  ht->capacity = capacity; 
 
   return ht;
 }
@@ -82,8 +86,29 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  unsigned int hashKey = hash(key, ht->capacity);
+  
+  if(ht->storage[hashKey] == NULL) {
+        ht->storage[hashKey] = create_pair(key, value);
+  } else {
+      printf("Warning: You are linking due to collision.\n");
+      if(ht->storage[hashKey]->next == NULL) {
+        ht->storage[hashKey]->next = create_pair(key, value);
+      } else {
+          LinkedPair *currentNode = ht->storage[hashKey];
+          LinkedPair *nextNode = ht->storage[hashKey]->next;
+          
+          while(currentNode->next != NULL) {
+            currentNode = nextNode;
+            if(currentNode->next == NULL) {
+              currentNode->next = create_pair(key, value);
+            }
+          }
+        }
+    }
 }
+
+
 
 /****
   Fill this in.
@@ -95,7 +120,25 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int hashKey = hash(key, ht->capacity);
 
+  if (ht->storage[hashKey] != NULL) {
+    if (strcmp(ht->storage[hashKey]->key, key) == 0){
+      destroy_pair(ht->storage[hashKey]);
+      ht->storage[hashKey] = NULL;
+    } else {
+          LinkedPair *currentNode = ht->storage[hashKey];  
+          LinkedPair *nextNode = ht->storage[hashKey]->next; 
+          while(strcmp(ht->storage[hashKey]->key, key) != 0) {
+            currentNode = nextNode; 
+            if(strcmp(ht->storage[hashKey]->key, key) == 0) {
+              destroy_pair(currentNode);
+              currentNode = NULL;
+              break;
+            }
+          }
+      }
+  }
 }
 
 /****
@@ -108,7 +151,25 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int hashKey = hash(key, ht->capacity);
+  if (ht->storage[hashKey] != NULL) {
+    if (strcmp(ht->storage[hashKey]->key, key) == 0) {
+      return ht->storage[hashKey]->value;
+    } else {
+          LinkedPair *currentNode = ht->storage[hashKey];  
+          LinkedPair *nextNode = ht->storage[hashKey]->next; 
+          while(strcmp(currentNode->key, key) != 0) {
+            currentNode = nextNode; 
+            if(strcmp(currentNode->key, key) == 0) {
+              return currentNode->value;
+              break;
+            }
+          }
+      }
+  } else {
+      return NULL;
+  }
+  
 }
 
 /****
@@ -118,7 +179,12 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for(int i = 0; i < ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
 
+  free(ht->storage);
+  free(ht);
 }
 
 /****
@@ -131,7 +197,17 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = malloc(sizeof(HashTable));
+
+  new_ht->storage = calloc(ht->capacity * 2, sizeof(LinkedPair *));
+
+  new_ht->capacity = ht->capacity * 2;
+
+  for(int i = 0; i < ht->capacity; i++){
+    hash_table_insert(new_ht, ht->storage[i]->key, ht->storage[i]->value);
+  }
+
+  destroy_hash_table(ht);
 
   return new_ht;
 }
@@ -145,10 +221,15 @@ int main(void)
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
+  // hash_table_insert(ht, "line_4", "Line 4!\n");
+  // hash_table_insert(ht, "line_5", "Line 5!\n");
 
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
+  // printf("%s", hash_table_retrieve(ht, "line_4"));
+  // printf("%s", hash_table_retrieve(ht, "line_5"));
+
 
   int old_capacity = ht->capacity;
   ht = hash_table_resize(ht);
