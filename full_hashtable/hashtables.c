@@ -139,7 +139,21 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int index = hash(key, ht->capacity);
+
+  LinkedPair *current = NULL;
+  char *value = NULL;
+
+  if(ht->storage[index] == NULL){
+    return value;
+  }else{
+    while(strcmp(current->key, key) != 0 && current->next != NULL){
+      current = current->next;
+    }
+    value =current->value;
+  }
+
+  return value;
 }
 
 /****
@@ -166,8 +180,16 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-
+  //
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+  //run a loop that goes through the capacity.
+  for(int i = 0; i < ht->capacity; i++){
+  //the new_ht takes in the previous storage.
+    new_ht->storage[i] = ht->storage[i];
+  }
+  //destroy the previous hash cause it its capacity is old.
+  destroy_hash_table(ht);
+  //return the new and resized hash table.
   return new_ht;
 }
 
