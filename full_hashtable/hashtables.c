@@ -26,8 +26,8 @@ typedef struct HashTable {
 LinkedPair *create_pair(char *key, char *value)
 {
   LinkedPair *pair = malloc(sizeof(LinkedPair));
-  pair->key = key;
-  pair->value = value;
+  pair->key = strdup(key);
+  pair->value = strdup(value);
   pair->next = NULL;
 
   return pair;
@@ -38,7 +38,11 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL) {
+    free(pair->key);
+    free(pair->value);
+    free(pair);
+  }
 }
 
 /****
@@ -67,7 +71,7 @@ unsigned int hash(char *str, int max)
 HashTable *create_hash_table(int capacity)
 {
   HashTable *ht = malloc(sizeof(HashTable));
-  ht->storage = calloc(capacity, sizeof(Pair));
+  ht->storage = calloc(capacity, sizeof(LinkedPair));
   ht->capacity = capacity;
 
   return ht;
@@ -87,16 +91,15 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   LinkedPair *storagelocation = ht->storage[hash(key, ht->capacity)];
   LinkedPair *pair = create_pair(key, value);
   if (storagelocation == NULL) {
-    storagelocation = pair;
-  } else if (storagelocation->key == key) {
+    ht->storage[hash(key, ht->capacity)] = pair;
+  } else if (strcmp(storagelocation->key,key) == 0) {
     LinkedPair *tempnext = storagelocation->next;
     destroy_pair(storagelocation);
-    storagelocation = pair;
-    storagelocation->next = tempnext;
+    ht->storage[hash(key, ht->capacity)] = pair;
+    ht->storage[hash(key, ht->capacity)]->next = tempnext;
   } else if ((storagelocation != NULL) && (strcmp(storagelocation->key, key) != 0)) {
-    LinkedPair *tempnext = storagelocation;
-    storagelocation = pair;
-    pair->next = tempnext;
+    ht->storage[hash(key, ht->capacity)] = pair;
+    pair->next = storagelocation;
   } else {
     printf("WARNING: YOU'RE IN NO-MAN'S LAND! What's happening here?\n");
   }
@@ -118,7 +121,7 @@ void hash_table_remove(HashTable *ht, char *key)
   } else if (strcmp(storagelocation->key, key) == 0) {
     LinkedPair *tempstoragelocation = storagelocation->next;
     destroy_pair(storagelocation);
-    storagelocation = tempstoragelocation;
+    ht->storage[hash(key, ht->capacity)] = tempstoragelocation;
     printf("Pair was destroyed successfully!\n");
   } else {
     LinkedPair *current = storagelocation;
@@ -149,8 +152,9 @@ void hash_table_remove(HashTable *ht, char *key)
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
   LinkedPair *storagelocation = ht->storage[hash(key, ht->capacity)];
+  printf("%s\n", storagelocation->key);
   if (storagelocation == NULL) {
-    printf("This key does not exist :/\n");
+    printf("This key does not exist :/ 1\n");
   } else if (strcmp(storagelocation->key, key) == 0) {
     return storagelocation->value;
   }
@@ -199,8 +203,14 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+  for (int i = 0; i<ht->capacity; i++) {
+    LinkedPair *oldpair = ht->storage[i];
+    LinkedPair *newpair = create_pair(oldpair->key, oldpair->value);
+    newpair->next = oldpair->next;
+    new_ht->storage[hash(newpair->key, new_ht->capacity)] = newpair;
+  }
+  destroy_hash_table(ht);
   return new_ht;
 }
 
