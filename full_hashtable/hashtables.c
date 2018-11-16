@@ -137,12 +137,17 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
       //if something exists  take the pair.next and have equal to new pair 
       // ht->storage[hash_index]->next = pair; 
       //^Not as simple as that. What if there is  already a next? and then a next after that. 
-      LinkedPair *linked_pair = ht->storage[hash_index];
-      //create a loop to check for a null value  if null set the new pair else go to the next 
-      while(linked_pair->next != NULL){
-        linked_pair = linked_pair->next; 
+      if(strcmp(ht->storage[hash_index]->key, key) == 0){
+        ht->storage[hash_index] = new_pair; 
+      } else {
+        LinkedPair *linked_pair = ht->storage[hash_index];
+        //create a loop to check for a null value  if null set the new pair else go to the next 
+        while(linked_pair->next != NULL){
+          linked_pair = linked_pair->next; 
+        }
+        linked_pair->next = new_pair; 
+
       }
-      linked_pair->next = new_pair; 
 
     }
 
@@ -261,10 +266,9 @@ HashTable *hash_table_resize(HashTable *ht)
     if(ht->storage[i] != NULL){
       current = ht->storage[i];
       do {
+        printf("Inside of here"); 
         hash_table_insert(new_ht, current->key, current->value);
-        if(current->next != NULL){
-          current = current->next;
-        }
+        current = current->next;
         
       }
       while(current != NULL); 
