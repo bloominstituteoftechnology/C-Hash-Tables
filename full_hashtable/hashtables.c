@@ -129,7 +129,33 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int index = hash(key, ht->capacity);
+  if (ht->storage[index] != NULL) {
+    LinkedPair *current_pair = ht->storage[index];
+    while (current_pair != NULL) {
+      if (strcmp(current_pair->key, key) == 0) {
+        return current_pair->key;
+      } else {
+        current_pair = current_pair->next;
+      }
+    }
+    printf("key not found\n");
+    return NULL;
+  } else {
+    printf("hash not found\n");
+    return NULL;
+  }
+  
+  // else if (strcmp(ht->storage[index]->key, key) == 0) {
+  //   return ht-storage[index]->value;
+  // } else {
+  //   LinkedPair *current_pair = ht->storage[index];
+  //   while (current_pair->next != NULL) {
+
+  //   }
+  // }
+
+  // return NULL;
 }
 
 /****
@@ -149,7 +175,7 @@ void destroy_hash_table(HashTable *ht)
       }
     }
   }
-  
+
   free(ht->storage);
   free(ht);
 }
