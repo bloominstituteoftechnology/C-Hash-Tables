@@ -10,7 +10,7 @@ typedef struct LinkedPair {
   char *key;
   char *value;
   struct LinkedPair *next;
-  int *length;
+
 } LinkedPair;
 
 /****
@@ -30,7 +30,6 @@ LinkedPair *create_pair(char *key, char *value)
   pair->key = key;
   pair->value = value;
   pair->next = NULL;
-  pair->length = 0;
   return pair;
 }
 
@@ -68,6 +67,8 @@ unsigned int hash(char *str, int max)
 HashTable *create_hash_table(int capacity)
 {
   HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
   return ht;
 }
 
@@ -82,6 +83,9 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  int hashkey = hash(key, ht->capacity);
+  LinkedPair *pair = create_pair(hashkey, value);
+  ht->storage[hashkey] = pair;
 
 }
 
@@ -95,7 +99,10 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  if(ht->storage[hash(key, ht->capacity)] != NULL && hash(key, ht->capacity) ){
+    free(ht->storage[hash(key, ht->capacity)]);
+    ht->storage[hash(key, ht->capacity)] = NULL;
+  }
 }
 
 /****
@@ -108,7 +115,13 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  int indexVal = hash(key, ht->capacity);
+  if (ht->storage[indexVal] == NULL) {
+    return NULL;
+  }else{
+    return ht->storage[indexVal]->value;
+  }
+  // return NULL;
 }
 
 /****
@@ -118,7 +131,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  if(ht != NULL) free(ht);
 }
 
 /****
