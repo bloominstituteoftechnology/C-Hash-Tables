@@ -140,7 +140,7 @@ void hash_table_remove(HashTable *ht, char *key)
   {
     printf("Warning: previous index being overwritten");
   }
-//maybe add else wrapper if needed.
+  //maybe add else wrapper if needed.
   if (strcmp(stored_pair->key, key) == 0)
   {
     ht->storage[index] = stored_pair->next;
@@ -171,6 +171,27 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+
+  if (ht->storage[index] != NULL)
+  {
+    if (strcmp(ht->storage[index]->key, key) == 0)
+    {
+      return ht->storage[index]->value;
+    }
+    else
+    {
+      LinkedPair *stored_pair = ht->storage[index];
+      while (stored_pair->next != NULL)
+      {
+        if (strcmp(stored_pair->next->key, key) == 0)
+        {
+         return stored_pair->next->value;
+        }
+        stored_pair = stored_pair->next;
+      }
+    }
+  }
   return NULL;
 }
 
