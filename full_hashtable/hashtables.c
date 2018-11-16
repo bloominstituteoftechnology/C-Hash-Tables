@@ -139,7 +139,19 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for (int i=0; i<ht->capacity; i++) {
+    LinkedPair *current_pair = ht->storage[i];
+    while (current_pair != NULL) {
+      if (current_pair->next != NULL) {
+        current_pair = current_pair->next;
+      } else {
+        destroy_pair(current_pair);
+      }
+    }
+  }
+  
+  free(ht->storage);
+  free(ht);
 }
 
 /****
