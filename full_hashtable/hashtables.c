@@ -10,7 +10,7 @@ typedef struct LinkedPair {
   char *key;
   char *value;
   struct LinkedPair *next;
-
+  int length;
 } LinkedPair;
 
 /****
@@ -30,6 +30,7 @@ LinkedPair *create_pair(char *key, char *value)
   pair->key = key;
   pair->value = value;
   pair->next = NULL;
+  pair->length = 0;
   return pair;
 }
 
@@ -115,11 +116,19 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  LinkedPair *current_pair;
+
   int indexVal = hash(key, ht->capacity);
   if (ht->storage[indexVal] == NULL) {
     return NULL;
-  }else{
+  }else if (current_pair->next == NULL){
     return ht->storage[indexVal]->value;
+  }else{
+    // ht->storage[indexVal]->next->value
+    LinkedPair *linkedLenght = *ht->storage->pair->length;
+    for (int i = 0; i < linkedLenght; i++) {
+      
+    }
   }
   // return NULL;
 }
@@ -127,7 +136,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 /****
   Fill this in.
 
-  Don't forget to free any malloc'ed memory!
+  Don't forget to free any malloc'ed mery!
  ****/
 void destroy_hash_table(HashTable *ht)
 {
