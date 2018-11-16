@@ -53,7 +53,7 @@ unsigned int hash(char *str, int max)
   while ((c = *u_str++)) {
     hash = ((hash << 5) + hash) + c;
   }
-
+ 
   return hash % max;
 }
 
@@ -67,7 +67,9 @@ unsigned int hash(char *str, int max)
 BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
-
+  ht = malloc(sizeof(BasicHashTable));
+  ht->storage = calloc(capacity, sizeof(Pair *));
+  ht->capacity = capacity;
   return ht;
 }
 
@@ -75,12 +77,16 @@ BasicHashTable *create_hash_table(int capacity)
   Fill this in.
 
   If you are overwriting a value with a different key, print a warning.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  int hashkey = hash(key, ht->capacity);
+  Pair *pair = create_pair(key, value);
+  if (ht->storage[hashkey] != 0){
+    printf("we bout to overwrite");
+  }
+  ht -> storage[hashkey] = pair;
 }
 
 /****
@@ -90,7 +96,9 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int h = hash(key, ht->capacity);
+  destroy_pair(ht->storage[h]);
+  ht->storage[h] = NULL;
 }
 
 /****
@@ -100,6 +108,10 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int h = hash(key, ht->capacity);
+  if (ht->storage[h] != 0){
+    return ht->storage[h]-> value;
+  }
   return NULL;
 }
 
@@ -110,7 +122,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  free(ht);
 }
 
 
