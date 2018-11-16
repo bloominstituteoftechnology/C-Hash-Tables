@@ -64,10 +64,14 @@ unsigned int hash(char *str, int max)
   All values in storage should be initialized to NULL
   (hint: look up `calloc`)
  ****/
+/*
+create_hash_table(3);
+*/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity; //indices in an array
+  ht->storage = calloc(capacity, sizeof(Pair *)); //this size of struct 
   return ht;
 }
 
@@ -81,6 +85,10 @@ BasicHashTable *create_hash_table(int capacity)
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
 
+  int hashkey = hash(key, ht->capacity); 
+  Pair *pair = create_pair(key, value); 
+  ht->storage[hashkey] = pair;
+
 }
 
 /****
@@ -90,6 +98,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  if(ht->storage[hash(key, ht->capacity)] != NULL ) {
+    free(ht->storage[hash(key, ht->capacity)]);
+    
+    ht->storage[hash(key, ht->capacity)] = NULL;
+  } 
 
 }
 
@@ -100,7 +113,16 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+
+  int indexVal = hash(key, ht->capacity);
+
+  if(ht->storage[indexVal] == NULL) {
+    return NULL;
+  }else{
+    return ht->storage[indexVal]->value;
+  }
+  
+
 }
 
 /****
@@ -110,29 +132,35 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  if (ht != NULL) free(ht);
 }
 
 
 #ifndef TESTING
 int main(void)
 {
+  printf("about to create Ht table\n");
   struct BasicHashTable *ht = create_hash_table(16);
+  printf("created the table\n");
 
   hash_table_insert(ht, "line", "Here today...\n");
+  printf("inserted into the table\n");
 
   printf("%s", hash_table_retrieve(ht, "line"));
-
+  printf("retrieved the value from the ht\n");
+  
   hash_table_remove(ht, "line");
-
+  printf("removed from the hashtable\n");
+  
   if (hash_table_retrieve(ht, "line") == NULL) {
     printf("...gone tomorrow. (success)\n");
   } else {
     fprintf(stderr, "ERROR: STILL HERE\n");
   }
-
+  printf("retreive from the tables\n");
+  
   destroy_hash_table(ht);
-
+  printf("destroyed the table\n");
   return 0;
 }
 #endif
