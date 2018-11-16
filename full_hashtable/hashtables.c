@@ -43,6 +43,28 @@ int main(void)
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
 
+  hash_table_insert(ht, "key-0", "new-val-0");
+  hash_table_insert(ht, "key-1", "new-val-1");
+  hash_table_insert(ht, "key-2", "new-val-2");
+  hash_table_insert(ht, "key-3", "new-val-3");
+  hash_table_insert(ht, "key-4", "new-val-4");
+  hash_table_insert(ht, "key-5", "new-val-5");
+  hash_table_insert(ht, "key-6", "new-val-6");
+  hash_table_insert(ht, "key-7", "new-val-7");
+  hash_table_insert(ht, "key-8", "new-val-8");
+  hash_table_insert(ht, "key-9", "new-val-9");
+
+  printf("%s\n", hash_table_retrieve(ht, "key-0"));
+  printf("%s\n", hash_table_retrieve(ht, "key-1"));
+  printf("%s\n", hash_table_retrieve(ht, "key-2"));
+  printf("%s\n", hash_table_retrieve(ht, "key-3"));
+  printf("%s\n", hash_table_retrieve(ht, "key-4"));
+  printf("%s\n", hash_table_retrieve(ht, "key-5"));
+  printf("%s\n", hash_table_retrieve(ht, "key-6"));
+  printf("%s\n", hash_table_retrieve(ht, "key-7"));
+  printf("%s\n", hash_table_retrieve(ht, "key-8"));
+  printf("%s\n", hash_table_retrieve(ht, "key-9"));
+
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
@@ -124,31 +146,26 @@ HashTable *create_hash_table(int capacity)
  
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-    //get a hash 
-    unsigned int hash_index = hash(key, ht->capacity);
-    //create a LinkedPair 
-    LinkedPair *new_pair = create_pair(key, value);
 
-    //check if something exists at the hash 
-    if (ht->storage[hash_index] == NULL){
-      //if nothing exists  set the hash to new pair 
-      ht->storage[hash_index] = new_pair;
+    LinkedPair * newLinkedPair = create_pair(key, value);
+    int hashKey = hash(key, ht->capacity);
+    LinkedPair *current =  ht->storage[hashKey];
+    if(current == NULL){
+      ht->storage[hashKey] = newLinkedPair;
     } else {
-      //if something exists  take the pair.next and have equal to new pair 
-      // ht->storage[hash_index]->next = pair; 
-      //^Not as simple as that. What if there is  already a next? and then a next after that. 
-      if(strcmp(ht->storage[hash_index]->key, key) == 0){
-        ht->storage[hash_index] = new_pair; 
-      } else {
-        LinkedPair *linked_pair = ht->storage[hash_index];
-        //create a loop to check for a null value  if null set the new pair else go to the next 
-        while(linked_pair->next != NULL){
-          linked_pair = linked_pair->next; 
+      while(current != NULL){
+        if(strcmp(current->key, key) ==0 ){
+          current->value = value;
+          break;
+        } else if (current->next == NULL){
+          current->next = newLinkedPair;
+          break;
+        } else {
+          current = current->next;
         }
-        linked_pair->next = new_pair; 
-
       }
-
+      // newLinkedPair->next = ht->storage[hashKey];
+      // ht->storage[hashKey] = newLinkedPair;
     }
 
 }
@@ -162,37 +179,23 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  
 void hash_table_remove(HashTable *ht, char *key)
 {
-  //get hash 
-  unsigned int  hash_index = hash(key, ht->capacity);
-  //create parent  if not null 
-  LinkedPair *parent = NULL; 
-
-  //Check if the index point of the storarage is null 
-  if(ht->storage[hash_index] == NULL){
-    printf("ERROR: The item is not in the hash table");
-  }else {
-    parent = ht->storage[hash_index]; 
-  }
-
-  //loop through checking for the next node's key, 
-  //if it matches we have the item we plan to delete 
-  while(strcmp(parent->next->key, key) != 0 && parent->next != NULL){
-      parent = parent->next; 
-  }
-
-  if(parent->next != NULL){
-    LinkedPair *deleting = parent->next; 
-    LinkedPair *next_next = NULL; 
-    if(deleting->next != NULL){
-      next_next = deleting->next; 
+    int hashedKey = hash(key, ht->capacity);
+    LinkedPair *pair = ht->storage[hashedKey];
+    LinkedPair *trail = NULL;
+    while(pair != NULL && strcmp(pair->key, key) != 0){
+      trail = pair;
+      pair = pair->next;
+    }
+    if(pair == NULL){
+      printf("%s is not a key", key);
+      return;
+    }
+    if(trail == NULL){
+      ht->storage[hashedKey] = pair->next;
+    }else{
+      trail->next = pair->next;
     }
 
-    parent->next = next_next; 
-    destroy_pair(deleting);
-    
-  } else {
-    printf("ERROR  ITEM NOT FOUND"); 
-  }
 }
 
   // Fill this in.
@@ -210,19 +213,24 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   //check if null else start loop 
 
   LinkedPair *current = NULL;
-  char *value = NULL; 
   if(ht->storage[hash_index] == NULL){
-    // printf("ERROR: key does not exsit");
-    return value; 
+    printf("ERROR: key does not exsit");
+    return NULL; 
   } else {
     current = ht->storage[hash_index]; 
-    while(strcmp(current->key, key) != 0 && current != NULL){
+    
+    while(current != NULL){
+      if(strcmp(current->key, key) == 0){
+          printf("281\n"); 
+          return current->value; 
+      }
+      printf("284\n");
       current = current->next; 
     }
-    value = current->value; 
+ 
   }
 
-  return value; 
+  return NULL; 
 }
 
   // Fill this in.
