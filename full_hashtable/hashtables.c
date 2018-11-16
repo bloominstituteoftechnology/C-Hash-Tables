@@ -10,7 +10,6 @@ typedef struct LinkedPair {
   char *key;
   char *value;
   struct LinkedPair *next;
-  int length;
 } LinkedPair;
 
 /****
@@ -30,7 +29,6 @@ LinkedPair *create_pair(char *key, char *value)
   pair->key = key;
   pair->value = value;
   pair->next = NULL;
-  pair->length = 0;
   return pair;
 }
 
@@ -125,12 +123,18 @@ char *hash_table_retrieve(HashTable *ht, char *key)
     return ht->storage[indexVal]->value;
   }else{
     // ht->storage[indexVal]->next->value
-    LinkedPair *linkedLenght = *ht->storage->pair->length;
-    for (int i = 0; i < linkedLenght; i++) {
-      
+    // LinkedPair *linkedLenght = *ht->storage->pair->length;
+    while(current_pair->next != NULL) {
+      if(strcmp(current_pair->key, key) == 0) {
+        return current_pair->value;
+      }
+      current_pair = current_pair->next;
+    }
+    if(strcmp(current_pair->key, key) == 0) {
+      return current_pair->value;
     }
   }
-  // return NULL;
+  return NULL;
 }
 
 /****
