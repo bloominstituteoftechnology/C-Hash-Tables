@@ -26,8 +26,8 @@ typedef struct HashTable {
 LinkedPair *create_pair(char *key, char *value)
 {
   LinkedPair *pair = malloc(sizeof(LinkedPair));
-  pair->key = key;
-  pair->value = value;
+  pair->key = strdup(key);
+  pair->value = strdup(value);
   pair->next = NULL;
 
   return pair;
@@ -68,7 +68,7 @@ HashTable *create_hash_table(int capacity)
 {
   HashTable *ht = malloc(sizeof(HashTable));
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(LinkedPair));
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -86,14 +86,11 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   LinkedPair * pair = create_pair(key, value);
   int ind = hash(key, ht->capacity);
-  printf("Inserting %s %s into %d\n", key, value, ind);
   if(ht->storage[ind] == NULL) {
     ht->storage[ind] = pair;
   } else {
     LinkedPair * current = ht->storage[ind];
     while (current != NULL) {
-      int x = strcmp(current->key, key);
-      printf("%s = %s : %d\n", current->key, key, x);
       if(strcmp(current->key, key) == 0) {
         printf("Overwriting %s\n", key);
         current->value = value;
@@ -153,7 +150,6 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 {
   int ind = hash(key, ht->capacity);
   LinkedPair * current = ht->storage[ind];
-  printf("Retrieving %s from %d\n", key, ind);
   while(current != NULL) {
     if (strcmp(current->key, key) == 0) {
       return current->value;
