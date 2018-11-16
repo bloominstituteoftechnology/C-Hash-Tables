@@ -139,21 +139,26 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  //
   unsigned int index = hash(key, ht->capacity);
 
   LinkedPair *current = NULL;
   char *value = NULL;
-
+  //check if there is anything in the hash
   if(ht->storage[index] == NULL){
+    //if not return the value
     return value;
   }else{
+    //if not loop through and current is the next value.
     while(strcmp(current->key, key) != 0 && current->next != NULL){
       current = current->next;
     }
-    value =current->value;
+    //set value as the current.
+    value = current->value;
+    return value;
   }
 
-  return value;
+  return NULL;
 }
 
 /****
@@ -197,12 +202,13 @@ HashTable *hash_table_resize(HashTable *ht)
 #ifndef TESTING
 int main(void)
 {
+  printf("working at the start");
   struct HashTable *ht = create_hash_table(2);
-
+  printf("Hashtable created");
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
-
+  printf("Insertion succefult");
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
