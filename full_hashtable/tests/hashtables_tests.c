@@ -3,11 +3,12 @@
 
 char *basic_hash_table_test()
 {
+    printf("about to start\n");
     struct HashTable *ht = create_hash_table(8);
-
+    printf("created hash table\n");
     char *return_value = hash_table_retrieve(ht, "key-0");
     mu_assert(return_value == NULL, "Initialized value is not NULL");
-
+    printf("first retrieval\n");
     hash_table_insert(ht, "key-0", "val-0");
     hash_table_insert(ht, "key-1", "val-1");
     hash_table_insert(ht, "key-2", "val-2");
@@ -18,7 +19,7 @@ char *basic_hash_table_test()
     hash_table_insert(ht, "key-7", "val-7");
     hash_table_insert(ht, "key-8", "val-8");
     hash_table_insert(ht, "key-9", "val-9");
-
+    printf("first round of insertions finished\n");
     return_value = hash_table_retrieve(ht, "key-0");
     mu_assert(strcmp(return_value, "val-0") == 0, "Value is not stored correctly");
     return_value = hash_table_retrieve(ht, "key-1");

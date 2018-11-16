@@ -147,15 +147,21 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   LinkedPair *current_pair;
   for (int i = 0; i < ht->capacity; i++) {
     current_pair = ht->storage[i];
-    while (current_pair->next != NULL) {
+    printf("Is current pair null? %s\n", current_pair == NULL ? "Yes": "No");
+    if (current_pair != NULL) {
+      printf("We are in current_pair != NULL condition\n");
+      while (current_pair->next != NULL) {
+        if (strcmp(current_pair->key, key) == 0) {
+        return current_pair->value;
+        }
+        current_pair = current_pair->next;
+      }
+
       if (strcmp(current_pair->key, key) == 0) {
-      return current_pair->value;
+        return current_pair->value;
       }
-      current_pair = current_pair->next;
     }
-    if (strcmp(current_pair->key, key) == 0) {
-      return current_pair->value;
-      }
+
   }
   return NULL;
 }
