@@ -117,7 +117,25 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
 
+  LinkedPair *temp = ht->storage[index];
+
+  if (temp == NULL) {
+    printf("key not found\n");
+  } else if (strcmp(temp->key, key) == 0) {
+    ht->storage[index] = temp->next;
+    destroy_pair(temp);
+  } else {
+    while (temp->next != NULL) {
+      if (strcmp(temp->next->key, key) == 0) {
+        temp->next = temp->next->next;
+        destroy_pair(temp->next);
+        return;
+      }
+      temp = temp->next;
+    }
+  }
 }
 
 /****
@@ -130,6 +148,19 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int hashIndex = hash(key, ht-> capacity); 
+  LinkedPair *linked_node = ht-> storage[hashIndex]; 
+  if(linked_node == NULL){
+    return NULL; 
+  }else{
+    while(linked_node != NULL){
+      if(linked_node-> key != key){
+        linked_node = linked_node-> next; 
+      }else{
+        return linked_node-> value; 
+      }
+    }
+  }
   return NULL;
 }
 
