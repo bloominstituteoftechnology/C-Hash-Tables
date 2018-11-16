@@ -38,7 +38,12 @@ LinkedPair *create_pair(char *key, char *value)
 void destroy_pair(LinkedPair *pair)
 {
   if (pair != NULL) {
+	  //printf("Destroying pointer %p and key %s \n", pair, pair->key);
+	  //pair->key = NULL;
+	  //pair->value = NULL;
+	  //pair->next = NULL;
 	  free(pair);
+	  //printf(" pointer in destroy %s \n", pair->key);
   }	  
 }
 
@@ -85,22 +90,17 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-	int index = hash(key, ht->capacity);
+	 unsigned int index = hash(key, ht->capacity);
 
 	if(ht->storage[index]){
                 LinkedPair *a = ht->storage[index];
-		//printf("a value %p \n", a);
-		//printf("ht-> value %p \n", ht->storage[index]);
-
 		int flag =0;
 
-		while(a!=NULL){
+		while(a){
 			if(strcmp(a->key, key)==0){
 				printf("a->key: %s key: %s \n", a->key, key);
 
 				printf("Key Value pair already exists, overwriting the value...\n");
-                                //destroy_pair(a);
-                		//a = create_pair(key, value);
 				a->value = NULL;
 				a->value = value;
 				flag = 1;
@@ -115,7 +115,6 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 		if(flag==0) {
 			//printf("Creating new pair \n");
 			//printf("a value %p \n", a);
-			//printf("ht->storage[index]->next value %p \n", ht->storage[index]->next);
 			ht->storage[index]->next = create_pair(key, value);
 			printf("Inserted %s and %s \n", key, value);
 		}
@@ -137,43 +136,29 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-	int index = hash(key, ht->capacity);
+	 
+	unsigned int index = hash(key, ht -> capacity);
 	
-	if(ht->storage[index]){
-        	LinkedPair *a = ht->storage[index];
-		LinkedPair *a_previous = a;
+  		LinkedPair *a = ht -> storage[index];
+  		LinkedPair *a_previous = a;
 
-                while(a!=NULL){
-                        if(strcmp(a->key, key)==0){
-				if(a->next==NULL){
-					printf("a->key is: %s and key is: %s\n", a->key, key);
-					printf("a address %p \n", a);
-                                	destroy_pair(a);
-					a = NULL;
-					printf("Destroyed %s \n", key);
-					//printf("a->val should be NULL %s \n", a->value);
-					break;
-				}
-				else{
-					printf("a->key is: %s and key is: %s\n", a->key, key);
-					a_previous->next = a->next;
-					printf("a address where a_prev %p \n ", a);
-					//printf("a->key is: %s and key is: %s\n", a->key, key);
-					destroy_pair(a);
-                                        a = NULL;
-					printf("Destroyed %s \n", key);
-					//printf("a->val should be NULL %s \n", a->value);
-                                        break;
-				}
-                        }
-			a_previous = a;
-                        a = a->next;
+  	while (a==NULL && strcmp(a -> key, key)==0) {
+    		a_previous = a;
+    		a = a_previous -> next;
+  	}
+  	
+	if (a != NULL) {
 
-                }
-	}
-	else{
-		printf("The Key you are trying to remove could not be found");
-	}	
+    		if (a == a_previous) {
+      			ht -> storage[index] = a -> next;
+    	}
+
+    	a_previous -> next = a -> next;
+    	destroy_pair(a);
+  	} 	
+	else {
+    		perror("The Key you are trying to remove could not be found\n");
+  	}
 
 }
 
@@ -204,7 +189,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 		return NULL;
         }
         else{
-                printf("The Key you are trying to retrieve could not be found");
+                printf("The Key you are trying to retrieve could not be found \n");
 		return NULL;
         }
 }
