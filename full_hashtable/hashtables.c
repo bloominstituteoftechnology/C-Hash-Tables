@@ -136,11 +136,11 @@ void hash_table_remove(HashTable *ht, char *key)
   //linkedpairparent->next = linkedpair->next
   //destroypair(linkedpair)
   LinkedPair *stored_pair = ht->storage[index];
-  if (stored_pair = NULL)
+  if (stored_pair == NULL)
   {
-    printf("Warning: previous index being overwritten");
+    printf("Warning: no item with that key exists!");
   }
-  //maybe add else wrapper if needed.
+
   if (strcmp(stored_pair->key, key) == 0)
   {
     ht->storage[index] = stored_pair->next;
@@ -186,7 +186,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
       {
         if (strcmp(stored_pair->next->key, key) == 0)
         {
-         return stored_pair->next->value;
+          return stored_pair->next->value;
         }
         stored_pair = stored_pair->next;
       }
@@ -202,6 +202,18 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for (int i = 0; i < ht->capacity - 1; i++)
+  {
+    LinkedPair *stored_pair = ht->storage[i];
+    while (stored_pair != NULL)
+    {
+      LinkedPair *temp = stored_pair->next;
+      destroy_pair(temp);
+      stored_pair = temp;
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
@@ -214,8 +226,16 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+  for (int i = 0; i < ht->capacity - 1; i++)
+  {
+    LinkedPair *linked_pair = ht->storage[i];
+    while (linked_pair != NULL)
+    {
+      hash_table_insert(new_ht, linked_pair->key, linked_pair->value);
+      linked_pair = linked_pair->next;
+    }
+  }
   return new_ht;
 }
 

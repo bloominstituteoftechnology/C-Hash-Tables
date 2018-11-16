@@ -98,16 +98,15 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   ht->storage[hashIndex] = pair;
 
   //BRADY SOLUTION
-    // unsigned int index = hash(key, ht->capacity);
-    // Pair *stored_pair = ht->storage[index];
-    // if (stored_pair != NULL) 
-    // {
-      //if (strcmp(key, key ) != 0) {do linked list stuff}
-    // }
-    // destorypairs(stored_pair)
-    // }
-    // ht->storage[index]  = create_pair(key, value);
-
+  // unsigned int index = hash(key, ht->capacity);
+  // Pair *stored_pair = ht->storage[index];
+  // if (stored_pair != NULL)
+  // {
+  //if (strcmp(key, key ) != 0) {do linked list stuff}
+  // }
+  // destorypairs(stored_pair)
+  // }
+  // ht->storage[index]  = create_pair(key, value);
 }
 
 /****
@@ -145,7 +144,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-  for (int i = 0; i < ht->capacity; i++)
+  for (int i = 0; i < ht->capacity - 1; i++)
   {
     destroy_pair(ht->storage[i]);
   }
