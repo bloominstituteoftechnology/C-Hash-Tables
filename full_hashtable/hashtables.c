@@ -26,8 +26,10 @@ typedef struct HashTable {
 LinkedPair *create_pair(char *key, char *value)
 {
   LinkedPair *pair = malloc(sizeof(LinkedPair));
-  pair->key = key;
-  pair->value = value;
+  pair->key = strdup(key);
+  pair->value = strdup(value);
+  // pair->key = key;
+  // pair->value = value;
   pair->next = NULL;
 
   return pair;
@@ -38,7 +40,11 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL) {
+    free(pair->key);
+    free(pair->value);
+    free(pair);
+  } 
 }
 
 /****
@@ -66,7 +72,7 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht =malloc(sizeof(HashTable)) ;
+  HashTable *ht = malloc(sizeof(HashTable));
   ht->capacity = capacity;
   ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
@@ -92,7 +98,8 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     while (current_pair != NULL) {
       if (strcmp(current_pair->key, key) == 0) {
         free(current_pair->value);
-        current_pair->value = value;
+        current_pair->value = strdup(value);
+        // current_pair->value = value;
         break;
       } else if (current_pair->next == NULL) {
         current_pair->next = new_pair;
@@ -134,7 +141,7 @@ void hash_table_remove(HashTable *ht, char *key)
         current_pair = current_pair->next;
       }
     }
-    printf("nothing to remove\n");
+    // printf("nothing to remove\n");
 
   } else {
     printf("could not remove\n");
@@ -165,20 +172,10 @@ char *hash_table_retrieve(HashTable *ht, char *key)
     printf("key not found\n");
     return NULL;
   } else {
-    printf("hash not found\n");
-    return NULL;
+    // printf("hash not found\n");
+  return NULL;
   }
   
-  // else if (strcmp(ht->storage[index]->key, key) == 0) {
-  //   return ht-storage[index]->value;
-  // } else {
-  //   LinkedPair *current_pair = ht->storage[index];
-  //   while (current_pair->next != NULL) {
-
-  //   }
-  // }
-
-  // return NULL;
 }
 
 /****
@@ -190,20 +187,20 @@ void destroy_hash_table(HashTable *ht)
 {
   for (int i=0; i<ht->capacity; i++) {
     if (ht->storage[i] != NULL) {
-
+      LinkedPair *current_pair = ht->storage[i];
+      LinkedPair *next_pair = ht->storage[i]->next;
+      while (next_pair != NULL) {
+        // if (current_pair->next != NULL) {
+        //   current_pair = current_pair->next;
+        // } else {
+        //   destroy_pair(current_pair);
+        // }
+        destroy_pair(current_pair);
+        current_pair = next_pair;
+        next_pair = current_pair->next;
+      }
     }
-    LinkedPair *current_pair = ht->storage[i];
-    LinkedPair *next_pair = ht->storage[i]->next;
-    while (next_pair != NULL) {
-      // if (current_pair->next != NULL) {
-      //   current_pair = current_pair->next;
-      // } else {
-      //   destroy_pair(current_pair);
-      // }
-      destroy_pair(current_pair);
-      current_pair = next_pair;
-      next_pair = current_pair->next;
-    }
+    
   }
 
   free(ht->storage);
@@ -230,7 +227,7 @@ HashTable *hash_table_resize(HashTable *ht)
       }
     }
   }
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
   return new_ht;
 }
 
