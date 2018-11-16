@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Hash table key/value pair with linked list pointer
  ****/
@@ -38,7 +37,14 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL) {
+	  //printf("Destroying pointer %p and key %s \n", pair, pair->key);
+	  //pair->key = NULL;
+	  //pair->value = NULL;
+	  //pair->next = NULL;
+	  free(pair);
+	  //printf(" pointer in destroy %s \n", pair->key);
+  }	  
 }
 
 /****
@@ -66,7 +72,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = (LinkedPair**)calloc(capacity, sizeof(LinkedPair*));
 
   return ht;
 }
@@ -82,7 +90,40 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+	 unsigned int index = hash(key, ht->capacity);
 
+	if(ht->storage[index]){
+                LinkedPair *a = ht->storage[index];
+		int flag =0;
+
+		while(a){
+			if(strcmp(a->key, key)==0){
+				printf("a->key: %s key: %s \n", a->key, key);
+
+				printf("Key Value pair already exists, overwriting the value...\n");
+				a->value = NULL;
+				a->value = value;
+				flag = 1;
+
+			}
+			//printf("a before %p \n", a);
+			//printf("a->next before assignment  %p \n", a->next);
+                        a = a->next;
+			//printf("a after next assignment %p \n", a);
+		}
+
+		if(flag==0) {
+			//printf("Creating new pair \n");
+			//printf("a value %p \n", a);
+			ht->storage[index]->next = create_pair(key, value);
+			printf("Inserted %s and %s \n", key, value);
+		}
+
+	}
+	else{
+		ht->storage[index] = create_pair(key, value);
+		printf("Inserted %s and %s \n", key, value);
+	    }	
 }
 
 /****
@@ -95,8 +136,32 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+	 
+	unsigned int index = hash(key, ht -> capacity);
+	
+  		LinkedPair *a = ht -> storage[index];
+  		LinkedPair *a_previous = a;
+
+  	while (a==NULL && strcmp(a -> key, key)==0) {
+    		a_previous = a;
+    		a = a_previous -> next;
+  	}
+  	
+	if (a != NULL) {
+
+    		if (a == a_previous) {
+      			ht -> storage[index] = a -> next;
+    	}
+
+    	a_previous -> next = a -> next;
+    	destroy_pair(a);
+  	} 	
+	else {
+    		perror("The Key you are trying to remove could not be found\n");
+  	}
 
 }
+
 
 /****
   Fill this in.
@@ -108,7 +173,25 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  
+	int index = hash(key, ht->capacity);
+
+        if(ht->storage[index]){
+                LinkedPair *a = ht->storage[index];
+
+                while(a!=NULL){
+                        if(a->key == key){
+                                return a->value;
+			}
+                        a = a->next;
+
+                }
+		return NULL;
+        }
+        else{
+                printf("The Key you are trying to retrieve could not be found \n");
+		return NULL;
+        }
 }
 
 /****
@@ -118,7 +201,11 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+	for(int i=0; i < ht->capacity; i++){
+                        destroy_pair(ht->storage[i]);
+        }
+        	free(ht->storage);
+                free(ht);
 }
 
 /****
@@ -131,7 +218,18 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  int new_cap = 2 * ht->capacity;	
+  HashTable *new_ht = create_hash_table(new_cap);
+
+  for(int i=0; i < ht->capacity; i++){
+	
+	LinkedPair *b = ht->storage[i]; 
+
+	while(b != NULL){  
+  		hash_table_insert(new_ht, ht->storage[i]->key, ht->storage[i]->value);
+		b = b->next;
+	}	
+  }
 
   return new_ht;
 }
