@@ -26,8 +26,8 @@ typedef struct HashTable {
 LinkedPair *create_pair(char *key, char *value)
 {
   LinkedPair *pair = malloc(sizeof(LinkedPair));
-  pair->key = key;
-  pair->value = value;
+  pair->key = strdup(key);
+  pair->value = strdup(value);
   pair->next = NULL;
 
   return pair;
@@ -38,7 +38,11 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL) {
+    free(pair->key);
+    free(pair->value);
+    free(pair);
+  }
 }
 
 /****
