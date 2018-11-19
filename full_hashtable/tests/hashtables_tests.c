@@ -4,9 +4,12 @@
 char *basic_hash_table_test()
 {
     struct HashTable *ht = create_hash_table(8);
+    printf("create hash sucess\n\n");
 
     char *return_value = hash_table_retrieve(ht, "key-0");
+    printf("return value sucess\n\n");
     mu_assert(return_value == NULL, "Initialized value is not NULL");
+    printf("mu assert sucess\n\n");
 
     hash_table_insert(ht, "key-0", "val-0");
     hash_table_insert(ht, "key-1", "val-1");
@@ -18,16 +21,21 @@ char *basic_hash_table_test()
     hash_table_insert(ht, "key-7", "val-7");
     hash_table_insert(ht, "key-8", "val-8");
     hash_table_insert(ht, "key-9", "val-9");
+    printf("first insert set\n");
 
     return_value = hash_table_retrieve(ht, "key-0");
+    printf("v2 %s\n", return_value);
     mu_assert(strcmp(return_value, "val-0") == 0, "Value is not stored correctly");
+    printf("v3 %s\n", return_value);
     return_value = hash_table_retrieve(ht, "key-1");
+    printf("v4 %s\n", return_value);
     mu_assert(strcmp(return_value, "val-1") == 0, "Value is not stored correctly");
     return_value = hash_table_retrieve(ht, "key-2");
     mu_assert(strcmp(return_value, "val-2") == 0, "Value is not stored correctly");
     return_value = hash_table_retrieve(ht, "key-3");
     mu_assert(strcmp(return_value, "val-3") == 0, "Value is not stored correctly");
     return_value = hash_table_retrieve(ht, "key-4");
+    printf("pass testva44444lue\n");
     mu_assert(strcmp(return_value, "val-4") == 0, "Value is not stored correctly");
     return_value = hash_table_retrieve(ht, "key-5");
     mu_assert(strcmp(return_value, "val-5") == 0, "Value is not stored correctly");
@@ -36,9 +44,12 @@ char *basic_hash_table_test()
     return_value = hash_table_retrieve(ht, "key-7");
     mu_assert(strcmp(return_value, "val-7") == 0, "Value is not stored correctly");
     return_value = hash_table_retrieve(ht, "key-8");
+    printf("pass t55555estvalue\n");
     mu_assert(strcmp(return_value, "val-8") == 0, "Value is not stored correctly");
     return_value = hash_table_retrieve(ht, "key-9");
+    printf("pass t66estvalue\n");
     mu_assert(strcmp(return_value, "val-9") == 0, "Value is not stored correctly");
+    printf("first retrieve set \n");
 
 
     hash_table_insert(ht, "key-0", "new-val-0");
@@ -51,14 +62,19 @@ char *basic_hash_table_test()
     hash_table_insert(ht, "key-7", "new-val-7");
     hash_table_insert(ht, "key-8", "new-val-8");
     hash_table_insert(ht, "key-9", "new-val-9");
+    printf("second insert set \n");
 
     return_value = hash_table_retrieve(ht, "key-0");
+    printf("great1 %s\n", return_value);
     mu_assert(strcmp(return_value, "new-val-0") == 0, "Value is not overwritten correctly");
     return_value = hash_table_retrieve(ht, "key-1");
+    printf("great2 %s\n", return_value);
     mu_assert(strcmp(return_value, "new-val-1") == 0, "Value is not overwritten correctly");
     return_value = hash_table_retrieve(ht, "key-2");
+    printf("great3 %s\n", return_value);
     mu_assert(strcmp(return_value, "new-val-2") == 0, "Value is not overwritten correctly");
     return_value = hash_table_retrieve(ht, "key-3");
+    printf("great4 %s\n", return_value);
     mu_assert(strcmp(return_value, "new-val-3") == 0, "Value is not overwritten correctly");
     return_value = hash_table_retrieve(ht, "key-4");
     mu_assert(strcmp(return_value, "new-val-4") == 0, "Value is not overwritten correctly");
@@ -72,9 +88,12 @@ char *basic_hash_table_test()
     mu_assert(strcmp(return_value, "new-val-8") == 0, "Value is not overwritten correctly");
     return_value = hash_table_retrieve(ht, "key-9");
     mu_assert(strcmp(return_value, "new-val-9") == 0, "Value is not overwritten correctly");
+    printf("great second retrieve passed %s\n", return_value);
 
     hash_table_remove(ht, "key-9");
+    printf("remove1");
     hash_table_remove(ht, "key-8");
+    printf("remove2");
     hash_table_remove(ht, "key-7");
     hash_table_remove(ht, "key-6");
     hash_table_remove(ht, "key-5");
