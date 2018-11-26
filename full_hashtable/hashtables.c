@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Hash table key/value pair with linked list pointer
  ****/
-typedef struct LinkedPair {
+typedef struct LinkedPair
+{
   char *key;
   char *value;
   struct LinkedPair *next;
@@ -15,7 +15,8 @@ typedef struct LinkedPair {
 /****
   Hash table with linked pairs
  ****/
-typedef struct HashTable {
+typedef struct HashTable
+{
   int capacity;
   LinkedPair **storage;
 } HashTable;
@@ -38,7 +39,8 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL)
+    free(pair);
 }
 
 /****
@@ -50,9 +52,10 @@ unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
   int c;
-  unsigned char * u_str = (unsigned char *)str;
+  unsigned char *u_str = (unsigned char *)str;
 
-  while ((c = *u_str++)) {
+  while ((c = *u_str++))
+  {
     hash = ((hash << 5) + hash) + c;
   }
 
@@ -66,7 +69,10 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -82,7 +88,33 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  int hashidex = hash(key, ht->capacity);
+  LinkedPair *linked_node = ht->storage[hashidex];
+  if (linked_node == NULL)
+  {
+    printf("linked node at head: %d \n", hashidex);
+    linked_node = create_pair(key, value);
+    ht->storage[hashidex] = linked_node;
+  }
+  else
+  {
+    int count = 1;
+    while (linked_node != NULL)
+    {
+      if (linked_node->next != NULL)
+      {
+        count += 1;
+        linked_node = linked_node->next;
+      }
+      else
+      {
+        break;
+      }
+    }
+    printf("Count %d \n", count);
+    printf("linked node created at tail: %d \n", hashidex);
+    linked_node->next = create_pair(key, value);
+  }
 }
 
 /****
@@ -95,7 +127,31 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  int hashIndex = hash(key, ht->capacity);
+  LinkedPair *linked_node = ht->storage[hashIndex];
+  LinkedPair *previous = NULL;
+  if (linked_node == NULL)
+  {
+    printf("pair not found");
+  }
+  else
+  {
+    while (linked_node->next != NULL)
+    {
+      if (linked_node->key != key)
+      {
+        previous = linked_node;
+        linked_node = linked_node->next;
+      }
+      else
+      {
+        previous->next = linked_node->next;
+        break;
+      }
+    }
+    printf("Removing %s \n", linked_node->key);
+    destroy_pair(linked_node);
+  }
 }
 
 /****
@@ -108,6 +164,26 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int hashidex = hash(key, ht->capacity);
+  LinkedPair *linked_node = ht->storage[hashidex];
+  if (linked_node == NULL)
+  {
+    return NULL;
+  }
+  else
+  {
+    while (linked_node != NULL)
+    {
+      if (linked_node->key != key)
+      {
+        linked_node = linked_node->next;
+      }
+      else
+      {
+        return linked_node->value;
+      }
+    }
+  }
   return NULL;
 }
 
@@ -118,7 +194,16 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  LinkedPair *previous = NULL;
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    while (ht->storage[i]->next)
+    {
+      previous = ht->storage[i];
+      ht->storage[i] = ht->storage[i]->next;
+      destroy_pair(previous);
+    }
+  }
 }
 
 /****
@@ -131,11 +216,20 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+
+  for (int i = 0; i < ht->capacity - 1; i++)
+  {
+    LinkedPair *temp = ht->storage[i];
+    while (temp != NULL)
+    {
+      hash_table_insert(new_ht, temp->key, temp->value);
+      temp = temp->next;
+    }
+  }
 
   return new_ht;
 }
-
 
 #ifndef TESTING
 int main(void)
