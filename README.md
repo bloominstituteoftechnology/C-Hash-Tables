@@ -1,3 +1,22 @@
+## DAY 1
+
+- [ ] Build your code by typing `make` then `./b_hashtable` in the terminal.
+
+- [ ] Run tests by typing `make tests`.
+
+## DAY 2
+- [ ] Build your code by typing `make` then `./hashtable` in the terminal.
+
+- [ ] Run tests by typing `make tests`.
+
+## STRETCH GOALS
+- [ ] Update your HashTable to automatically double in size when it grows past a load factor of 0.7.
+
+- [ ] Update your HashTable to automatically half in size when it shrinks past a load factor of 0.2. This should only occur if the HashTable has been resized past the initial size.
+
+- [ ] Refactor tests to pass with your resizing HashTable.
+
+
 # Hash Tables
 
 Hash tables are arguably the single most important data structure known to mankind. Used to implement everything from objects in JavaScript and dictionaries in Python to Memcached over a distributed computer network, hash tables are beloved by programmers for providing key/value storage with constant big-O time complexity for insertion, deletion and search.
