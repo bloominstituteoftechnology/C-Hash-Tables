@@ -72,6 +72,9 @@ BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
 
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(char *));
+
   return ht;
 }
 
@@ -84,6 +87,13 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  unsigned int hash_key = hash(key, ht->capacity);
+  if (ht->storage[hash_key] != NULL){
+    printf("Collision warning");
+    return;
+  } else {
+    ht->storage[hash_key] = value;
+  }
 
 }
 
