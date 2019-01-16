@@ -94,14 +94,21 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   // Create a hashed key
   unsigned int hashed_key = hash(key, ht->capacity);
 
-  // If the space is occupied, free it and print a warning
+  // If the space is occupied
   if (ht->storage[hashed_key] != NULL)
   {
+    // and if the keys do not match
+    if (strcmp(ht->storage[hashed_key]->key, key) != 0)
+    {
+      // print a warning stating that the key will be overwritten
+      printf("Previous key is being overwritten.\n");
+    }
+
+    // then free the occupied space
     free(ht->storage[hashed_key]);
-    printf("Previous value is being overwritten.\n");
   }
 
-  // Create a new key/value pair and insert it into that space
+  // finally, create a new key/value pair and insert it into that space
   ht->storage[hashed_key] = create_pair(key, value);
 }
 
