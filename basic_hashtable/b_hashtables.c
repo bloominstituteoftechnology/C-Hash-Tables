@@ -70,9 +70,11 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));//malloc takes 1 argument, 
+  //does not initialize the memory allocated
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(Pair*));
+  ht->storage = calloc(capacity, sizeof(Pair*));//calloc takes 2 arguments, initializes
+  //the memory to ZERO
 
   return ht;
 }
@@ -103,7 +105,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int hashed = hash(key, ht->capacity);
+  if(ht->storage[hashed]){
+    destroy_pair(ht->storage[hashed]);
+    ht->storage[hashed] = NULL;
+  }
 }
 
 /****
