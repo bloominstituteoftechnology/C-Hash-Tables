@@ -28,7 +28,7 @@ LinkedPair *create_pair(char *key, char *value)
   LinkedPair *pair = malloc(sizeof(LinkedPair));
   pair->key = strdup(key);
   pair->value = strdup(value);
-  pair->next = NULL;
+  pair->next = NULL;//stop the link chain
 
   return pair;
 }
@@ -88,10 +88,24 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-  int hashed = hash(key, ht capacity);
+  int hashed = hash(key, ht->capacity);
   LinkedPair *pair = ht->storage[hashed];
+  if(!pair){
+    LinkedPair *new =create_pair(key, value);
+    ht->storage[hashed]=new;
+  }else{
+    while(pair){
+      if(!strcmp(pair->key, key)){
+        free(pair->value);
+        pair->value=strdup(value);
+        return;
+      }if(!pair->next)
+      }
+    }
   
-}
+  
+  
+
 
 /****
   Fill this in.
