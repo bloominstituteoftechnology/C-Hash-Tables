@@ -98,7 +98,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   if (ht->storage[hashed_key] != NULL)
   {
     free(ht->storage[hashed_key]);
-    printf("Value is being overwritten.");
+    printf("Previous value is being overwritten.\n");
   }
 
   // Create a new key/value pair and insert it into that space
@@ -112,7 +112,25 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  // create a hashed key
+  unsigned int hashed_key = hash(key, ht->capacity);
 
+  // if that space is not empty
+  if (ht->storage[hashed_key] != NULL)
+  {
+    // and if the keys match up
+    if (strcmp(ht->storage[hashed_key]->key, key) == 0)
+    {
+      // free up the memory held in that space, set to NULL, and return
+      free(ht->storage[hashed_key]);
+      ht->storage[hashed_key] = NULL;
+      return;
+    }
+  }
+
+  // otherwise, print a key not found error and exit
+  fprintf(stderr, "Key '%s' not found.\n", key);
+  exit(1);
 }
 
 /****
