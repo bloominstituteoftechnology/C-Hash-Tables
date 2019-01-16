@@ -140,6 +140,21 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  // create a hashed key
+  unsigned int hashed_key = hash(key, ht->capacity);
+
+  // if the space is not empty
+  if (ht->storage[hashed_key] != NULL)
+  {
+    // and if the keys match
+    if (strcmp(ht->storage[hashed_key]->key, key) == 0)
+    {
+      // return the value at that space
+      return ht->storage[hashed_key]->value;
+    }
+  }
+
+  // otherwise return NULL as the key will not have been found
   return NULL;
 }
 
