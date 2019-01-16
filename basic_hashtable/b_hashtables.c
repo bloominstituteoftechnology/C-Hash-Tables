@@ -91,7 +91,18 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  // Create a hashed key
+  unsigned int hashed_key = hash(key, ht->capacity);
 
+  // If the space is occupied, free it and print a warning
+  if (ht->storage[hashed_key] != NULL)
+  {
+    free(ht->storage[hashed_key]);
+    printf("Value is being overwritten.");
+  }
+
+  // Create a new key/value pair and insert it into that space
+  ht->storage[hashed_key] = create_pair(key, value);
 }
 
 /****
