@@ -103,6 +103,17 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
       // print a warning stating that the key will be overwritten
       printf("Previous key is being overwritten.\n");
     }
+    // else if the keys match
+    else
+    {
+      // and if the values match
+      if (strcmp(ht->storage[hashed_key]->value, value) == 0)
+      {
+        // print an error stating that the key/value pair already exists and exit
+        fprintf(stderr, "Key '%s' and value '%s' already exist.\n", key, value);
+        exit(1);
+      }
+    }
 
     // then free the occupied space
     destroy_pair(ht->storage[hashed_key]);
