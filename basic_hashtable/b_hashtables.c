@@ -86,7 +86,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   if (ht->storage[newHash] != NULL) {
     printf("WARNING: overwriting value");
   }
-  ht->storage[newHash] = value;
+  ht->storage[newHash] = create_pair(key, value);
 }
 
 /****
@@ -100,6 +100,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
   unsigned int clrHash = hash(key, capacity);
   if (ht->storage[clrHash] != NULL) {
     ht->storage[clrHash] = NULL;
+    destroy_pair(ht->storage[clrHash]);
   }
   else {
     printf("ERROR: Hash is already empty");
@@ -115,7 +116,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
   int capacity = ht->capacity;  
   unsigned int fndHash = hash(key, capacity);
-    return ht->storage[fndHash];
+    return *ht->storage[fndHash]->value;
 }
 
 /****
@@ -127,6 +128,7 @@ void destroy_hash_table(BasicHashTable *ht)
 {
   for (int i = 0; i < ht->capacity; i++) {
     destroy_pair(ht->storage[i]);
+    free(ht->storage);
   }
   free(ht);
 }
