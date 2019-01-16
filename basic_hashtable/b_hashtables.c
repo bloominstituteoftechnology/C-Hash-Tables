@@ -70,7 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->storage = calloc(capacity, sizeof(Pair *));
+  ht->capacity = capacity;
 
   return ht;
 }
@@ -84,6 +86,20 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  // hash key
+  int hashedkey = hash(key, ht->capacity);
+  // make if key exists else make a pair with key and value given
+  if(ht->storage[hashedkey] != NULL) {
+    printf("Overwriting a value.");
+    // clear stored value
+    destroy_pair(ht->storage[hashedkey]);
+    // make new pair at given hashed index
+    ht->storage[hashedkey] = create_pair(key,value);
+  }
+  else {
+    // make new pair at given hashed index
+    ht->storage[hashedkey] = create_pair(key,value);
+  }
 
 }
 
@@ -94,7 +110,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  unsigned int hashedkey = hash(key, ht->capacity);
+  // if key even exists then clear ky value pair
+  if(ht->storage[hashedkey] != NULL) {
+    printf("Deleting a value.");
+    // clear stored value
+    destroy_pair(ht->storage[hashedkey]);
+    ht->storage[hashedkey] = NULL;
+  }
 }
 
 /****
@@ -104,6 +127,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int hashedkey = hash(key, ht->capacity);
+  // check if value exists
+  if(ht->storage[hashedkey] != NULL) {
+    return ht->storage[hashedkey]->value;
+  }
+
   return NULL;
 }
 
@@ -114,7 +143,13 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  // loop through each bucket
+  for(int i =0; i < ht->capacity; i++) {
+    destroy_pair(ht->storage[i]);
+  }
+  // free malloc'ed memory
+  free(ht->storage);
+  free(ht);
 }
 
 
