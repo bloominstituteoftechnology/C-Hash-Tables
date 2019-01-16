@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Basic hash table key/value pair
  ****/
@@ -52,7 +51,7 @@ unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
   int c;
-  unsigned char * u_str = (unsigned char *)str;
+  unsigned char * u_str = (unsigned char *)str;  // cast the input str from a char * to an unsigned char * called u_str
 
   while ((c = *u_str++)) {
     hash = ((hash << 5) + hash) + c;
@@ -60,7 +59,6 @@ unsigned int hash(char *str, int max)
 
   return hash % max;
 }
-
 
 /****
   Fill this in.
@@ -70,8 +68,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));   // allocate memory for a BasicHashTable struct type as defined above and return a pointer to it
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair));  // ??? Should this use sizeof(Pair) or sizeof(Pair *) ???
   return ht;
 }
 
@@ -84,7 +83,13 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  unsigned int hashed_key = hash(key, ht->capacity);
+  Pair *pair = create_pair(key, value); // I'm not sure if the key here should be hashed or not
+  if (ht->storage[hashed_key] != NULL) {
+    printf("Warning: You are overwriting an existing pair in the hash table.");
+    destroy_pair(ht->storage[hashed_key]);
+  }
+  ht->storage[hashed_key] = pair;
 }
 
 /****
