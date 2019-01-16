@@ -87,7 +87,7 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  int new_pair = create_pair(key, value); // creates a new node for insertion
+  Pair *new_pair = create_pair(key, value); // creates a new node for insertion
   unsigned int target_index = hash(key, ht->capacity); // creates an array index for node to be inserted into
 
   if (ht->storage[target_index] != NULL){ // If the node at the index is not empty
@@ -117,8 +117,6 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  
-  return NULL;
 }
 
 /****
