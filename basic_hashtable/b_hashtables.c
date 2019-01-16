@@ -70,7 +70,10 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable)); // allocate memory for a hash table
+
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(char *)); // allocate the memory storage for size * and fill with spaces with NULL
 
   return ht;
 }
@@ -84,7 +87,17 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  int new_pair = create_pair(key, value); // creates a new node for insertion
+  unsigned int target_index = hash(key, ht->capacity); // creates an array index for node to be inserted into
 
+  if (ht->storage[target_index] != NULL){ // If the node at the index is not empty
+    printf("You're overwriting an existing value value!\n"); // give warning
+    destroy_pair(ht->storage[target_index]); // free up the memory at that index
+    ht->storage[target_index] = new_pair; // insert new node into target index
+  }
+  else {
+    ht->storage[target_index] = new_pair; // just insert new node into target index if it's empty
+  }
 }
 
 /****
@@ -104,6 +117,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  
   return NULL;
 }
 
@@ -123,19 +137,26 @@ int main(void)
 {
   struct BasicHashTable *ht = create_hash_table(16);
 
-  hash_table_insert(ht, "line", "Here today...\n");
+  // MY TESTS
+  hash_table_insert(ht, "tim", "texas\n");
+  hash_table_insert(ht, "josh", "mexico\n");
+  hash_table_insert(ht, "alex", "missouri\n"); // collision with tim, will override tim
 
-  printf("%s", hash_table_retrieve(ht, "line"));
 
-  hash_table_remove(ht, "line");
+  // DEFAULT TESTS
+  // hash_table_insert(ht, "line", "Here today...\n");
 
-  if (hash_table_retrieve(ht, "line") == NULL) {
-    printf("...gone tomorrow. (success)\n");
-  } else {
-    fprintf(stderr, "ERROR: STILL HERE\n");
-  }
+  // printf("%s", hash_table_retrieve(ht, "line"));
 
-  destroy_hash_table(ht);
+  // hash_table_remove(ht, "line");
+
+  // if (hash_table_retrieve(ht, "line") == NULL) {
+  //   printf("...gone tomorrow. (success)\n");
+  // } else {
+  //   fprintf(stderr, "ERROR: STILL HERE\n");
+  // }
+
+  // destroy_hash_table(ht);
 
   return 0;
 }
