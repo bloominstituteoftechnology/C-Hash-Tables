@@ -86,7 +86,14 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  Pair *pair = create_pair(key, value);
+  int hashed = hash(key, ht->capacity);
 
+  if(ht->storage[hashed]){
+    printf("Overwriting value with a different key\n");
+    destroy_pair(ht->storage[hashed]);
+  }
+  ht->storage[hashed]=pair;
 }
 
 /****
@@ -116,6 +123,11 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for(int i = 0; i<ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->storage);
+  free(ht);
 
 }
 
