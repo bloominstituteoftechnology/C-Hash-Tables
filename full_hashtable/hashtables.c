@@ -93,7 +93,64 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  // create an index by hashing the key
+  unsigned int index = hash(key, ht->capacity);
 
+  // if there is nothing in that space
+  if (ht->storage[index] == NULL)
+  {
+    // create a key/value pair in that space
+    ht->storage[index] = create_pair(key, value);
+  }
+  // else, if there is something occupying that space
+  else
+  {
+    // and if the keys match
+    if (strcmp(ht->storage[index]->key, key) == 0)
+    {
+      // and if the values match
+      if (strcmp(ht->storage[index]->value, value) == 0) {
+        // print an error stating that the key/value pair already exists and exit
+        fprintf(stderr, "Key '%s' and value '%s' already exist.\n", key, value);
+        exit(1);
+      }
+      // else if the values do not match
+      else
+      {
+        // print a warning stating that the key will be overwritten
+        printf("Previous key is being overwritten.\n");
+
+        // create a pointer to the next key/value pair
+        LinkedPair *prev_next = ht->storage[index]->next;
+
+        // then free the occupied space
+        destroy_pair(ht->storage[index]);
+
+        // create a new key/value pair and insert it into that space
+        ht->storage[index] = create_pair(key, value);
+
+        // assign its next pointer the value of the previous next key/value pair
+        ht->storage[index]->next = prev_next;
+      }
+    }
+    // else if the keys do not match
+    else
+    {
+      // create pointers to the current and next pair
+      LinkedPair *curr_pair = ht->storage[index];
+      LinkedPair *next_pair = curr_pair->next;
+
+      // cycle through the pairs until your next pair is a NULL pointer
+      while(next_pair != NULL)
+      {
+        curr_pair = next_pair->next;
+        next_pair = curr_pair->next;
+      }
+
+      // create a new key/value pair and insert it as the next pair
+      curr_pair->next = create_pair(key, value);
+    }
+  }
 }
 
 /****
