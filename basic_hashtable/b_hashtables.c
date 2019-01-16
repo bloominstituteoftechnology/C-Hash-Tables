@@ -85,8 +85,19 @@ BasicHashTable *create_hash_table(int capacity)
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
-{
+{  
+  // 1. Get hash && create a pair between key and value passed in so we can put it in the ht later
+  Pair *new_pair = create_pair(key, value);
+  int hash_key = hash(key, ht->capacity);
 
+  // 2. Check if we overwrite a value that has a different key
+  if (ht->storage[hash_key] != NULL) {
+    printf("Value Exists Already: Value already exists in a different key (overwriting value)...");
+    destroy_pair(ht->storage[hash_key]);
+  }
+
+  // 3. Insert new Pair into our specified index
+  ht->storage[hash_key] = new_pair;
 }
 
 /****
@@ -96,7 +107,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  
 }
 
 /****
