@@ -91,6 +91,12 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  int hashIndex = hash(key, ht->capacity);
+  if (ht->storage[hashIndex] != NULL) {
+    printf("Existing key, value has been overwritten");
+    destroy_pair(ht->storage[hashIndex]);
+  }
+  ht->storage[hashIndex] = create_pair(key, value);
 
 }
 
