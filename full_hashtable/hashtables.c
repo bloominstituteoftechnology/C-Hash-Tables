@@ -89,6 +89,9 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     LinkedPair *currHash = ht->storage[newHash];
     while (currHash->next != NULL) {
       currHash = currHash->next;
+    if (strcmp(currHash->key, key) == 0) {
+      currHash->value = value;
+    }
     }
     currHash->next = create_pair(key, value);
   }
@@ -143,8 +146,12 @@ char *hash_table_retrieve(HashTable *ht, char *key)
           currkey = currkey->next;
         }
       }
+      
     }
     }
+      else {
+    return NULL;
+  }
 }
 
 /****
@@ -158,6 +165,7 @@ void destroy_hash_table(HashTable *ht)
     destroy_pair(ht->storage[i]);
   }
   free(ht);
+  free(ht->storage);
 }
 
 /****
