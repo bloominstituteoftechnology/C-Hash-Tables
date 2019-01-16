@@ -117,6 +117,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  unsigned int hashed_key = hash(key, ht->capacity); // hash the incoming key to find the index
+
+  if (ht->storage[hashed_key] != NULL) { // if the index at storage is not empty
+    return ht->storage[hashed_key]->value; // return value at key
+  }
+
+  return NULL; // if nothing is there, return null
 }
 
 /****
@@ -136,10 +143,10 @@ int main(void)
   struct BasicHashTable *ht = create_hash_table(16);
 
   // MY TESTS
-  hash_table_insert(ht, "tim", "texas\n");
-  hash_table_insert(ht, "josh", "mexico\n");
-  hash_table_insert(ht, "alex", "missouri\n"); // collision with tim, will override tim
-
+  hash_table_insert(ht, "tim", "texas\n"); // index 15
+  hash_table_insert(ht, "josh", "mexico\n"); // index 9
+  hash_table_insert(ht, "alex", "missouri\n"); // also index 15, collision -> will override tim
+  printf("%s", hash_table_retrieve(ht, "josh")); // returns mexico
 
   // DEFAULT TESTS
   // hash_table_insert(ht, "line", "Here today...\n");
