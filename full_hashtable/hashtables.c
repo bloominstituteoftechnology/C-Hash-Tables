@@ -38,12 +38,16 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) {
-    free(pair->key);
-    free(pair->value);
-    free(pair);
-  }
+  if (pair !=NULL) free(pair);
 }
+// {
+//   if (pair != NULL) {
+//     free(pair->key);
+//     free(pair->value);
+//     free(pair);
+//   }
+// }
+//or {if (pair !=NULL) free(pair);}
 
 /****
   djb2 hash function
@@ -121,8 +125,24 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  
+  int hashed = hash(key, ht->capacity);
+  LinkedPair *pair = ht->storage[hashed];
+  LinkedPair *previous;
+
+  if(pair && !strcmp(pair->key, key)){
+    ht->storage[hashed]=pair->next;
+  }
+  while(pair && strcmp(pair->key, key)){
+    previous = pair;
+    pair = pair->next;
+  }
+  if (pair){
+    previous->next = pair->next;
+  }
+  destroy_pair(pair);
 }
+
+
 
 /****
   Fill this in.
