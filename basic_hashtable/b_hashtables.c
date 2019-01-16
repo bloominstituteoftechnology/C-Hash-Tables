@@ -107,7 +107,17 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  
+  // 1. Get hash
+  int hash_key = hash(key, ht->capacity);
+
+  // 2. Check if the key exists, if so we delete it (get rid of key/value pair that is at current key, and then set to NULL)
+  if (ht->storage[hash_key] != NULL) {
+    destroy_pair(ht->storage[hash_key]);
+    ht->storage[hash_key] = NULL;
+  } else {
+    printf("There is nothing at specified key");
+    exit(1);
+  }  
 }
 
 /****
@@ -117,6 +127,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  // 1. Get hash
+  int hash_key = hash(key, ht->capacity);
+
+  // 2. Base Case: If key is not found return NULL || Else: We return the value at that storage index
+  if (ht->storage[hash_key]) {
+    return ht->storage[hash_key]->value;
+  }
   return NULL;
 }
 
@@ -127,7 +144,14 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  // 1. Grab all pairs in storage && destroy the pair
+  for (int i = 0; i < ht->capacity; i++) {
+    destroy_pair(ht->storage[i]);    
+  }
+  
+  // 2. We free the storage after all the pairs are set to NULL -> free the hash table
+  free(ht->storage);
+  free(ht);
 }
 
 
