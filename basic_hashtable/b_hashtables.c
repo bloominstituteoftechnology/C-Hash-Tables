@@ -107,7 +107,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int hashed_key = hash(key, ht->capacity); // hash the incoming key to find the index
 
+  if (ht->storage[hashed_key] != NULL) { // if the index at storage is not empty
+    destroy_pair(ht->storage[hashed_key]); // free up the memory at that index
+  }
 }
 
 /****
@@ -147,6 +151,8 @@ int main(void)
   hash_table_insert(ht, "josh", "mexico\n"); // index 9
   hash_table_insert(ht, "alex", "missouri\n"); // also index 15, collision -> will override tim
   printf("%s", hash_table_retrieve(ht, "josh")); // returns mexico
+  hash_table_remove(ht, "josh"); // removes the specified key
+  printf("%s", hash_table_retrieve(ht, "josh")); // returns nothing since it was deleted
 
   // DEFAULT TESTS
   // hash_table_insert(ht, "line", "Here today...\n");
