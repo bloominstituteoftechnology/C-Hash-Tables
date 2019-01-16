@@ -24,8 +24,8 @@ typedef struct BasicHashTable {
  ****/
 Pair *create_pair(char *key, char *value)
 {
-  Pair *pair = malloc(sizeof(Pair));
-  pair->key = strdup(key);
+  Pair *pair = malloc(sizeof(Pair));//alocate the memory
+  pair->key = strdup(key);//duplicate the string
   pair->value = strdup(value);
 
   return pair;
@@ -37,8 +37,6 @@ Pair *create_pair(char *key, char *value)
 void destroy_pair(Pair *pair)
 {
   if (pair != NULL) {
-    free(pair->key);
-    free(pair->value);
     free(pair);
   }
 }
@@ -119,6 +117,10 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int hashed = hash(key, ht->capacity);
+  if (ht->storage[hashed]){
+    return ht->storage[hashed]->value;
+}
   return NULL;
 }
 
