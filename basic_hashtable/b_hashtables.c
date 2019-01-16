@@ -44,7 +44,6 @@ void destroy_pair(Pair *pair)
 
 /****
   djb2 hash function
-
   Do not modify this!
  ****/
 unsigned int hash(char *str, int max)
@@ -62,7 +61,6 @@ unsigned int hash(char *str, int max)
 
 /****
   Fill this in.
-
   All values in storage should be initialized to NULL
   (hint: look up `calloc`)
  ****/
@@ -76,9 +74,7 @@ BasicHashTable *create_hash_table(int capacity)
 
 /****
   Fill this in.
-
   If you are overwriting a value with a different key, print a warning.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
@@ -86,7 +82,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   unsigned int hashed_key = hash(key, ht->capacity);
   Pair *pair = create_pair(key, value); // I'm not sure if the key here should be hashed or not
   if (ht->storage[hashed_key] != NULL) {
-    printf("Warning: You are overwriting an existing pair in the hash table.");
+    printf("Warning: You are overwriting an existing value in the hash table.");
     destroy_pair(ht->storage[hashed_key]);
   }
   ht->storage[hashed_key] = pair;
@@ -94,34 +90,51 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 
 /****
   Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  unsigned int hashed_key = hash(key, ht->capacity);
+  if (ht->storage[hashed_key] != NULL) { // if the hashed key is in the table
+    destroy_pair(ht->storage[hashed_key]);
+    ht->storage[hashed_key] = NULL;
+  } else {
+    printf("No pair with that key was found in the hash table.");
+    return;
+  }
 }
 
 /****
   Fill this in.
-
   Should return NULL if the key is not found.
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int hashed_key = hash(key, ht->capacity);
+  if (ht->storage[hashed_key] != NULL) {     // if the hashed key is in the table. ? do I need to check if ht->storage[hashed]->key is actually equal to input key
+    return ht->storage[hashed_key]->value;
+  } else {
+    printf("No pair with that key was found in the hash table.");
+    return NULL;
+  }
 }
 
 /****
   Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  // for-loop through the hash table and run destroy_pair on each non-null pair:
+  for (int i = 0; i < ht->capacity; i++) {
+    if (ht->storage[i] != NULL) {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  // free the relevant memory:
+  free(ht->storage);
+  free(ht);
 }
-
 
 #ifndef TESTING
 int main(void)

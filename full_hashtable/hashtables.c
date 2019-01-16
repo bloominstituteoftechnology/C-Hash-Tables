@@ -65,13 +65,14 @@ unsigned int hash(char *str, int max)
 
 /****
   Fill this in.
-
   All values in storage should be initialized to NULL
  ****/
+// This is the same as for the basic table but with Linked Pairs this time
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair)); // ??? Should this use sizeof(LinkedPair) or sizeof(LinkedPair *) ???
   return ht;
 }
 
@@ -86,7 +87,13 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  unsigned int hashed_key = hash(key, ht->capacity);
+  LinkedPair *pair = create_pair(key, value);
+  
+  if (ht->storage[hashed_key] == NULL) {
+    ht->storage[hashed_key] = pair;
+    return;
+  }
 }
 
 /****
@@ -145,6 +152,8 @@ HashTable *hash_table_resize(HashTable *ht)
 int main(void)
 {
   struct HashTable *ht = create_hash_table(2);
+  int capacity = ht->capacity;
+  printf("Hash table created with capacity == %d\n", capacity);
 
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
