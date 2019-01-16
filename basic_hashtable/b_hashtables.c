@@ -70,7 +70,7 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = calloc(capacity, sizeof(Pair*));
   ht->capacity = capacity;
   ht->storage = calloc(capacity, sizeof(Pair));
   for (int i=0; i<capacity; i++){
