@@ -71,6 +71,10 @@ unsigned int hash(char *str, int max)
 BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
+  
+  ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+
 
   return ht;
 }
