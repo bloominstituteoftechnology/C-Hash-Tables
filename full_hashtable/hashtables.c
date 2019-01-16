@@ -99,13 +99,17 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
         free(pair->value);
         pair->value=strdup(value);
         return;
-      }if(!pair->next)
       }
+      if(!pair->next){
+        break;
+      }
+      pair=pair->next;
     }
+  LinkedPair *new = create_pair(key, value);
+  pair->next=new;
+  }
+}
   
-  
-  
-
 
 /****
   Fill this in.
@@ -153,7 +157,11 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht =create_hash_table;(ht->capacity * 2);
+  for(int i=0; i<ht->capacity; i++){
+    new_ht->storage[i]=ht->storage[i];
+  }
+  destroy_hash_table(ht);
 
   return new_ht;
 }
