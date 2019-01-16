@@ -110,7 +110,15 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  // Create the hash
+  unsigned int index = hash(key, ht->capacity);
 
+  // If it exists, free it, else, print an error
+  if (ht->storage[index]) {
+    destroy_pair(ht->storage[index]);
+  } else {
+    fprintf(stderr, "Index %d does not exists\n", index);
+  }
 }
 
 /****
