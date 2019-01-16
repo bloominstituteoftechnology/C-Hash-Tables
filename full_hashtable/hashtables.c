@@ -70,7 +70,14 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  // allocate memory for the new instance of the HashTable struct
+  HashTable *ht = malloc(sizeof(HashTable));
+
+  // set initial value for capacity
+  ht->capacity = capacity;
+
+  // allocate memory for storage
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
