@@ -154,6 +154,16 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int hashed=hash(key, ht-c->capacity);
+  LinkedPair *pair = ht->storage[hashed];
+
+  while(pair){
+    if(!strcmp(pair->key, key)){
+      return pair->value;
+
+    }
+    pair = pair->next;
+  }
   return NULL;
 }
 
