@@ -105,7 +105,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
     }
 
     // then free the occupied space
-    free(ht->storage[hashed_key]);
+    destroy_pair(ht->storage[hashed_key]);
   }
 
   // finally, create a new key/value pair and insert it into that space
@@ -129,7 +129,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
     if (strcmp(ht->storage[hashed_key]->key, key) == 0)
     {
       // free up the memory held in that space, set to NULL, and return
-      free(ht->storage[hashed_key]);
+      destroy_pair(ht->storage[hashed_key]);
       ht->storage[hashed_key] = NULL;
       return;
     }
@@ -177,7 +177,7 @@ void destroy_hash_table(BasicHashTable *ht)
   {
     if (ht->storage[i] != NULL)
     {
-      free(ht->storage[i]);
+      destroy_pair(ht->storage[i]);
       ht->storage[i] = NULL;
     }
   }
