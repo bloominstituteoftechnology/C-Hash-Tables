@@ -70,7 +70,12 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  // BasicHashTable *ht;
+
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+
+  ht->capacity = capacity;
+  ht->storage = calloc((size_t)ht->capacity, sizeof(Pair*));
 
   return ht;
 }
@@ -114,7 +119,12 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for (int i = 0; i < ht->capacity; i++) {
+    Pair* pair = ht->storage[i];
+    destroy_pair(pair);
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
