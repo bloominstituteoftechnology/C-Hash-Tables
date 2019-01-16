@@ -165,7 +165,21 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  // free up any and all key/value pairs in storage
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    if (ht->storage[i] != NULL)
+    {
+      free(ht->storage[i]);
+      ht->storage[i] = NULL;
+    }
+  }
 
+  // free up storage
+  if (ht->storage != NULL) free(ht->storage);
+
+  // free up the hash table
+  if (ht != NULL) free(ht);
 }
 
 
