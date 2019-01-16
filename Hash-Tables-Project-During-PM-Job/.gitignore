@@ -1,0 +1,10 @@
+build
+*/build
+*/tests/hashtables_tests
+*/tests/b_hashtables_tests
+*.o
+*.dSYM
+*.log
+
+*/b_hashtables
+*/hashtables
