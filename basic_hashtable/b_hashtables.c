@@ -36,11 +36,7 @@ Pair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(Pair *pair)
 {
-  if (pair != NULL) {
-    free(pair->key);
-    free(pair->value);
-    free(pair);
-  }
+  if (pair != NULL) free(pair);
 }
 
 /****
@@ -70,7 +66,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
