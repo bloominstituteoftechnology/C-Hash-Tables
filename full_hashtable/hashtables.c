@@ -70,9 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht = malloc(sizeof(HashTable));
+  HashTable *ht = malloc(sizeof(HashTable));//calls 1 arguments
   ht->capacity = capacity;
-  ht->storage=calloc(capacity, sizeof(LinkedPair*));
+  ht->storage=calloc(capacity, sizeof(LinkedPair*));//calls 2 arguments
   
   return ht;
 }
