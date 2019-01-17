@@ -9,7 +9,7 @@
 typedef struct LinkedPair {
   char *key;
   char *value;
-  struct LinkedPair *next;
+  struct LinkedPair *next;  // Remember to use this when building linked lists for overlapping hashed_keys
 } LinkedPair;
 
 /****
@@ -78,30 +78,43 @@ HashTable *create_hash_table(int capacity)
 
 /****
   Fill this in.
-
   Inserting values to the same index with different keys should be
   added to the corresponding LinkedPair list.
-
   Inserting values to the same index with existing keys can overwrite
   the value in th existing LinkedPair list.
  ****/
+// Think of the hash table as an array of linked lists.
+// Hashed keys correspond to indexes of the hash table.
+// When multiple Pairs have keys that hash to the same number (they are equal modulo ht->capacity),
+// they form a linked list at the same hashed-key index
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   unsigned int hashed_key = hash(key, ht->capacity);
-  LinkedPair *pair = create_pair(key, value);
-  
+  LinkedPair *new_pair = create_pair(key, value);
+
   if (ht->storage[hashed_key] == NULL) {
-    ht->storage[hashed_key] = pair;
+    ht->storage[hashed_key] = new_pair;
     return;
+  }
+
+  LinkedPair *current_pair = ht->storage[hashed_key];
+  while (current_pair != NULL) {                // Step through the linked list until landing on a NULL slot
+    if (strcmp(key, current_pair->key) == 0) {  // check if the key of the current pair is equal to the key of the pair you want to insert
+      current_pair->value = value;
+      return;
+    }
+    if (current_pair->next == NULL) {
+      current_pair->next = new_pair;
+      return;
+    }
+    current_pair = current_pair->next;
   }
 }
 
 /****
   Fill this in.
-
   Should search the entire list of LinkedPairs for existing
   keys and remove matching LinkedPairs safely.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_remove(HashTable *ht, char *key)
@@ -111,14 +124,27 @@ void hash_table_remove(HashTable *ht, char *key)
 
 /****
   Fill this in.
-
   Should search the entire list of LinkedPairs for existing
   keys.
-
   Return NULL if the key is not found.
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int hashed_key = hash(key, ht->capacity);
+  LinkedPair *current_pair = ht->storage[hashed_key];
+
+  if (current_pair == NULL) {
+    return NULL;
+  }
+  if (strcmp(current_pair->key, key) == 0) {
+    return current_pair->value;
+  }
+  while (current_pair->next != NULL) {
+    if (strcmp(current_pair->next->key, key) == 0){
+      return current_pair->next->value;
+    }
+    current_pair = current_pair->next;
+  }
   return NULL;
 }
 
