@@ -17,6 +17,7 @@ typedef struct LinkedPair {
  ****/
 typedef struct HashTable {
   int capacity;
+  int count;
   LinkedPair **storage;
 } HashTable;
 
