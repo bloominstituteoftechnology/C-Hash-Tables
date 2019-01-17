@@ -71,6 +71,9 @@ unsigned int hash(char *str, int max)
 HashTable *create_hash_table(int capacity)
 {
   HashTable *ht;
+  ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair));
 
   return ht;
 }
@@ -86,7 +89,35 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int hash_index = hash(key, ht->capacity);
+  LinkedPair *linked_pair = create_pair(key, value);
+  // if  a LinkedPair is already stored at this index
+  if (ht->storage[hash_index] != NULL){
+    // if this LinkedPair has the same key, overwrite the value only
+    // no need to modify key or the next pair. key and current's pair LinkedPair may remain as they are.
+    if (strcmp(ht->storage[hash_index]->key, key) == 0){
+      printf("Warning: overwriting previous Pair with current Pair");
+      ht->storage[hash_index]->value = value;
+    }
+    // if keys are not the same, check if there's a linked pair
+    else if (ht->storage[hash_index]->next == NULL) {
+      // there is no Linked Pair, so link it
+      ht->storage[hash_index]->next = linked_pair; //???
+    }
+    // there is a Linked Pair. find the next unlinked pair, and assign it there
+    else {
+      LinkedPair *current_pair = ht->storage[hash_index]->next;
+      while (current_pair->next != NULL){
+        current_pair = current_pair->next;
+      } //when current_pair's next value is finally NULL, assign the linked_pair to it
+      current_pair->next = linked_pair;
+    }
 
+  }
+  //the current index is emtpy. assign the linked_pair
+  else {
+    ht->storage[hash_index] = linked_pair;
+  }
 }
 
 /****
@@ -99,8 +130,26 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int hash_index = hash(key, ht->capacity);
 
+  LinkedPair *current_pair = ht->storage[hash_index];
+
+  if (current_pair == NULL){
+    printf("nothing to remove\n");
+  } else {
+    //while keys do not match and there's still a next pair
+    while (strcmp(current_pair->key, key) != 0 && current_pair->next != NULL){
+      current_pair = current_pair->next;
+    }
+    if (strcmp(current_pair->key, key) == 0) {
+      destroy_pair(current_pair);
+      current_pair = NULL;
+    } else {
+    printf("nothing to remove\n");
+    }
+  }
 }
+
 
 /****
   Fill this in.
@@ -112,6 +161,16 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int hash_index = hash(key, ht->capacity);
+  LinkedPair *current_pair = ht->storage[hash_index];
+  while (current_pair != NULL) {
+    if (strcmp(current_pair->key, key) == 0){
+      return current_pair->value;
+    } else {
+      current_pair = current_pair->next;
+    }
+  }
+
   return NULL;
 }
 
@@ -122,7 +181,16 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for (int i=0; i<ht->capacity; i++){
+    LinkedPair *current_pair = ht->storage[i];
+    LinkedPair *next_pair = ht->storage[i]->next;
+    while (current_pair->next != NULL){
+      next_pair = current_pair->next;
+      destroy_pair(current_pair);
+      current_pair = next_pair;
+    }
+    destroy_pair(current_pair);
+  }
 }
 
 /****
