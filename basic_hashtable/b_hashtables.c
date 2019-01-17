@@ -87,13 +87,13 @@ BasicHashTable *create_hash_table(int capacity)
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   Pair *pair = create_pair(key, value);
-  int hashed = hash(key, ht->capacity);
+  int hashKey = hash(key, ht->capacity);
 
-  if(ht->storage[hashed]){
+  if(ht->storage[hashKey]){
     printf("Overwriting value with a different key\n");
-    destroy_pair(ht->storage[hashed]);
+    destroy_pair(ht->storage[hashKey]);
   }
-  ht->storage[hashed]=pair;
+  ht->storage[hashKey]=pair;
 }
 
 /****
@@ -103,23 +103,23 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  int hashed = hash(key, ht->capacity);
-  if(ht->storage[hashed]){
-    destroy_pair(ht->storage[hashed]);
-    ht->storage[hashed] = NULL;
+  int hashKey = hash(key, ht->capacity);
+  if(ht->storage[hashKey]){
+    destroy_pair(ht->storage[hashKey]);
+    ht->storage[hashKey] = NULL;
   }
 }
 
 /****
   Fill this in.
-
+in the snow
   Should return NULL if the key is not found.
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  int hashed = hash(key, ht->capacity);
-  if (ht->storage[hashed]){
-    return ht->storage[hashed]->value;
+  int hashKey = hash(key, ht->capacity);
+  if (ht->storage[hashKey]){
+    return ht->storage[hashKey]->value;
 }
   return NULL;
 }

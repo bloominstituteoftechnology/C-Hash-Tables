@@ -92,11 +92,11 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-  int hashed = hash(key, ht->capacity);
-  LinkedPair *pair = ht->storage[hashed];
+  int hashKey = hash(key, ht->capacity);//what happens if I use unsigned
+  LinkedPair *pair = ht->storage[hashKey];
   if(!pair){
     LinkedPair *new =create_pair(key, value);
-    ht->storage[hashed]=new;
+    ht->storage[hashKey]=new;
   }else{
     while(pair){
       if(!strcmp(pair->key, key)){
@@ -125,12 +125,12 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  int hashed = hash(key, ht->capacity);
-  LinkedPair *pair = ht->storage[hashed];
+  int hashKey = hash(key, ht->capacity);
+  LinkedPair *pair = ht->storage[hashKey];
   LinkedPair *previous;
 
   if(pair && !strcmp(pair->key, key)){
-    ht->storage[hashed]=pair->next;
+    ht->storage[hashKey]=pair->next;
   }
   while(pair && strcmp(pair->key, key)){
     previous = pair;
@@ -154,8 +154,8 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  int hashed=hash(key, ht-c->capacity);
-  LinkedPair *pair = ht->storage[hashed];
+  int hashKey=hash(key, ht->capacity);
+  LinkedPair *pair = ht->storage[hashKey];
 
   while(pair){
     if(!strcmp(pair->key, key)){
@@ -174,7 +174,11 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for (int i =0; i<ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
