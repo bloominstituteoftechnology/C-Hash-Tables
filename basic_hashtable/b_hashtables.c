@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+// comment
 
 /****
   Basic hash table key/value pair
@@ -70,8 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair));
   return ht;
 }
 
@@ -84,7 +85,11 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  Pair *pair = create_pair(key, value);
+  if (ht->storage[hash(key, ht->capacity)] != NULL) {
+    printf("Warning: a value in the hash table is being overwritten.\n");
+  }
+  ht->storage[hash(key, ht->capacity)] = pair;
 }
 
 /****
@@ -94,7 +99,8 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  Pair *pair = create_pair(NULL, NULL);
+  ht->storage[hash(key, ht->capacity)] = pair;
 }
 
 /****
@@ -104,7 +110,11 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  if (ht->storage[hash(key, ht->capacity)]->value != NULL) {
+    return ht->storage[hash(key, ht->capacity)]->value;
+  } else {
+    return NULL;
+  }
 }
 
 /****
@@ -114,7 +124,11 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for (int i = 0; i < ht->capacity; i++) {
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
@@ -122,13 +136,13 @@ void destroy_hash_table(BasicHashTable *ht)
 int main(void)
 {
   struct BasicHashTable *ht = create_hash_table(16);
-
+  printf("=== Hash table created\n");
   hash_table_insert(ht, "line", "Here today...\n");
-
+  printf("=== Insertion successful\n");
   printf("%s", hash_table_retrieve(ht, "line"));
-
+  printf("=== Retrieval successful\n");
   hash_table_remove(ht, "line");
-
+  printf("=== Removal successful\n");
   if (hash_table_retrieve(ht, "line") == NULL) {
     printf("...gone tomorrow. (success)\n");
   } else {
@@ -136,7 +150,7 @@ int main(void)
   }
 
   destroy_hash_table(ht);
-
+  printf("=== Destruction successful\n");
   return 0;
 }
 #endif
