@@ -129,7 +129,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
         // create a new key/value pair and insert it into that space
         ht->storage[index] = create_pair(key, value);
 
-        // assign its next pointer the value of the previous next key/value pair
+        // assign its next pointer the value of the previously next key/value pair
         ht->storage[index]->next = prev_next;
       }
     }
@@ -143,7 +143,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
       // cycle through the pairs until your next pair is a NULL pointer
       while(next_pair != NULL)
       {
-        curr_pair = next_pair->next;
+        curr_pair = next_pair;
         next_pair = curr_pair->next;
       }
 
@@ -163,7 +163,56 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  // create an index by hashing the key
+  unsigned int index = hash(key, ht->capacity);
 
+  // if there exists a LinkedPair pointer in that space
+  if (ht->storage[index] != NULL)
+  {
+    // and if the keys match
+    if (strcmp(ht->storage[index]->key, key) == 0)
+    {
+      // create a pointer to the next key/value pair
+      LinkedPair *prev_next = ht->storage[index]->next;
+
+      // then free the occupied space
+      destroy_pair(ht->storage[index]);
+
+      // assign in its place the value of the previously next key/value pair
+      ht->storage[index] = prev_next;
+    }
+    // else if the keys do not match
+    else
+    {
+      // create pointers to the previous and current pair
+      LinkedPair *prev_pair = ht->storage[index];
+      LinkedPair *curr_pair = ht->storage[index]->next;
+
+      // cycle through the pairs until your curr pair is a NULL pointer
+      // or the keys match
+      while(curr_pair != NULL && strcmp(curr_pair->key, key) != 0)
+      {
+        prev_pair = curr_pair;
+        curr_pair = prev_pair->next;
+      }
+
+      // if current pair is not null, a matching key was found
+      if (curr_pair != NULL)
+      {
+        // assign the previous pair's next to point to current pair's next
+        // and destroy the current pair
+        prev_pair->next = curr_pair->next;
+        destroy_pair(curr_pair);
+      }
+      // else key does not exist
+      // print an error message stating such and exit
+      else
+      {
+        fprintf(stderr, "Key '%s' does not exist.\n", key);
+        exit(1);
+      }
+    }
+  }
 }
 
 /****
