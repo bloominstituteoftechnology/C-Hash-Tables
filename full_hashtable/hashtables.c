@@ -38,6 +38,7 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
+  printf("destroy pair working so far\n");
   if (pair != NULL) {
     free(pair->key);
     free(pair->value);
@@ -91,31 +92,53 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   unsigned int hash_index = hash(key, ht->capacity);
   LinkedPair *linked_pair = create_pair(key, value);
+      printf("TOP linked pair key, value, next: %s %3s %3s\n", linked_pair->key, linked_pair->value, linked_pair->next);
   // if  a LinkedPair is already stored at this index
   if (ht->storage[hash_index] != NULL){
     // if this LinkedPair has the same key, overwrite the value only
     // no need to modify key or the next pair. key and current's pair LinkedPair may remain as they are.
     if (strcmp(ht->storage[hash_index]->key, key) == 0){
-      printf("Warning: overwriting previous Pair with current Pair");
+      printf("\nWarning: overwriting previous Pair with current Pair\n");
+      printf("PREVIOUS key, value, next: %s %3s %3s\n", ht->storage[hash_index]->key, ht->storage[hash_index]->value, ht->storage[hash_index]->next);
       ht->storage[hash_index]->value = value;
+      printf("OVERWRITTEN linked pair key, value, next: %s %3s %3s\n", linked_pair->key, linked_pair->value, linked_pair->next);
     }
     // if keys are not the same, check if there's a linked pair
     else if (ht->storage[hash_index]->next == NULL) {
       // there is no Linked Pair, so link it
+      printf("there is no Linked Pair, so link it\n\n");
       ht->storage[hash_index]->next = linked_pair; //???
     }
     // there is a Linked Pair. find the next unlinked pair, and assign it there
     else {
-      LinkedPair *current_pair = ht->storage[hash_index]->next;
-      while (current_pair->next != NULL){
-        current_pair = current_pair->next;
-      } //when current_pair's next value is finally NULL, assign the linked_pair to it
-      current_pair->next = linked_pair;
+      LinkedPair *current_pair = ht->storage[hash_index];
+      while(current_pair->next != NULL){
+        if (strcmp(current_pair->next->key, key)==0){
+          printf("got it, overwrite linked pair with same key\n");
+          current_pair->next = linked_pair;
+          return;
+        } else { current_pair = current_pair->next; }
+      }
+        current_pair->next = linked_pair;
+
+
+
+
+      
+      // printf("I will never run \n\n");
+      // LinkedPair *current_pair = ht->storage[hash_index]->next;
+      // printf("FIRST ELSE  current pair key, value, next: %s %3s %3s\n\n", current_pair->key, current_pair->value, current_pair->next);
+      // while (current_pair->next != NULL){
+      //   printf("running");
+      //   current_pair = current_pair->next;
+      // } //when current_pair's next value is finally NULL, assign the linked_pair to it
+      // current_pair = linked_pair;
     }
 
   }
   //the current index is emtpy. assign the linked_pair
   else {
+    printf("Standard printing\n");
     ht->storage[hash_index] = linked_pair;
   }
 }
@@ -181,14 +204,21 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  printf("destroying hash table\n");
+  printf("ht capacity: %s", ht->capacity);
   for (int i=0; i<ht->capacity; i++){
+    printf("round: %d", i);
+    printf("%s\n", ht->storage[i]->value);
     LinkedPair *current_pair = ht->storage[i];
-    LinkedPair *next_pair = ht->storage[i]->next;
+    LinkedPair *next_pair;
+    printf("haseeing\n");
     while (current_pair->next != NULL){
       next_pair = current_pair->next;
       destroy_pair(current_pair);
+      free(current_pair->next);
       current_pair = next_pair;
     }
+     printf("here\n");
     destroy_pair(current_pair);
   }
 }
@@ -204,6 +234,33 @@ void destroy_hash_table(HashTable *ht)
 HashTable *hash_table_resize(HashTable *ht)
 {
   HashTable *new_ht;
+  new_ht = malloc(sizeof(HashTable));
+  new_ht->capacity = ht->capacity*2;
+  new_ht->storage = calloc(new_ht->capacity, sizeof(LinkedPair));
+
+  for (int i=0; i<ht->capacity; i++){
+    printf("resizing round: %d\n", i);
+    LinkedPair *current_pair = ht->storage[i];
+    LinkedPair *next_pair;
+    while(current_pair->next != NULL){
+      printf("\n while loop \n");
+      next_pair = current_pair->next;
+      hash_table_insert(new_ht, current_pair->key, current_pair->value);
+      printf("aqui");
+      printf("%s", hash_table_retrieve(new_ht, current_pair->key));
+      // printf(hash_table_retrieve(new_ht, current_pair->key);
+      printf("now here?\n");
+      // free(current_pair->next);
+
+      destroy_pair(current_pair);
+      current_pair = next_pair;
+    }
+    printf("\n NO while loop \n");
+    hash_table_insert(new_ht, current_pair->key, current_pair->value);
+    destroy_pair(current_pair);
+    free(current_pair->next);
+
+  }
 
   return new_ht;
 }
@@ -215,19 +272,24 @@ int main(void)
   struct HashTable *ht = create_hash_table(2);
 
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
+  // hash_table_insert(ht, "line_1", "HUGE hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
 
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
+  // // printf("%s", ht->storage[1]->next->value);
+  // printf("really ignroiong me like this");
 
   int old_capacity = ht->capacity;
+  printf("\n\nhere\n");
   ht = hash_table_resize(ht);
+  printf("\nyo\n\n");
   int new_capacity = ht->capacity;
 
   printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
-
+  printf("\n ht->capacity: %d\n", ht->capacity);
   destroy_hash_table(ht);
 
   return 0;
