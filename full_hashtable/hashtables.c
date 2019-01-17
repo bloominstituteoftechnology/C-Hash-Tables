@@ -75,8 +75,6 @@ HashTable *create_hash_table(int capacity)
   ht->capacity = capacity;
   ht->storage = (LinkedPair**)calloc(capacity, sizeof(LinkedPair));
 
-
-
   return ht;
 }
 
@@ -91,6 +89,22 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  int hashed_key = hash(key, ht->capacity);
+  LinkedPair *x = ht->storage[hashed_key];
+  LinkedPair *n;
+
+  while (x != NULL && strcmp(x->key, key) != 0) {
+    n = x;
+    x = n->next;
+  }
+
+  if (x != NULL) {
+    x->value = value;
+  } else {
+    LinkedPair *n = create_pair(key, value);
+    n->next = ht->storage[hashed_key];
+    ht->storage[hashed_key] = n;
+  }
   
 }
 
