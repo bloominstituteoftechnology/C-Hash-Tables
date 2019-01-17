@@ -72,7 +72,7 @@ HashTable *create_hash_table(int capacity)
 {
   HashTable *ht = malloc(sizeof(HashTable));
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(LinkedPair));
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -88,7 +88,25 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  int index = hash(key, ht->capacity); // hash the key to get the index
 
+  if(ht->storage[index] != NULL){ // if there is something in the index already ...
+    LinkedPair *current_pair = ht->storage[index]; // store that pair in a variable while we make room
+    while(current_pair != NULL){ // so long as our current_pair has a value, do some logic checks:
+      if(strcmp(current_pair->key, key) == 0){ // if the keys for the new pair and current pair are the same,
+        free(current_pair->value); // free the value...
+        current_pair->value = strdup(value); // ... and replace it with the new value
+        break;
+      } else if(current_pair->next == NULL){ // if there is no next value in the LinkedList, insert the given pair there
+        current_pair->next = create_pair(key, value);
+        break;
+      } else {
+        current_pair = current_pair->next; // if neither of the above conditions are met, move to the next pair
+      }
+    }
+  } else {
+    ht->storage[index] = create_pair(key, value); // if there's nothing at the given index, store the new pair there
+  }
 }
 
 /****
