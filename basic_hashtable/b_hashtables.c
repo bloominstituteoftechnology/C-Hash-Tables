@@ -111,6 +111,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  int hashKey = hash(key, ht->capacity);
+  if (ht->storage[hashKey])
+  {
+    destroy_pair(ht->storage[hashKey]);
+    ht->storage[hashKey] = NULL;
+  }
 }
 
 /****
