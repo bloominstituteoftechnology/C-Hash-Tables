@@ -38,12 +38,7 @@ LinkedPair *create_pair(char *key, char *value)
 void destroy_pair(LinkedPair *pair)
 {
   if (pair != NULL) {
-	  //printf("Destroying pointer %p and key %s \n", pair, pair->key);
-	  //pair->key = NULL;
-	  //pair->value = NULL;
-	  //pair->next = NULL;
 	  free(pair);
-	  //printf(" pointer in destroy %s \n", pair->key);
   }	  
 }
 
@@ -74,7 +69,7 @@ HashTable *create_hash_table(int capacity)
 {
   HashTable *ht = malloc(sizeof(HashTable));
   ht->capacity = capacity;
-  ht->storage = (LinkedPair**)calloc(capacity, sizeof(LinkedPair*));
+  ht->storage = calloc(capacity, sizeof(LinkedPair*));
 
   return ht;
 }
@@ -88,43 +83,76 @@ HashTable *create_hash_table(int capacity)
   Inserting values to the same index with existing keys can overwrite
   the value in th existing LinkedPair list.
  ****/
+
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-	 unsigned int index = hash(key, ht->capacity);
+  unsigned int index = hash(key, ht->capacity);
 
-	if(ht->storage[index]){
-                LinkedPair *a = ht->storage[index];
-		int flag =0;
+  if(ht->storage[index] == NULL){
+    ht->storage[index] = create_pair(key, value);
+    printf("Inserted %s and %s \n", key, value);
+  }
+  
+  else{
+      LinkedPair *current_pair = ht->storage[index];
+      
+      while(current_pair){
+         
+         if(strcmp(current_pair->key, key)==0){
+            printf("comparing keys %s and %s\n", current_pair->key, key);		 
+            printf("Overwriting key %s \n", key);
+            current_pair->value = value;
+	    //n = NULL;
+            return;
+         }
+	 else if(current_pair->next){
+		 current_pair = current_pair->next;	
+	 }
+	 else{      
+      		 current_pair->next = create_pair(key, value);   
+     		 printf("Inserted %s and %s \n", key, value);	 
+      	 }
+      }
+   }  
+} 
 
-		while(a){
-			if(strcmp(a->key, key)==0){
-				printf("a->key: %s key: %s \n", a->key, key);
 
-				printf("Key Value pair already exists, overwriting the value...\n");
-				a->value = NULL;
-				a->value = value;
-				flag = 1;
 
-			}
-			//printf("a before %p \n", a);
-			//printf("a->next before assignment  %p \n", a->next);
-                        a = a->next;
-			//printf("a after next assignment %p \n", a);
-		}
+/* Alternative solution to insert
+	
+void hash_table_insert(HashTable *ht, char *key, char *value)
+{
+        unsigned int index = hash(key, ht->capacity);
 
-		if(flag==0) {
-			//printf("Creating new pair \n");
-			//printf("a value %p \n", a);
-			ht->storage[index]->next = create_pair(key, value);
-			printf("Inserted %s and %s \n", key, value);
-		}
+        if(ht->storage[index]){
+                LinkedPair *currentPair = ht->storage[index];
 
-	}
-	else{
-		ht->storage[index] = create_pair(key, value);
-		printf("Inserted %s and %s \n", key, value);
-	    }	
-}
+                while(currentPair){                                      //if the index (exits) for the key is not empty, enter the loop
+                        if(strcmp(currentPair->key, key)==0){           //check to see if there is a key match, overwrite the value     
+
+                                printf("currentPair->key: %s key: %s \n", currentPair->key, key);
+                                printf("Key Value pair already exists, overwriting the value...\n");
+                                currentPair->value = value;
+                                currentPair = NULL;
+                        }
+                        else if(currentPair->next){   //keep movining across the linked list till you find the key and overwrite the value or reach NULL
+                                currentPair = currentPair->next;
+                        }
+                        else{                            //the given key is not yet created at the index, and reached NULL, create a new pair.  
+                                currentPair->next = create_pair(key, value);
+                                printf("Inserted %s and %s \n", key, value);
+                        }
+                }
+        }
+        else{                             //if the index is empty and does not have any key/value pairs, create a new pair
+                ht->storage[index] = create_pair(key, value);
+                printf("Inserted %s and %s \n", key, value);
+            }
+}   
+
+*/
+
+
 
 /****
   Fill this in.
@@ -136,29 +164,27 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-	 
-	unsigned int index = hash(key, ht -> capacity);
-	
-  		LinkedPair *a = ht -> storage[index];
-  		LinkedPair *a_previous = a;
+	unsigned int index = hash(key, ht->capacity);
+  
+  	LinkedPair *current_pair = ht->storage[index];
+  	LinkedPair *last_pair;
 
-  	while (a==NULL && strcmp(a -> key, key)==0) {
-    		a_previous = a;
-    		a = a_previous -> next;
-  	}
-  	
-	if (a != NULL) {
+  	for(int i=0; i<ht->capacity; i++){
+    	
+		while (current_pair != NULL && strcmp(current_pair->key, key) != 0) {
+    			last_pair = current_pair;
+    			current_pair = last_pair->next;
+    		}
 
-    		if (a == a_previous) {
-      			ht -> storage[index] = a -> next;
-    	}
+    		if (current_pair == NULL) {
+    		printf("The key could not be removed: %s\n", key);
+  		}
 
-    	a_previous -> next = a -> next;
-    	destroy_pair(a);
-  	} 	
-	else {
-    		perror("The Key you are trying to remove could not be found\n");
-  	}
+		else {
+    			destroy_pair(ht->storage[index]);
+    			ht->storage[index] = NULL;
+  		}
+ 		}	 
 
 }
 
@@ -177,13 +203,13 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 	int index = hash(key, ht->capacity);
 
         if(ht->storage[index]){
-                LinkedPair *a = ht->storage[index];
+                LinkedPair *currentPair = ht->storage[index];
 
-                while(a!=NULL){
-                        if(a->key == key){
-                                return a->value;
+                while(currentPair!=NULL){
+                        if(currentPair->key == key){
+                                return currentPair->value;
 			}
-                        a = a->next;
+                        currentPair = currentPair->next;
 
                 }
 		return NULL;
