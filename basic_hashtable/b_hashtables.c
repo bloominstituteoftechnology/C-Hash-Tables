@@ -70,8 +70,12 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(char *));
+  for (int i=0; i<capacity; i++) {
+    ht->storage[i] = NULL;
+  }
   return ht;
 }
 
@@ -84,7 +88,11 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  if (ht->storage[target_index] != NULL) {
+    fprintf(stderr, "error");
+    destroy_pair(ht->storage[target_index]);
+    ht->storage[target_index] = new_pair;
+  }
 }
 
 /****
