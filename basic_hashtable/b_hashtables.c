@@ -102,6 +102,7 @@ void hash_table_remove(BasicHashTable *ht, char *key){
   int index = hash(key, ht->capacity);
   if(ht->storage[index] != NULL){
   destroy_pair(ht->storage[index]);
+  ht->storage[index] = NULL;
   }
 }
 
@@ -125,7 +126,12 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key){
   Don't forget to free any malloc'ed memory!
  ****/
 void destroy_hash_table(BasicHashTable *ht){
-
+  for(int i = 0; i < ht->capacity; i++){
+  destroy_pair(ht->storage[i]);
+  ht->storage[i] = NULL;
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
