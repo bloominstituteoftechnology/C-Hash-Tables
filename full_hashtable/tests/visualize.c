@@ -2,27 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-/****
-  Hash table key/value pair with linked list pointer
- ****/
 typedef struct LinkedPair {
   char *key;
   char *value;
   struct LinkedPair *next;
 } LinkedPair;
 
-/****
-  Hash table with linked pairs
- ****/
 typedef struct HashTable {
   int capacity;
   LinkedPair **storage;
 } HashTable;
 
-/****
-  Create a key/value linked pair to be stored in the hash table.
- ****/
 LinkedPair *create_pair(char *key, char *value)
 {
   LinkedPair *pair = malloc(sizeof(LinkedPair));
@@ -33,9 +23,6 @@ LinkedPair *create_pair(char *key, char *value)
   return pair;
 }
 
-/****
-  Use this function to safely destroy a hashtable pair.
- ****/
 void destroy_pair(LinkedPair *pair)
 {
   if (pair != NULL) {
@@ -47,11 +34,6 @@ void destroy_pair(LinkedPair *pair)
   }
 }
 
-/****
-  djb2 hash function
-
-  Do not modify this!
- ****/
 unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
@@ -65,11 +47,6 @@ unsigned int hash(char *str, int max)
   return hash % max;
 }
 
-/****
-  Fill this in.
-
-  All values in storage should be initialized to NULL
- ****/
 HashTable *create_hash_table(int capacity)
 {
   HashTable *ht = malloc(sizeof(HashTable)); // allocate memory for a hash table;
@@ -80,15 +57,6 @@ HashTable *create_hash_table(int capacity)
   return ht;
 }
 
-/****
-  Fill this in.
-
-  Inserting values to the same index with different keys should be
-  added to the corresponding LinkedPair list.
-
-  Inserting values to the same index with existing keys can overwrite
-  the value in th existing LinkedPair list.
- ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   unsigned int target_index = hash(key, ht->capacity); // creates an array index for node to be inserted into
@@ -116,14 +84,6 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   }
 }
 
-/****
-  Fill this in.
-
-  Should search the entire list of LinkedPairs for existing
-  keys and remove matching LinkedPairs safely.
-
-  Don't forget to free any malloc'ed memory!
- ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
   unsigned int target_index = hash(key, ht->capacity);
@@ -144,37 +104,16 @@ void hash_table_remove(HashTable *ht, char *key)
   }
 }
 
-/****
-  Fill this in.
-
-  Should search the entire list of LinkedPairs for existing
-  keys.
-
-  Return NULL if the key is not found.
- ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
   return NULL;
 }
 
-/****
-  Fill this in.
-
-  Don't forget to free any malloc'ed memory!
- ****/
 void destroy_hash_table(HashTable *ht)
 {
 
 }
 
-/****
-  Fill this in.
-
-  Should create a new hash table with double the capacity
-  of the original and copy all elements into the new hash table.
-
-  Don't forget to free any malloc'ed memory!
- ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
   HashTable *new_ht;
