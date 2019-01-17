@@ -66,19 +66,15 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     ht->storage[target_index] = new_pair;
   }
   else {
-    while (ht->storage[target_index] != 0) { // if the current index is not empty, 3 things can happens
-      // 1. check if the keys are the same, then overwrite existing value with the new value
+    while (ht->storage[target_index] != 0) {
       if (strcmp(ht->storage[target_index]->key, key) == 0) { // == or != compares base addresses, strcmp to compare values
         ht->storage[target_index]->value = value;
         break;
       }
-      // 2. check if keys are different AND there's an empty "next" slot, insert new pair there
       else if (strcmp(ht->storage[target_index]->key, key) != 0 && ht->storage[target_index]->next == NULL) {
         ht->storage[target_index]->next = new_pair;
         break;
       }
-      // 3. If neither of the terminating conditionals activates, must mean that it's a new linked list node to be attached
-      // continue with while loop until there are matching keys or there's an empty "next" slot
       ht->storage[target_index] = ht->storage[target_index]->next;
     }
   }
@@ -135,28 +131,33 @@ void destroy_hash_table(HashTable *ht)
 
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table(ht->capacity*2);
+
+  for (int i = 0; i < ht->capacity; i++) {
+    new_ht->storage[i] = ht->storage[i];
+  }
+  destroy_hash_table(ht);
 
   return new_ht;
 }
-
 
 #ifndef TESTING
 int main(void)
 {
   struct HashTable *ht = create_hash_table(2);
+  hash_table_insert(ht, "line_1", "Tiny hash table\n");
+  hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
+  hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
 
-  hash_table_insert(ht, "tim", "texas\n"); // inserts index 1
-  hash_table_insert(ht, "josh", "mexico\n"); // inserts index 1 -> INDEX COLLISION, sets on existing node's "next"
-  hash_table_insert(ht, "tim", "california\n"); // inserts index 1 -> INDEX & KEY COLLISION, set on exisiting node's "value"
+  printf("%s", hash_table_retrieve(ht, "line_1"));
+  printf("%s", hash_table_retrieve(ht, "line_2"));
+  printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  // REMOVE (Choose only 1)
-  // hash_table_remove(ht, "tim"); // removes tim from the 1st node and shift josh to 1st node
-  // hash_table_remove(ht, "josh"); // removes josh from the 2nd node
+  int old_capacity = ht->capacity;
+  ht = hash_table_resize(ht);
+  int new_capacity = ht->capacity;
 
-  // RETRIEVE
-  printf("%s\n", hash_table_retrieve(ht, "tim")); // returns california
-  printf("%s\n", hash_table_retrieve(ht, "josh")); // returns josh
+  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
   destroy_hash_table(ht);
   return 0;

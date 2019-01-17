@@ -157,12 +157,11 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   unsigned int target_index = hash(key, ht->capacity);
   LinkedPair *current = ht->storage[target_index]; // shortens the name and serve as marker
 
-  while (current != 0) { // LOOP while there's a current node
+  while (current->key != 0) { // LOOP while there's a current node
     if (strcmp(current->key, key) == 0) { // EXIT 1 if keys match, return the value
       return current->value;
     }
     else if (strcmp(current->key, key) != 0 && current->next == 0) { // EXIT 2 if no key matches and no linked node, return NULL
-      fprintf(stderr, "That key was not found.");
       return NULL;
     }
     current = current->next; // ITERATOR Move to the next linked node and continue with while loop to check
@@ -196,7 +195,13 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table(ht->capacity*2); // Create new hash table with double capacity
+
+  for (int i = 0; i < ht->capacity; i++) { // copy from old storage to new storage
+    new_ht->storage[i] = ht->storage[i];
+  }
+
+  destroy_hash_table(ht); // destroy old hash table
 
   return new_ht;
 }
@@ -207,37 +212,32 @@ int main(void)
 {
   struct HashTable *ht = create_hash_table(2);
 
+  // MY TESTS
   hash_table_insert(ht, "tim", "texas\n"); // inserts index 1
-  hash_table_insert(ht, "josh", "mexico\n"); // inserts index 1 -> INDEX COLLISION, sets on existing node's "next"
-  hash_table_insert(ht, "tim", "california\n"); // inserts index 1 -> INDEX & KEY COLLISION, set on exisiting node's "value"
+  printf("%s\n", hash_table_retrieve(ht, "tim")); // returns texas
 
-  // REMOVE (Choose only 1)
+  hash_table_insert(ht, "josh", "mexico\n"); // inserts index 1 -> INDEX COLLISION, sets on existing node's "next"
+  printf("%s\n", hash_table_retrieve(ht, "josh")); // returns mexico
+
+  hash_table_insert(ht, "tim", "california\n"); // inserts index 1 -> INDEX & KEY COLLISION, set on exisiting node's "value"
+  printf("%s\n", hash_table_retrieve(ht, "tim")); // returns california
   // hash_table_remove(ht, "tim"); // removes tim from the 1st node and shift josh to 1st node
   // hash_table_remove(ht, "josh"); // removes josh from the 2nd node
-
-  // RETRIEVE
-  printf("%s\n", hash_table_retrieve(ht, "tim")); // returns california
-  printf("%s\n", hash_table_retrieve(ht, "josh")); // returns josh
-
-  destroy_hash_table(ht);
 
   // DEFAULT
   // hash_table_insert(ht, "line_1", "Tiny hash table\n");
   // hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   // hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
-
   // printf("%s", hash_table_retrieve(ht, "line_1"));
   // printf("%s", hash_table_retrieve(ht, "line_2"));
   // printf("%s", hash_table_retrieve(ht, "line_3"));
-
   // int old_capacity = ht->capacity;
   // ht = hash_table_resize(ht);
   // int new_capacity = ht->capacity;
 
   // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  // destroy_hash_table(ht);
-
+  destroy_hash_table(ht);
   return 0;
 }
 #endif
