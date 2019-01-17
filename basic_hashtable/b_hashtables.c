@@ -109,6 +109,9 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  int ind = hash(key, ht->capacity);
+  destroy_pair(ht->storage[ind]);
+  ht->storage[ind] = NULL;
 }
 
 /****
@@ -118,7 +121,14 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  int ind = hash(key, ht->capacity);
+
+  if (ht->storage[ind] == NULL)
+  {
+    return NULL;
+  }
+  else
+    return ht->storage[ind]->value;
 }
 
 /****
