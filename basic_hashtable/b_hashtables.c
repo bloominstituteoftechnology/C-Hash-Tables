@@ -110,8 +110,12 @@ void hash_table_remove(BasicHashTable *ht, char *key){
 
   Should return NULL if the key is not found.
  ****/
-char *hash_table_retrieve(BasicHashTable *ht, char *key)
-{
+char *hash_table_retrieve(BasicHashTable *ht, char *key){
+  int index = hash(key, ht->capacity);
+  Pair *pair = ht->storage[index];
+  if(pair != NULL){
+    return pair->value;
+  }
   return NULL;
 }
 
@@ -120,8 +124,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void destroy_hash_table(BasicHashTable *ht)
-{
+void destroy_hash_table(BasicHashTable *ht){
 
 }
 
