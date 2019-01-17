@@ -47,7 +47,6 @@ void destroy_pair(LinkedPair *pair)
 
 /****
   djb2 hash function
-
   Do not modify this!
  ****/
 unsigned int hash(char *str, int max)
@@ -65,53 +64,101 @@ unsigned int hash(char *str, int max)
 
 /****
   Fill this in.
-
   All values in storage should be initialized to NULL
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
 
 /****
   Fill this in.
-
   Inserting values to the same index with different keys should be
   added to the corresponding LinkedPair list.
-
   Inserting values to the same index with existing keys can overwrite
   the value in th existing LinkedPair list.
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int newHash = hash(key, ht->capacity);
+  LinkedPair *evalPair = ht->storage[newHash];
 
+  if (evalPair == NULL) {
+    LinkedPair *newPair = create_pair(key, value);
+    ht->storage[newHash] = newPair;
+    return;
+  }
+
+  while(evalPair != NULL){
+    if (strcmp(evalPair->key, key) == 0){
+      evalPair->value = strdup(value);
+      return;
+    }else{
+      if (evalPair->next == NULL){
+        break;
+      }
+      evalPair = evalPair->next;
+    }
+  }
+
+  LinkedPair *newPair = create_pair(key, value);
+  evalPair->next = newPair;
 }
 
 /****
   Fill this in.
-
   Should search the entire list of LinkedPairs for existing
   keys and remove matching LinkedPairs safely.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int checkHash = hash(key, ht->capacity);
+  LinkedPair *evalPair = ht->storage[checkHash];
+  LinkedPair *prev;
 
+  if (evalPair != NULL && strcmp(evalPair->key, key) == 0){
+    ht->storage[checkHash] = evalPair->next;
+  }
+
+  while(evalPair != NULL && strcmp(evalPair->key, key) != 0){
+    prev = evalPair;
+    evalPair = prev->next;
+  }
+  if (evalPair == NULL) {
+    return;
+  }
+
+  prev->next = evalPair->next;
 }
 
 /****
   Fill this in.
-
   Should search the entire list of LinkedPairs for existing
   keys.
-
   Return NULL if the key is not found.
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int checkHash = hash(key, ht->capacity);
+  if (ht->storage[checkHash] != NULL) {
+    if (strcmp(ht->storage[checkHash]->key, key) == 0) {
+      return ht->storage[checkHash]->value;
+    } else {
+      LinkedPair *checkPair = ht->storage[checkHash]->next;
+      while(checkPair) {
+        if (strcmp(checkPair->key, key) == 0){
+          return checkPair->value;
+        } else {
+          checkPair = checkPair->next;
+        }
+      }
+    }
+  }
   return NULL;
 }
 

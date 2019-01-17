@@ -111,41 +111,48 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 
   Should return NULL if the key is not found.
  ****/
-char *hash_table_retrieve(BasicHashTable *ht, char *key)
-{
-  return NULL;
-}
+ char *hash_table_retrieve(BasicHashTable *ht, char *key)
+ {
+   int keyHash = hash(key, ht->capacity);
+   if (ht->storage[keyHash]) {
+     return ht->storage[keyHash]->value;
+   }
+   return NULL;
+ }
 
-/****
-  Fill this in.
+ /****
+   Fill this in.
+   Don't forget to free any malloc'ed memory!
+  ****/
+ void destroy_hash_table(BasicHashTable *ht)
+ {
+   for(int i = 0; i < ht->capacity; i++) {
+     destroy_pair(ht->storage[i]);
+   }
+   free(ht->storage);
+   free(ht);
+ }
 
-  Don't forget to free any malloc'ed memory!
- ****/
-void destroy_hash_table(BasicHashTable *ht)
-{
 
-}
+ #ifndef TESTING
+ int main(void)
+ {
+   struct BasicHashTable *ht = create_hash_table(16);
 
+   hash_table_insert(ht, "line", "Here today...\n");
 
-#ifndef TESTING
-int main(void)
-{
-  struct BasicHashTable *ht = create_hash_table(16);
+   printf("%s", hash_table_retrieve(ht, "line"));
 
-  hash_table_insert(ht, "line", "Here today...\n");
+   hash_table_remove(ht, "line");
 
-  printf("%s", hash_table_retrieve(ht, "line"));
+   if (hash_table_retrieve(ht, "line") == NULL) {
+     printf("...gone tomorrow. (success)\n");
+   } else {
+     fprintf(stderr, "ERROR: STILL HERE\n");
+   }
 
-  hash_table_remove(ht, "line");
+   destroy_hash_table(ht);
 
-  if (hash_table_retrieve(ht, "line") == NULL) {
-    printf("...gone tomorrow. (success)\n");
-  } else {
-    fprintf(stderr, "ERROR: STILL HERE\n");
-  }
-
-  destroy_hash_table(ht);
-
-  return 0;
-}
-#endif
+   return 0;
+ }
+ #endif
