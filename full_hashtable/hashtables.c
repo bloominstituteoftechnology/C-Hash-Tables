@@ -63,6 +63,24 @@ unsigned int hash(char *str, int max)
   return hash % max;
 }
 
+// helper function to print out storage
+void ht_print(HashTable *ht)
+{
+  LinkedPair *curr_pair;
+  for (int i = 0; i < ht->capacity; i++){
+    if (ht->storage[i] != NULL)
+    {
+      printf("At index %d\n", i);
+      curr_pair = ht->storage[i];
+      while(curr_pair != NULL)
+      {
+        printf("Key %s, Value: %s\n", curr_pair->key, curr_pair->value);
+        curr_pair = curr_pair->next;
+      }
+    }
+  }
+}
+
 /****
   Fill this in.
 
@@ -108,47 +126,61 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     // and if the keys match
     if (strcmp(ht->storage[index]->key, key) == 0)
     {
-      // and if the values match
-      if (strcmp(ht->storage[index]->value, value) == 0) {
-        // print an error stating that the key/value pair already exists and exit
-        fprintf(stderr, "Key '%s' and value '%s' already exist.\n", key, value);
-        exit(1);
+      // print a warning stating that the key will be overwritten
+      printf("Previous key is being overwritten.\n");
+
+      // create a pointer to the next key/value pair
+      LinkedPair *prev_next = ht->storage[index]->next;
+
+      // then free the occupied space
+      destroy_pair(ht->storage[index]);
+
+      // create a new key/value pair and insert it into that space
+      ht->storage[index] = create_pair(key, value);
+
+      // assign its next pointer the value of the previously next key/value pair
+      ht->storage[index]->next = prev_next;
+    }
+    // else if they keys do not match
+    else
+    {
+      // create pointers to the previous and current pairs
+      LinkedPair *prev_pair = ht->storage[index];
+      LinkedPair *curr_pair = ht->storage[index]->next;
+
+      // cycle through the pairs until your curr pair is a NULL pointer or the keys match
+      while(curr_pair != NULL && strcmp(curr_pair->key, key) != 0)
+      {
+        prev_pair = curr_pair;
+        curr_pair = prev_pair->next;
       }
-      // else if the values do not match
-      else
+
+      // if current pair is not NULL, a matching key was found
+      if (curr_pair != NULL)
       {
         // print a warning stating that the key will be overwritten
         printf("Previous key is being overwritten.\n");
 
-        // create a pointer to the next key/value pair
-        LinkedPair *prev_next = ht->storage[index]->next;
+        // create a pointer to the current pair's next value
+        LinkedPair *curr_pair_next = curr_pair->next;
 
         // then free the occupied space
-        destroy_pair(ht->storage[index]);
+        destroy_pair(curr_pair);
 
-        // create a new key/value pair and insert it into that space
-        ht->storage[index] = create_pair(key, value);
+        // create a new key/value pair
+        LinkedPair *new_pair = create_pair(key, value);
 
-        // assign its next pointer the value of the previously next key/value pair
-        ht->storage[index]->next = prev_next;
+        // assign previous pair's next value to this new pair
+        // and assign this new pair's next value to what was the current pair's next value
+        prev_pair->next = new_pair;
+        new_pair->next = curr_pair_next;
       }
-    }
-    // else if the keys do not match
-    else
-    {
-      // create pointers to the current and next pair
-      LinkedPair *curr_pair = ht->storage[index];
-      LinkedPair *next_pair = curr_pair->next;
-
-      // cycle through the pairs until your next pair is a NULL pointer
-      while(next_pair != NULL)
+      // else if the current pair was NULL, a matching key was not found
+      else
       {
-        curr_pair = next_pair;
-        next_pair = curr_pair->next;
+        // create a new key/value pair and insert that into the previous pair's next value
+        prev_pair->next = create_pair(key, value);
       }
-
-      // create a new key/value pair and insert it as the next pair
-      curr_pair->next = create_pair(key, value);
     }
   }
 }
@@ -188,8 +220,7 @@ void hash_table_remove(HashTable *ht, char *key)
       LinkedPair *prev_pair = ht->storage[index];
       LinkedPair *curr_pair = ht->storage[index]->next;
 
-      // cycle through the pairs until your curr pair is a NULL pointer
-      // or the keys match
+      // cycle through the pairs until your curr pair is a NULL pointer or the keys match
       while(curr_pair != NULL && strcmp(curr_pair->key, key) != 0)
       {
         prev_pair = curr_pair;
@@ -225,6 +256,29 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  // create an index by hashing the key
+  unsigned int index = hash(key, ht->capacity);
+
+  // if there exists a LinkedPair pointer in that space
+  if (ht->storage[index] != NULL)
+  {
+      // create a pointer to the current pair
+      LinkedPair *curr_pair = ht->storage[index];
+
+      // cycle through the pairs until your curr pair is a NULL pointer or the keys match
+      while(curr_pair != NULL && strcmp(curr_pair->key, key) != 0)
+      {
+        curr_pair = curr_pair->next;
+      }
+
+      // if current pair is not null, a matching key was found
+      if (curr_pair != NULL)
+      {
+        // return the value associated with that key
+        return curr_pair->value;
+      }
+  }
+  // if no LinkedPair pointer or matching key was found, return NULL
   return NULL;
 }
 
@@ -267,11 +321,15 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  int old_capacity = ht->capacity;
-  ht = hash_table_resize(ht);
-  int new_capacity = ht->capacity;
+  hash_table_insert(ht, "line_3", "new-val-0");
 
-  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  ht_print(ht);
+
+  // int old_capacity = ht->capacity;
+  // ht = hash_table_resize(ht);
+  // int new_capacity = ht->capacity;
+
+  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
   destroy_hash_table(ht);
 
