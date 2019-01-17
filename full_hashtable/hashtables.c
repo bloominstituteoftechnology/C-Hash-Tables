@@ -88,6 +88,35 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  // Create a hash
+  unsigned long index = hash(key, ht->capacity);
+
+  // Create current and last linked pair, set current to current index
+  LinkedPair *cpair = ht->storage[index];
+  LinkedPair *lpair;
+
+  // Traverse the linked list
+  while(cpair != NULL && strcmp(cpair->key, key) != 0) {
+    lpair = cpair;
+    cpair = lpair->next;
+  }
+
+  // If null, add a new pair to the end of the linked list, else,
+  // replace the value
+  if (cpair == NULL) {
+    // Create a new pair
+    LinkedPair *pair = create_pair(key, value);
+
+    // Set the pair's next node to the current index
+    pair->next = ht->storage[index];
+
+    // set the current index to the new pair
+    ht->storage[index] = pair;
+  } else {
+    // Set the current index's value to the new value
+    cpair->value = value;
+  }
+
 
 }
 
@@ -123,12 +152,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 
   // Traverse the current linked pair and check if the keys equal
   // if so, break, else, continue till cpair equals null
-  while(cpair != NULL) {
-    if (strcmp(cpair->key, key) != 0) {
-      // Return the current value
-      return cpair->value;
-    }
-
+  while(cpair != NULL && strcmp(cpair->key, key) != 0) {
     lpair = cpair;
     cpair = lpair->next;
   }
@@ -137,6 +161,8 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   if (cpair == NULL) {
     return NULL;
   }
+
+  return cpair->value;
 }
 
 /****
