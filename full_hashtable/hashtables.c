@@ -197,11 +197,18 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-  // inintialize new memory
-  // copy everything over
-  // free old memory
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+  for(int i = 0; i < ht->capacity; i++){
+    LinkedPair *current_pair = ht->storage[i];
+    if(current_pair != NULL){
+      while(current_pair != NULL){
+        hash_table_insert(new_ht, current_pair->key, current_pair->value);
+        current_pair = current_pair->next;
+      }
+    }
+  }
 
+  destroy_hash_table(ht);
 
   return new_ht;
 }
