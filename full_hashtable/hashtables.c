@@ -127,7 +127,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 void hash_table_remove(HashTable *ht, char *key)
 {
   unsigned int target_index = hash(key, ht->capacity);
-  LinkedPair *current = ht->storage[target_index]; // shortens the name
+  LinkedPair *current = ht->storage[target_index]; // shortens the name and serve as marker
 
   while (current != 0) { // LOOP while there's a current node
     if (strcmp(current->key, key) == 0 && current->next == 0) { // EXIT 1 if strings are the same and there's NOT a linked node
@@ -154,7 +154,20 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int target_index = hash(key, ht->capacity);
+  LinkedPair *current = ht->storage[target_index]; // shortens the name and serve as marker
+
+  while (current != 0) { // LOOP while there's a current node
+    if (strcmp(current->key, key) == 0) { // EXIT 1 if keys match, return the value
+      return current->value;
+    }
+    else if (strcmp(current->key, key) != 0 && current->next == 0) { // EXIT 2 if no key matches and no linked node, return NULL
+      fprintf(stderr, "That key was not found.");
+      return NULL;
+    }
+    current = current->next; // ITERATOR Move to the next linked node and continue with while loop to check
+  }
+  return 0;
 }
 
 /****
@@ -191,9 +204,16 @@ int main(void)
   hash_table_insert(ht, "tim", "texas\n"); // inserts index 1
   hash_table_insert(ht, "josh", "mexico\n"); // inserts index 1 -> INDEX COLLISION, sets on existing node's "next"
   hash_table_insert(ht, "tim", "california\n"); // inserts index 1 -> INDEX & KEY COLLISION, set on exisiting node's "value"
-  hash_table_remove(ht, "tim"); // removes tim from the 1st node and shift josh to 1st node
+
+  // REMOVE (Choose only 1)
+  // hash_table_remove(ht, "tim"); // removes tim from the 1st node and shift josh to 1st node
   // hash_table_remove(ht, "josh"); // removes josh from the 2nd node
 
+  // RETRIEVE
+  printf("%s\n", hash_table_retrieve(ht, "tim")); // returns california
+  printf("%s\n", hash_table_retrieve(ht, "josh")); // returns josh
+
+  // DEFAULT
   // hash_table_insert(ht, "line_1", "Tiny hash table\n");
   // hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   // hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
