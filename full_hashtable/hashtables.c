@@ -71,7 +71,13 @@ unsigned int hash(char *str, int max)
 HashTable *create_hash_table(int capacity)
 {
   HashTable *ht;
-
+  ht = malloc(sizeof(struct HashTable));
+  ht->storage = malloc(capacity*sizeof(struct LinkedPair*));
+  for(int i=0; i<capacity; i++)
+  {
+    ht->storage[i] = NULL;
+  }
+  ht->capacity = capacity;
   return ht;
 }
 
@@ -86,7 +92,20 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  LinkedPair *p = ht->storage[hash(key, ht->capacity)];
+  while(p != NULL)
+  {
+    if(strcmp(key, *p->key))
+    {
+      p = p->next;
+    }
+    else
+    {
+      destroy_pair(p);
+      break;
+    }
+  }
+  p = create_pair(key, value);
 }
 
 /****
@@ -99,7 +118,25 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  LinkedPair *p = ht->storage[hash(key, ht->capacity)];
+  if(p == NULL)
+  {
+    printf("Key of %s does not exist in table.\n", key);
+    return;
+  }
+  LinkedPair *previous;
+  while(strcmp(*p->key, key))
+  {
+    previous = p;
+    p = p->next;
+    if(p == NULL)
+    {
+      printf("Key of %s does not exist in table.\n", key);
+      return;
+    }
+  }
+  destroy_pair(p);
+  previous->next = NULL;
 }
 
 /****
