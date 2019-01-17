@@ -218,16 +218,13 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  unsigned long capacity = ht->capacity;
-
-  HashTable *new_ht = malloc((capacity * 2) * sizeof(HashTable));
-
-  new_ht->capacity = (unsigned long) ht-capacity * 2;
-  new_ht->storage = calloc((capacity * 2), sizeof(LinkedPair *));
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
 
   for (int i = 0; i < ht->capacity; i++) {
     new_ht->storage[i] = ht->storage[i];
   }
+
+  destroy_hash_table(ht);
 
   return new_ht;
 }
@@ -273,7 +270,7 @@ int main(void)
 
   printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
 
   return 0;
 }
