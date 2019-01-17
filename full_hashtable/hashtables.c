@@ -39,6 +39,8 @@ LinkedPair *create_pair(char *key, char *value)
 void destroy_pair(LinkedPair *pair)
 {
   if (pair != NULL) {
+    pair->key = NULL;
+    pair->value = NULL;
     free(pair->key);
     free(pair->value);
     free(pair);
@@ -138,7 +140,22 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int target_index = hash(key, ht->capacity);
+  LinkedPair *current = ht->storage[target_index]; // shortens the name
 
+  while (current != 0) { // LOOP while there's a current node
+    if (strcmp(current->key, key) == 0 && current->next == 0) { // EXIT 1 if strings are the same and there's NOT a linked node
+      destroy_pair(current);
+      break;
+    }
+    else if (strcmp(current->key, key) == 0 && current->next != 0) { // EXIT 2 if strings are same and there IS a linked node
+      current->key = current->next->key;
+      current->value = current->next->value;
+      current->next = current->next->next;
+      break;
+    }
+    current = current->next; // ITERATOR Move to the next linked node and continue with while loop to check
+  }
 }
 
 /****
@@ -188,6 +205,8 @@ int main(void)
   hash_table_insert(ht, "tim", "texas\n"); // inserts index 1
   hash_table_insert(ht, "josh", "mexico\n"); // inserts index 1 -> INDEX COLLISION, sets on existing node's "next"
   hash_table_insert(ht, "tim", "california\n"); // inserts index 1 -> INDEX & KEY COLLISION, set on exisiting node's "value"
+  hash_table_remove(ht, "tim"); // removes tim from the 1st node and shift josh to 1st node
+  // hash_table_remove(ht, "josh"); // removes josh from the 2nd node
 
   // hash_table_insert(ht, "line_1", "Tiny hash table\n");
   // hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
