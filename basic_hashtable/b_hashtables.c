@@ -68,9 +68,11 @@ unsigned int hash(char *str, int max)
   All values in storage should be initialized to NULL
   (hint: look up `calloc`)
  ****/
-BasicHashTable *create_hash_table(int capacity)
-{
+BasicHashTable *create_hash_table(int capacity){
   BasicHashTable *ht;
+  ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht-> storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -82,9 +84,13 @@ BasicHashTable *create_hash_table(int capacity)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void hash_table_insert(BasicHashTable *ht, char *key, char *value)
-{
-
+void hash_table_insert(BasicHashTable *ht, char *key, char *value){
+  int index = hash(key, ht->capacity);
+  if(ht->storage[index] != NULL){
+    printf("You are overwriting existing value");
+    destroy_pair(ht->storage[index]);
+  }
+  ht->storage[index] = create_pair(key, value);
 }
 
 /****
@@ -92,9 +98,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void hash_table_remove(BasicHashTable *ht, char *key)
-{
-
+void hash_table_remove(BasicHashTable *ht, char *key){
+  int index = hash(key, ht->capacity);
+  if(ht->storage[index] != NULL){
+  destroy_pair(ht->storage[index]);
+  }
 }
 
 /****
