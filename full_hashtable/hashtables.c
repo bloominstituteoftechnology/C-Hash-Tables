@@ -118,8 +118,20 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
- 
-
+  unsigned int hashed_key = hash(key, ht->capacity);
+  LinkedPair *current_pair = ht->storage[hashed_key];
+  LinkedPair *last_pair = current_pair;
+  while (current_pair) {
+    if (strcmp(current_pair->key, key) == 0) {
+      if (current_pair == ht->storage[hashed_key]) {
+        ht->storage[hashed_key] = current_pair->next;
+      }
+      last_pair->next = current_pair->next;
+      destroy_pair(current_pair);
+    }
+    last_pair = current_pair;
+    current_pair = current_pair->next;
+  }
 }
 
 /****
@@ -132,6 +144,18 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int hashed_key = hash(key, ht->capacity);
+  LinkedPair *current_pair = ht->storage[hashed_key];
+  LinkedPair *last_pair;
+  
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0) {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
+  if (current_pair != NULL) {
+    return current_pair->value;
+  }
+  printf("Unable to locate value with key: %s\n", key);
   return NULL;
 }
 
