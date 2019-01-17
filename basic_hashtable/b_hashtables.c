@@ -16,6 +16,7 @@ typedef struct Pair {
  ****/
 typedef struct BasicHashTable {
   int capacity;
+  int count;
   Pair **storage;
 } BasicHashTable;
 
@@ -73,6 +74,7 @@ BasicHashTable *create_hash_table(int capacity)
   BasicHashTable *ht;
   ht = malloc(sizeof(struct BasicHashTable));
   ht->capacity = capacity;
+  ht->count = 0;
   ht->storage = malloc(capacity*sizeof(struct Pair*));
   for(int i=0; i<capacity; i++)
   {
@@ -109,9 +111,33 @@ int is_same(char *key, char *old_key)
   return 1;
 }
 
+void resize_table(BasicHashTable *ht)
+{
+  int new_capacity = ht->capacity*2;
+  Pair **new_storage = malloc(new_capacity*sizeof(struct Pair*));
+  for(int i=0; i<new_capacity; i++)
+  {
+    new_storage[i] = NULL;
+  }
+  for(int i=0; i<ht->capacity; i++)
+  {
+    if(ht->storage[i] != NULL)
+    {
+      new_storage[i] = ht->storage[i];
+    }
+  }
+  free(ht->storage);
+  ht->storage = new_storage;
+  ht->capacity *= 2;
+}
+
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   int index = hash(key, ht->capacity);
+  if((ht->count*10)/ht->capacity >= 7)
+  {
+    resize_table(ht);
+  }
   if(ht->storage[index] != NULL)
   {
     if(!is_same(key, ht->storage[index]->key))
@@ -121,6 +147,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
     destroy_pair(ht->storage[index]);
   }
   ht->storage[index] = create_pair(key, value);
+  ht->count++;
 }
 
 /****
