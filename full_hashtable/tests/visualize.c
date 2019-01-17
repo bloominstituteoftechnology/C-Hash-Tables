@@ -124,7 +124,13 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 
 void destroy_hash_table(HashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++) {
+    ht->storage[i] = NULL; // without NULL -> error for object 0x7fbecec02b20: pointer being freed was not allocated
+    destroy_pair(ht->storage[i]); // destroy pair has built in NULL check and frees key, value, and node
+  }
 
+  free(ht->storage);
+  free(ht);
 }
 
 HashTable *hash_table_resize(HashTable *ht)
@@ -152,6 +158,7 @@ int main(void)
   printf("%s\n", hash_table_retrieve(ht, "tim")); // returns california
   printf("%s\n", hash_table_retrieve(ht, "josh")); // returns josh
 
+  destroy_hash_table(ht);
   return 0;
 }
 #endif
