@@ -88,7 +88,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {  
   // 1. Get hash && create a pair between key and value passed in so we can put it in the ht later
   Pair *new_pair = create_pair(key, value);
-  int hash_key = hash(key, ht->capacity);
+  unsigned int hash_key = hash(key, ht->capacity);
 
   // 2. Check if we overwrite a value that has a different key
   if (ht->storage[hash_key] != NULL) {
@@ -108,7 +108,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   // 1. Get hash
-  int hash_key = hash(key, ht->capacity);
+  unsigned int hash_key = hash(key, ht->capacity);
 
   // 2. Check if the key exists, if so we delete it (get rid of key/value pair that is at current key, and then set to NULL)
   if (ht->storage[hash_key] != NULL) {
@@ -128,7 +128,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
   // 1. Get hash
-  int hash_key = hash(key, ht->capacity);
+  unsigned int hash_key = hash(key, ht->capacity);
 
   // 2. Base Case: If key is not found return NULL || Else: We return the value at that storage index
   if (ht->storage[hash_key]) {
