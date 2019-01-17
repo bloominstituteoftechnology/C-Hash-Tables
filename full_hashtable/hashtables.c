@@ -92,6 +92,25 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   int i = hash(key, ht->capacity-1);
   LinkedPair * np = create_pair(key, value);
 
+  if ( ht->storage[i] == NULL ) {
+
+    ht->storage[i] = create_pair(key, value);
+
+  } else {
+
+      while ( ht->storage[i]->next != NULL ) {
+        
+        if ( ht->storage[i]->next) {
+
+            ht->storage[i]->next = np;
+        }
+        if (ht->storage[i]->key == key) {
+
+          ht->storage[i]->value = value;
+        }
+      }
+  }
+
 }
 
 /****
@@ -134,6 +153,13 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for ( int i = 0; i < ht->capacity; i++ ) {
+    if ( ht->storage[i] != NULL ) {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht->storage);
+  free(ht);
   
 
 }
