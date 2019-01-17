@@ -70,9 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
   
-  ht = malloc(sizeof(BasicHashTable));
+  
   ht->storage = calloc(capacity, sizeof(Pair));
   ht->capacity = capacity;
 
@@ -89,12 +89,16 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  int i = hash(key, ht->capacity-1);
+  int i = hash(key, ht->capacity-1); // created the key
+  Pair * np = create_pair(key, value); // created pair to be inserted
 
-  if ( ht->storage[i] != NULL ) {
-
+  if ( ht->storage[i] == NULL ) {
+    printf("Succesful!");
+    ht->storage[i] = np;
+  } else {
     free(ht->storage[i]);
-    printf("Warning, you've overwritten a value- \"%s\n\"", ht->storage[i]->value);
+    fprintf(stderr, "Warning, you've overwritten a value");
+    ht->storage[i] = np;
   }
 
 }
@@ -106,6 +110,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  int i = hash(key, ht->capacity-1); // created the key
+  printf("%s %s \n", ht->storage[i]->key, key );
+  if ( ht->storage[i]->key == key) {
+    destroy_pair(ht->storage[i]);
+    ht->storage[i] = NULL;
+  } else {
+    printf("That key is invalid");
+  }
 
 }
 
@@ -116,7 +128,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  int i = hash(key, ht->capacity-1);
+  if (ht->storage[i] == NULL) {
+    printf("Index is empty");
+    return NULL;
+  } else {
+    return ht->storage[i]->value;
+  }
 }
 
 /****
@@ -127,11 +145,11 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 void destroy_hash_table(BasicHashTable *ht)
 {
   for ( int i = 0; i < ht->capacity; i++ ) {
-    destroy_pair(ht->storage[i]);
     if ( ht->storage[i] != NULL ) {
-        free(ht->storage);
+      destroy_pair(ht->storage[i]);
     }
   }
+  free(ht->storage);
   free(ht);
 
 }
