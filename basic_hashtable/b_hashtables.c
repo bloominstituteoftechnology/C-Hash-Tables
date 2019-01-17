@@ -91,12 +91,13 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   if (ht->storage[hashed_key] != NULL)
   {
     fprintf(stderr, "Pair overwritten");
+    destroy_pair(ht->storage[hashed_key]);
     ht->storage[hashed_key] = new_pair;
   }
   else
   {
     ht->storage[hashed_key] = new_pair;
-  }
+  } 
 }
 
 /****
@@ -107,11 +108,10 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   int hashed_key = hash(key, ht->capacity);
-  if(ht->storage[hashed_key]->key == key)
+  if(ht->storage[hashed_key])
   {    
     destroy_pair(ht->storage[hashed_key]);
-    free(ht->storage[hashed_key]);
-    ht->storage[hashed_key] == 0;    
+    ht->storage[hashed_key] = NULL; 
   }
 }
 
@@ -126,11 +126,8 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   if(ht->storage[hashed_key] == NULL)
   {
     return NULL;
-  }
-  else
-  {
-    return ht->storage[hashed_key]->value;
-  }
+  }  
+  return ht->storage[hashed_key]->value;  
 }
 
 /****
@@ -148,7 +145,7 @@ void destroy_hash_table(BasicHashTable *ht)
     }
   } 
   free(ht->storage);
-  free(ht);
+  free(ht);  
 }
 
 
