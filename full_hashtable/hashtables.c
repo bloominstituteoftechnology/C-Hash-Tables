@@ -17,6 +17,7 @@ typedef struct LinkedPair {
  ****/
 typedef struct HashTable {
   int capacity;
+  int count;
   LinkedPair **storage;
 } HashTable;
 
@@ -66,7 +67,7 @@ unsigned int hash(char *str, int max)
 // helper function to print out storage
 void ht_print(HashTable *ht)
 {
-  printf("\nPrinting storage:\n");
+  printf("\nSTART printing storage:\n");
   LinkedPair *curr_pair;
 
   for (int i = 0; i < ht->capacity; i++){
@@ -82,6 +83,8 @@ void ht_print(HashTable *ht)
       }
     }
   }
+
+  printf("END printing storage. Capacity was %d. Count was: %d\n", ht->capacity, ht->count);
 }
 
 /****
@@ -94,8 +97,9 @@ HashTable *create_hash_table(int capacity)
   // allocate memory for the new instance of the HashTable struct
   HashTable *ht = malloc(sizeof(HashTable));
 
-  // set initial value for capacity
+  // set initial value for capacity and count
   ht->capacity = capacity;
+  ht->count = 0;
 
   // allocate memory for storage
   ht->storage = calloc(capacity, sizeof(LinkedPair *));
@@ -122,6 +126,9 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   {
     // create a key/value pair in that space
     ht->storage[index] = create_pair(key, value);
+
+    // increment count
+    ht->count++;
   }
   // else, if there is something occupying that space
   else
@@ -140,6 +147,9 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
       // create a new key/value pair and insert it into that space
       ht->storage[index] = create_pair(key, value);
+
+      //increment count
+      ht->count++;
 
       // assign its next pointer the value of the previously next key/value pair
       ht->storage[index]->next = prev_next;
@@ -173,6 +183,9 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
         // create a new key/value pair
         LinkedPair *new_pair = create_pair(key, value);
 
+        // increment count
+        ht->count++;
+
         // assign previous pair's next value to this new pair
         // and assign this new pair's next value to what was the current pair's next value
         prev_pair->next = new_pair;
@@ -183,6 +196,9 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
       {
         // create a new key/value pair and insert that into the previous pair's next value
         prev_pair->next = create_pair(key, value);
+
+        // increment count
+        ht->count++;
       }
     }
   }
@@ -215,6 +231,9 @@ void hash_table_remove(HashTable *ht, char *key)
 
       // assign in its place the value of the previously next key/value pair
       ht->storage[index] = prev_next;
+
+      // decrement count
+      ht->count--;
     }
     // else if the keys do not match
     else
@@ -237,6 +256,9 @@ void hash_table_remove(HashTable *ht, char *key)
         // and destroy the current pair
         prev_pair->next = curr_pair->next;
         destroy_pair(curr_pair);
+
+        // decrement count
+        ht->count--;
       }
       // else key does not exist
       // print an error message stating such and exit
