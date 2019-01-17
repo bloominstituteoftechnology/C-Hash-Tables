@@ -80,35 +80,39 @@ HashTable *create_hash_table(int capacity)
   Fill this in.
   Inserting values to the same index with different keys should be
   added to the corresponding LinkedPair list.
-  Inserting values to the same index with existing keys can overwrite
-  the value in th existing LinkedPair list.
+  *Inserting values to the same index with existing keys can overwrite
+  the value in th existing LinkedPair list.*
  ****/
 // Think of the hash table as an array of linked lists.
 // Hashed keys correspond to indexes of the hash table.
 // When multiple Pairs have keys that hash to the same number (they are equal modulo ht->capacity),
-// they form a linked list at the same hashed-key index
+// they form a linked list at the same index. hashed_key == index
+
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   unsigned int hashed_key = hash(key, ht->capacity);
-  LinkedPair *new_pair = create_pair(key, value);
+  // LinkedPair *new_pair = create_pair(key, value);
 
-  if (ht->storage[hashed_key] == NULL) {
-    ht->storage[hashed_key] = new_pair;
-    return;
-  }
+  // if (ht->storage[hashed_key] == NULL) {         // If there are no Pairs in the ht with the same hashed_key
+  //   ht->storage[hashed_key] = new_pair;          // insert the new_pair at that index
+  //   return;
+  // }
 
-  LinkedPair *current_pair = ht->storage[hashed_key];
-  while (current_pair != NULL) {                // Step through the linked list until landing on a NULL slot
-    if (strcmp(key, current_pair->key) == 0) {  // check if the key of the current pair is equal to the key of the pair you want to insert
-      current_pair->value = value;
+  LinkedPair *current_pair = ht->storage[hashed_key];      // make a pointer to the first pair at the index for this hashed_key
+  while (current_pair != NULL) {                           // Step through the linked list until landing on a NULL slot.
+    if (strcmp(key, current_pair->key) == 0) {             // If the key of the current pair is equal to the key of the pair to be inserted,
+      current_pair->value = value;                         // then overwrite the value of the existing pair with the new_pair value
       return;
     }
-    if (current_pair->next == NULL) {
-      current_pair->next = new_pair;
-      return;
-    }
+    // if (current_pair->next == NULL) {
+    //   current_pair->next = new_pair;
+    //   return;
+    // }
     current_pair = current_pair->next;
   }
+  LinkedPair *new_pair = create_pair(key, value);
+  ht->storage[hashed_key] = new_pair;                      // if no matching keys were found, insert the new_pair at the first NULL index
+  return;
 }
 
 /****
@@ -128,20 +132,19 @@ void hash_table_remove(HashTable *ht, char *key)
   keys.
   Return NULL if the key is not found.
  ****/
+// I'm applying basically the same process used for insert
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
   unsigned int hashed_key = hash(key, ht->capacity);
   LinkedPair *current_pair = ht->storage[hashed_key];
 
-  if (current_pair == NULL) {
-    return NULL;
-  }
-  if (strcmp(current_pair->key, key) == 0) {
-    return current_pair->value;
-  }
-  while (current_pair->next != NULL) {
-    if (strcmp(current_pair->next->key, key) == 0){
-      return current_pair->next->value;
+  // if (current_pair == NULL) {
+  //   return NULL;
+  // }
+  
+  while (current_pair != NULL) {
+    if (strcmp(current_pair->key, key) == 0){
+      return current_pair->value;
     }
     current_pair = current_pair->next;
   }
@@ -150,20 +153,22 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 
 /****
   Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  int i = 0;
+  while (i <= ht->capacity) {   
+    ht->storage[i] = NULL;
+    free(ht->storage[i]);
+    i++;
+  }
 }
 
 /****
   Fill this in.
-
   Should create a new hash table with double the capacity
   of the original and copy all elements into the new hash table.
-
   Don't forget to free any malloc'ed memory!
  ****/
 HashTable *hash_table_resize(HashTable *ht)
