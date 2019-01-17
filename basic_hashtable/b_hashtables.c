@@ -90,8 +90,8 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   int index = hash(key,ht->capacity-1);
   
   if (ht->storage[index] != NULL){
-    free(ht->storage[index]);
     printf("Warning: You have overwritten \"%s\n\"", ht->storage[index]->value);
+    free(ht->storage[index]);
   } 
   Pair *new_element = create_pair(key,value);
   ht->storage[index] = new_element;
@@ -123,6 +123,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
   int index = hash(key, ht->capacity-1);
   if (ht->storage[index] == NULL){
+    fprintf(stderr, "Key not found\n");
     return NULL;
   } else {
     return ht->storage[index]->value;
@@ -138,7 +139,9 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 void destroy_hash_table(BasicHashTable *ht)
 {
   for(int i = 0; i < ht->capacity; i++){
-    free(ht->storage[i]);
+    if(ht->storage[i] != NULL){
+      destroy_pair(ht->storage[i]);
+    }
   }
   free(ht->storage);
   free(ht);
