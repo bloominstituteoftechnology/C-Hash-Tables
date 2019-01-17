@@ -89,19 +89,26 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-int hashed_key = hash(key, ht->capacity);
-  LinkedPair *new_pair = create_pair(key, value);
-  if (ht->storage[hashed_key] != NULL)
+  unsigned int hashed_key = hash(key, ht->capacity); 
+  LinkedPair *curr_pair = ht->storage[hashed_key];  
+  LinkedPair *last_pair;
+  while (curr_pair != NULL && strcmp(curr_pair->key, key) != 0)
   {
-    fprintf(stderr, "Pair overwritten");
-    destroy_pair(ht->storage[hashed_key]);
-    ht->storage[hashed_key] = new_pair;
+    last_pair = curr_pair;
+    curr_pair = last_pair->next;
+  }
+  if (curr_pair != NULL)
+  {
+    curr_pair->value = value;
   }
   else
   {
+    LinkedPair *new_pair = create_pair(key, value);
+    new_pair->next = ht->storage[hashed_key];
     ht->storage[hashed_key] = new_pair;
   }
-  printf("Here insert\n");
+  
+  
 }
 
 /****
@@ -114,11 +121,20 @@ int hashed_key = hash(key, ht->capacity);
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  int hashed_key = hash(key, ht->capacity);
-  if(ht->storage[hashed_key])
-  {    
-    destroy_pair(ht->storage[hashed_key]);
-    ht->storage[hashed_key] = NULL; 
+  unsigned int hashed_key = hash(key, ht->capacity);
+  LinkedPair *curr_pair = ht->storage[hashed_key];
+  if(curr_pair)
+  { 
+    LinkedPair *viewed_pair = curr_pair;
+    while (strcmp(viewed_pair->key, key) != 0)
+    {
+      viewed_pair = curr_pair->next;
+    }
+    if (strcmp(viewed_pair->key, key) == 0)
+    {
+      destroy_pair(viewed_pair);
+      viewed_pair = NULL;
+    }
   }
 }
 
@@ -132,12 +148,24 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  int hashed_key = hash(key, ht->capacity);
-  if(ht->storage[hashed_key] == NULL)
-  {
-    return NULL;
-  }  
-  return ht->storage[hashed_key]->value;  
+  unsigned int hashed_key = hash(key, ht->capacity);
+  LinkedPair *curr_pair = ht->storage[hashed_key];
+  if(curr_pair)
+  { 
+    LinkedPair *viewed_pair = curr_pair;
+    while (strcmp(viewed_pair->key, key) != 0)
+    {
+      viewed_pair = curr_pair->next;
+    }
+    if (strcmp(viewed_pair->key, key) == 0)
+    {
+      return viewed_pair->value;
+    }
+    else
+    {
+      return NULL;
+    }
+  }
 }
 
 /****
