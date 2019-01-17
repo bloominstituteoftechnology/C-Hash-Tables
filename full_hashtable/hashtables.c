@@ -151,20 +151,20 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  int index = hash(key, ht->capacity);
+  int index = hash(key, ht->capacity); // get our index from the hash function
 
-  if(ht->storage[index] != NULL){
+  if(ht->storage[index] != NULL){ // if there is a pair at that index, store it in current_pair
     LinkedPair *current_pair = ht->storage[index];
-    while(current_pair != NULL){
-      if(strcmp(current_pair->key, key) == 0){
-        return current_pair->value;
+    while(current_pair != NULL){ // iterate to check if the keys are matching
+      if(strcmp(current_pair->key, key) == 0){ // if they do...
+        return current_pair->value; //... return that pair
       } else {
-        current_pair = current_pair->next;
+        current_pair = current_pair->next; // otherwise, move to the next pair in the LinkedList
       }
     }
   }
 
-  return NULL;
+  return NULL; // return NULL if no key match is found
 }
 
 /****
