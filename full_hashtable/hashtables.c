@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Hash table key/value pair with linked list pointer
  ****/
-typedef struct LinkedPair {
+typedef struct LinkedPair
+{
   char *key;
   char *value;
   struct LinkedPair *next;
@@ -15,7 +15,8 @@ typedef struct LinkedPair {
 /****
   Hash table with linked pairs
  ****/
-typedef struct HashTable {
+typedef struct HashTable
+{
   int capacity;
   LinkedPair **storage;
 } HashTable;
@@ -38,7 +39,8 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) free(pair);
+  if (pair != NULL)
+    free(pair);
 }
 
 /****
@@ -50,9 +52,10 @@ unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
   int c;
-  unsigned char * u_str = (unsigned char *)str;
+  unsigned char *u_str = (unsigned char *)str;
 
-  while ((c = *u_str++)) {
+  while ((c = *u_str++))
+  {
     hash = ((hash << 5) + hash) + c;
   }
 
@@ -83,19 +86,26 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
- int capacity = ht->capacity;
+  int capacity = ht->capacity;
   unsigned int newHash = hash(key, capacity);
-  if (ht->storage[newHash] != NULL) {
+  if (ht->storage[newHash] != NULL)
+  {
     LinkedPair *currHash = ht->storage[newHash];
-    while (currHash->next != NULL) {
-      currHash = currHash->next;
-    if (strcmp(currHash->key, key) == 0) {
+    if (strcmp(currHash->key, key) == 0)
+    {
       currHash->value = value;
     }
+    else
+    {
+      while (currHash->next != NULL)
+      {
+        currHash = currHash->next;
+      }
+      currHash->next = create_pair(key, value);
     }
-    currHash->next = create_pair(key, value);
   }
-  else {
+  else
+  {
     ht->storage[newHash] = create_pair(key, value);
   }
 }
@@ -110,12 +120,14 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  int capacity = ht->capacity;  
+  int capacity = ht->capacity;
   unsigned int clrHash = hash(key, capacity);
-  if (ht->storage[clrHash] != NULL) {
+  if (ht->storage[clrHash] != NULL)
+  {
     ht->storage[clrHash] = NULL;
   }
-  else {
+  else
+  {
     printf("ERROR: Hash is already empty");
   }
 }
@@ -130,26 +142,32 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  int capacity = ht->capacity;  
+  int capacity = ht->capacity;
   unsigned int fndHash = hash(key, capacity);
-  if (ht->storage[fndHash] != NULL) {
-    if (strcmp(key, ht->storage[fndHash]->key) == 0) {
+  if (ht->storage[fndHash] != NULL)
+  {
+    if (strcmp(key, ht->storage[fndHash]->key) == 0)
+    {
       return ht->storage[fndHash]->value;
-      }
-    else {
+    }
+    else
+    {
       LinkedPair *currkey = ht->storage[fndHash];
-      while(currkey->next != NULL){
-        if (strcmp(key, currkey->next->key) == 0) {
+      while (currkey->next != NULL)
+      {
+        if (strcmp(key, currkey->next->key) == 0)
+        {
           return currkey->next->value;
         }
-        else {
+        else
+        {
           currkey = currkey->next;
         }
       }
-      
     }
-    }
-      else {
+  }
+  else
+  {
     return NULL;
   }
 }
@@ -161,7 +179,8 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-  for (int i = 0; i < ht->capacity; i++) {
+  for (int i = 0; i < ht->capacity; i++)
+  {
     destroy_pair(ht->storage[i]);
   }
   free(ht);
@@ -182,12 +201,12 @@ HashTable *hash_table_resize(HashTable *ht)
   int capacity = ht->capacity * 2;
   new_ht->capacity = capacity;
   new_ht->storage = calloc(capacity, sizeof(LinkedPair *));
-  for (int i = 0; i < ht->capacity; i++) {
+  for (int i = 0; i < ht->capacity; i++)
+  {
     hash_table_insert(new_ht, ht->storage[i]->key, ht->storage[i]->value);
   }
   return new_ht;
 }
-
 
 #ifndef TESTING
 int main(void)
