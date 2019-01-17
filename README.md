@@ -3,7 +3,7 @@
 Hash tables are arguably the single most important data structure known to mankind. Used to implement everything from objects in JavaScript and dictionaries in Python to Memcached over a distributed computer network, hash tables are beloved by programmers for providing key/value storage with constant big-O time complexity for insertion, deletion and search.
 
 ## What is a hash table?
-
+- for pr
 Underneath the hood, a hash table is simply an array with its elements indexed by a hashed key. Like arrays, hash tables are initalized to a fixed size and inserting, deleting, and reading elements within those boundaries can be accomplished in constant time, or O(1).
 
 ![Hash Table](img/HashTableImage.png)
