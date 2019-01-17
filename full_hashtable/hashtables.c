@@ -71,7 +71,10 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair*));
 
   return ht;
 }
@@ -123,7 +126,19 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  LinkedPair *current_pair;
+  LinkedPair *pair_to_destroy;
 
+  for (int i = 0; i < ht->capacity; i++) {
+    current_pair = ht->storage[i];
+    while (current_pair != NULL) {
+      pair_to_destroy = current_pair;
+      current_pair = current_pair->next;
+      destroy_pair(pair_to_destroy);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
