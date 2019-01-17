@@ -66,6 +66,7 @@ unsigned int hash(char *str, int max)
 // helper function to print out storage
 void ht_print(HashTable *ht)
 {
+  printf("Printing storage:\n");
   LinkedPair *curr_pair;
   for (int i = 0; i < ht->capacity; i++){
     if (ht->storage[i] != NULL)
@@ -289,7 +290,31 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    if (ht->storage[i] != NULL)
+    {
+      LinkedPair *curr_pair = ht->storage[i];
+      LinkedPair *next_pair;
 
+      while(curr_pair != NULL)
+      {
+        next_pair = curr_pair->next;
+        destroy_pair(curr_pair);
+        curr_pair = next_pair;
+      }
+    }
+  }
+
+  if (ht->storage != NULL)
+  {
+    free(ht->storage);
+  }
+
+  if (ht != NULL)
+  {
+    free(ht);
+  }
 }
 
 /****
@@ -321,9 +346,7 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  hash_table_insert(ht, "line_3", "new-val-0");
-
-  ht_print(ht);
+  // ht_print(ht);
 
   // int old_capacity = ht->capacity;
   // ht = hash_table_resize(ht);
@@ -332,6 +355,7 @@ int main(void)
   // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
   destroy_hash_table(ht);
+  // ht_print(ht);
 
   return 0;
 }
