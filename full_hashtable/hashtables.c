@@ -93,7 +93,9 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     LinkedPair *currHash = ht->storage[newHash];
     if (strcmp(currHash->key, key) == 0)
     {
-      currHash->value = value;
+      //currHash->value = value;
+      destroy_pair(currHash);
+      currHash = create_pair(key, value);
     }
     else
     {
