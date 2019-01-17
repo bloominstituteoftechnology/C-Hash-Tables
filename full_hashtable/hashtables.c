@@ -119,25 +119,26 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  int index = hash(key, ht->capacity);
+  int index = hash(key, ht->capacity); // get our index from the hash function
 
-  if(ht->storage[index] != NULL){
-    LinkedPair *current_pair = ht->storage[index];
-    LinkedPair *previous_pair = NULL;
-    while(current_pair != NULL){
-      if(strcmp(current_pair->key, key) == 0){
-        if(previous_pair == NULL){
-          ht->storage[index] = current_pair->next;
-        } else {
-          previous_pair->next = current_pair->next;
-        }
-        destroy_pair(current_pair);
+  if(ht->storage[index] != NULL){ // if there is a value at that index...
+    LinkedPair *current_pair = ht->storage[index]; // store that pair in a variable
+    LinkedPair *previous_pair = NULL; // and initialize a pointer for its previous pair
+    while(current_pair != NULL){ // iterate over the linked list, starting from the current pair
+      if(strcmp(current_pair->key, key) == 0){ // if the keys match, do this:
+        if(previous_pair == NULL){ // if no pair precedes it...
+          ht->storage[index] = current_pair->next; // ...assign the next pair to the current index
+        } else { // if a previous value exists...
+          previous_pair->next = current_pair->next; // ... assign the current_next value to the previous_next value
+        } /** ^ This effectively removes the pair from the LinkedList ^ **/
+        destroy_pair(current_pair); // once it's removed from the list, free its memory and end the loop
         break;
-      } else {
+      } else { // if they keys don't match, iterate over the list until they do
       previous_pair = current_pair;
       current_pair = current_pair->next;
     }
   }
+}
 }
 
 /****
