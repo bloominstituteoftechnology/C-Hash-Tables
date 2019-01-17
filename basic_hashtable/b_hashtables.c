@@ -105,7 +105,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int hashed_key = hash(key, ht->capacity); // hash the incoming key to find the index
 
+  if (ht->storage[hashed_key] != NULL) { // if the index at storage is not empty
+    destroy_pair(ht->storage[hashed_key]); // free up the memory at that index
+  }
 }
 
 /****
