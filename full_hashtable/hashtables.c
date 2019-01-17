@@ -89,7 +89,43 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int target_index = hash(key, ht->capacity); // creates an array index for node to be inserted into
+  LinkedPair *new_pair = create_pair(key, value); // creates a new node for insertion
 
+  if (ht->storage[target_index] == 0) { // if the current index is empty, insert new_pair
+    ht->storage[target_index] = new_pair;
+  }
+  else {
+    while (ht->storage[target_index] != 0) { // if the current index is not empty, 3 things can happens
+      // 1. check if the keys are the same, then overwrite existing value with the new value
+      if (strcmp(ht->storage[target_index]->key, key) == 0) { // == or != compares base addresses, strcmp to compare values
+        ht->storage[target_index]->value = value;
+        break;
+      }
+      // 2. check if keys are different AND there's an empty "next" slot, insert new pair there
+      else if (strcmp(ht->storage[target_index]->key, key) != 0 && ht->storage[target_index]->next == NULL) {
+        ht->storage[target_index]->next = new_pair;
+        break;
+      }
+      // 3. If neither of the terminating conditionals activates, must mean that it's a new linked list node to be attached
+      // continue with while loop until there are matching keys or there's an empty "next" slot
+      ht->storage[target_index] = ht->storage[target_index]->next;
+    }
+  }
+
+  // ONE
+  // if (ht->storage[target_index]->key != NULL && ht->storage[target_index]->next !== NULL){ // If the node at the index is not empty
+  //   if (strcmp(ht->storage[target_index]->key,key) == 0) { // == or != for base addresses, strcmp to compare values
+  //     ht->storage[target_index]->value = value;
+  //     break;
+  //   }
+  //   else {
+  //     ht->storage[target_index]->next = new_pair;
+  //   }
+  // }
+  // else {
+  //   ht->storage[target_index] = new_pair; // just insert new node into target index if it's empty
+  // }
 }
 
 /****
@@ -148,6 +184,10 @@ HashTable *hash_table_resize(HashTable *ht)
 int main(void)
 {
   struct HashTable *ht = create_hash_table(2);
+
+  hash_table_insert(ht, "tim", "texas\n"); // inserts index 1
+  hash_table_insert(ht, "josh", "mexico\n"); // inserts index 1 -> INDEX COLLISION, sets on existing node's "next"
+  hash_table_insert(ht, "tim", "california\n"); // inserts index 1 -> INDEX & KEY COLLISION, set on exisiting node's "value"
 
   // hash_table_insert(ht, "line_1", "Tiny hash table\n");
   // hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
