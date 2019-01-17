@@ -66,16 +66,18 @@ unsigned int hash(char *str, int max)
 // helper function to print out storage
 void ht_print(HashTable *ht)
 {
-  printf("Printing storage:\n");
+  printf("\nPrinting storage:\n");
   LinkedPair *curr_pair;
+
   for (int i = 0; i < ht->capacity; i++){
     if (ht->storage[i] != NULL)
     {
-      printf("At index %d\n", i);
+      printf("At index %d:\n", i);
       curr_pair = ht->storage[i];
+
       while(curr_pair != NULL)
       {
-        printf("Key %s, Value: %s\n", curr_pair->key, curr_pair->value);
+        printf("Key: %s, Value: %s\n", curr_pair->key, curr_pair->value);
         curr_pair = curr_pair->next;
       }
     }
@@ -290,27 +292,37 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  // loop through all the pointers in storage
   for (int i = 0; i < ht->capacity; i++)
   {
+    // if there exists a LinkedPair pointer in that space
     if (ht->storage[i] != NULL)
     {
+      // set curr_pair to that pointer
       LinkedPair *curr_pair = ht->storage[i];
       LinkedPair *next_pair;
 
+      // loop through any and all LinkedPairs until reaching a NULL pointer
       while(curr_pair != NULL)
       {
+        // for each loop,
+        // point next_pair to curr_pair's next value
         next_pair = curr_pair->next;
+        // destroy current pair
         destroy_pair(curr_pair);
+        // make curr_pair now point to what was curr_pair's previous next pair
         curr_pair = next_pair;
       }
     }
   }
 
+  // free up storage
   if (ht->storage != NULL)
   {
     free(ht->storage);
   }
 
+  // free up the hash table
   if (ht != NULL)
   {
     free(ht);
@@ -327,7 +339,36 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  // new capacity will be twice previous capacity
+  int new_capacity = ht->capacity * 2;
+
+  // create a new ht
+  HashTable *new_ht = create_hash_table(new_capacity);
+
+  // loop through all the pointers in original ht storage
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    // if there exists a LinkedPair pointer in that space
+    if (ht->storage[i] != NULL)
+    {
+      // set curr_pair to that pointer
+      LinkedPair *curr_pair = ht->storage[i];
+
+      // loop through any and all LinkedPairs until reaching a NULL pointer
+      while(curr_pair != NULL)
+      {
+        // for each loop,
+        // insert curr_pair's key/value into new ht
+        hash_table_insert(new_ht, curr_pair->key, curr_pair->value);
+
+        // make curr_pair now point to its next pair
+        curr_pair = curr_pair->next;
+      }
+    }
+  }
+
+  // destroy the old ht
+  destroy_hash_table(ht);
 
   return new_ht;
 }
@@ -346,16 +387,17 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  // ht_print(ht);
+  ht_print(ht);
 
-  // int old_capacity = ht->capacity;
-  // ht = hash_table_resize(ht);
-  // int new_capacity = ht->capacity;
+  int old_capacity = ht->capacity;
+  ht = hash_table_resize(ht);
+  int new_capacity = ht->capacity;
 
-  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+
+  ht_print(ht);
 
   destroy_hash_table(ht);
-  // ht_print(ht);
 
   return 0;
 }
