@@ -71,7 +71,13 @@ unsigned int hash(char *str, int max)
 BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
-
+  ht = malloc(sizeof(struct BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = malloc(capacity*sizeof(struct Pair*));
+  for(int i=0; i<capacity; i++)
+  {
+    ht->storage[i] = NULL;
+  }
   return ht;
 }
 
@@ -82,9 +88,39 @@ BasicHashTable *create_hash_table(int capacity)
 
   Don't forget to free any malloc'ed memory!
  ****/
+int is_same(char *key, char *old_key)
+{
+  int i;
+  for(i=0; key[i]!='\0'; i++)
+  {
+    if(old_key[i]=='\0')
+    {
+      return 0;
+    }
+    if(key[i]!=old_key[i])
+    {
+      return 0;
+    }
+  }
+  if(old_key[i] != '\0')
+  {
+    return 0;
+  }
+  return 1;
+}
+
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  int index = hash(key, ht->capacity);
+  if(ht->storage[index] != NULL)
+  {
+    if(!is_same(key, ht->storage[index]->key))
+    {
+      printf("Warning: writing over a different key.\n");
+    }
+    destroy_pair(ht->storage[index]);
+  }
+  ht->storage[index] = create_pair(key, value);
 }
 
 /****
@@ -94,7 +130,9 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int index = hash(key, ht->capacity);
+  destroy_pair(ht->storage[index]);
+  ht->storage[index] = NULL;
 }
 
 /****
@@ -104,6 +142,11 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int index = hash(key, ht->capacity);
+  if(ht->storage[index] != NULL)
+  {
+    return ht->storage[index]->value;
+  }
   return NULL;
 }
 
@@ -114,7 +157,12 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for(int i=0; i<ht->capacity; i++)
+  {
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
