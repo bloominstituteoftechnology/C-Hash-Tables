@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -94,21 +95,18 @@ void hash_table_insert(HashTable *ht, char *key, char *value) //create hash, see
   LinkedPair *newnode = create_pair(key, value);
   if (ht->storage[hashedkey] == NULL) //empty index, insert value
   {
-    ht->storage[hashedkey] = create_pair(key, value);
+    ht->storage[hashedkey] = newnode;
+    printf("Inserted into empty index [%d]\n", hashedkey);
   }
-  else
+  else if (strcmp(key, ht->storage[hashedkey]->key) == 0) //if you reach node with same key as passed in key just change value
   {
-    while (ht->storage[hashedkey]->next != NULL)
-    {
-      if (ht->storage[hashedkey]->next) //If the end is reached add node as next to existing last node
-      {
-        ht->storage[hashedkey]->next = newnode;
-      }
-      if (ht->storage[hashedkey]->key == key) //if you reach node with same key as passed in key just change value
-      {                                       //if key passed in is same as existing key
-        ht->storage[hashedkey]->value = value;
-      }
-    }
+    ht->storage[hashedkey]->value = value;
+    printf("Just overwrote a value of a node with same key at index [%d]\n", hashedkey);
+  }
+  else if (ht->storage[hashedkey]->next == NULL) //If the end is reached add node as next to existing last node
+  {
+    ht->storage[hashedkey]->next = newnode;
+    printf("just added a node as a linked list [%d]\n ", hashedkey);
   }
 }
 
@@ -122,6 +120,29 @@ void hash_table_insert(HashTable *ht, char *key, char *value) //create hash, see
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int hashedkey = hash(key, ht->capacity);
+
+  LinkedPair *currentpair = ht->storage[hashedkey];
+  LinkedPair *oldpair;
+
+  while (currentpair != NULL)
+  {
+    if (strcmp(key, currentpair->key) == 0 && currentpair->next == NULL)
+    {
+      free(currentpair->key);
+      free(currentpair->value);
+      free(currentpair);
+    }
+    else if (strcmp(key, currentpair->key) == 0 && currentpair->next != NULL)
+    {
+      oldpair->next = currentpair->next;
+      free(currentpair->key);
+      free(currentpair->value);
+      free(currentpair);
+    }
+    oldpair = currentpair;
+    currentpair = oldpair->next;
+  }
 }
 
 /****
@@ -137,11 +158,15 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   unsigned int hashedkey = hash(key, ht->capacity);
   while (ht->storage[hashedkey] != NULL)
   {
-    if (ht->storage[hashedkey]->key = key)
+    if (strcmp(key, ht->storage[hashedkey]->key) == 0)
     {
-      printf("key of %s found with value of %s\n", key, ht->storage[hashedkey]->value);
-      return key;
+
+      return ht->storage[hashedkey]->value;
     }
+    else if (ht->storage[hashedkey]->next != NULL)
+    {
+      ht->storage[hashedkey] = ht->storage[hashedkey]->next;
+    } ////traverse linked lists to check if key matches
   }
   return NULL;
 }
@@ -151,8 +176,20 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void destroy_hash_table(HashTable *ht)
+void destroy_hash_table(HashTable *ht) //How to kill capacity->next?
 {
+  if (ht != NULL)
+  {
+    for (int i = 0; i < ht->capacity; i++)
+    {
+      if (ht->storage[i] != NULL)
+      {
+        destroy_pair(ht->storage[i]);
+      }
+    }
+    free(ht->storage);
+    free(ht);
+  }
 }
 
 /****
@@ -165,8 +202,27 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+  for (int i = 0; i < ht->capacity; i++) // For loop length of old hashtable
+  { 
+    LinkedPair *currentpair = ht->storage[i];
+    LinkedPair *oldpair;
 
+    if (currentpair != NULL) //Skip over null hashtable indices
+    {
+      new_ht->storage[i] = currentpair; //Place node into new hashtable
+      printf("inserted string:%s at index %d\n", new_ht->storage[i]->value, i);
+     
+      while (currentpair->next != NULL) //Check if there is a linked node
+      { 
+        oldpair = currentpair; //set oldpair to current
+        currentpair = currentpair->next; //set current to next
+
+        hash_table_insert(new_ht, currentpair->key, currentpair->value); //insert next node into hashtable
+      }
+      
+    }
+  }
   return new_ht;
 }
 
@@ -179,17 +235,21 @@ int main(void)
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
 
-  printf("%s\n", hash_table_retrieve(ht, "line_1"));
-  printf("%s\n", hash_table_retrieve(ht, "line_2"));
-  printf("%s\n", hash_table_retrieve(ht, "line_3"));
+  printf("Retrieved: %s", hash_table_retrieve(ht, "line_1"));
+  printf("Retrieved: %s", hash_table_retrieve(ht, "line_2"));
+  printf("Retrieved: %s", hash_table_retrieve(ht, "line_3"));
 
-  // int old_capacity = ht->capacity;
-  // ht = hash_table_resize(ht);
-  // int new_capacity = ht->capacity;
+  int old_capacity = ht->capacity;
+  ht = hash_table_resize(ht);
+  int new_capacity = ht->capacity;
 
-  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  printf("Should be tiny hash table = %s \n", hash_table_retrieve(ht, "line_1"));
+  printf("Filled beyond capacity = %s \n", hash_table_retrieve(ht, "line_2"));
+  printf("Linked lists save lives = %s \n", hash_table_retrieve(ht, "line_3"));
 
-  // destroy_hash_table(ht);
+  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+
+  destroy_hash_table(ht);
 
   return 0;
 }
