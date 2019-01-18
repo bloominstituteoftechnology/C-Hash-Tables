@@ -17,6 +17,7 @@ typedef struct LinkedPair {
  ****/
 typedef struct HashTable {
   int capacity;
+  int count;
   LinkedPair **storage;
 } HashTable;
 
@@ -70,8 +71,12 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = malloc(capacity*sizeof(LinkedPair));
+  for (int i=0; i<capacity; i++){
+    ht->storage[i] = NULL;
+  }
   return ht;
 }
 
@@ -86,6 +91,17 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+
+  unsigned int hash_index = hash(key, ht->capacity);
+  LinkedPair *current_pair = ht->storage[hash_index];
+  if (current_pair == NULL){
+    ht->storage[hash_index] = create_pair(key, value);
+  }
+  else {
+    for (int i=0; i<ht->capacity; i++){
+      if (current_pair->)
+    }
+  }
 
 }
 
@@ -154,13 +170,13 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  int old_capacity = ht->capacity;
-  ht = hash_table_resize(ht);
-  int new_capacity = ht->capacity;
+  // int old_capacity = ht->capacity;
+  // ht = hash_table_resize(ht);
+  // int new_capacity = ht->capacity;
 
-  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
 
   return 0;
 }
