@@ -91,27 +91,28 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-  unsigned int target_index = hash(key, ht->capacity); // creates an array index for node to be inserted into
-  LinkedPair *new_pair = create_pair(key, value); // creates a new node for insertion
-
-  if (ht->storage[target_index] == 0) { // if the current index is empty, insert new_pair
+  unsigned int target_index = hash(key, ht->capacity);
+  LinkedPair *new_pair = create_pair(key, value);
+  LinkedPair *current = ht->storage[target_index];
+  
+  if (ht->storage[target_index] == NULL) { // if the current index is empty, insert new_pair
     ht->storage[target_index] = new_pair;
   }
   else {
-    while (ht->storage[target_index] != 0) { // if the current index is not empty, 3 things can happens
-      // 1. check if the keys are the same, then overwrite existing value with the new value
-      if (strcmp(ht->storage[target_index]->key, key) == 0) { // == or != compares base addresses, strcmp to compare values
-        ht->storage[target_index]->value = value;
+    while (current != NULL) { // if the current index is not empty, 3 things can happens
+      // 1. if the keys are the same, then overwrite existing value with the new value
+      if (strcmp(current->key, key) == 0) { // == or != compares base addresses, strcmp to compare values
+        current->value = value;
         break;
       }
-      // 2. check if keys are different AND there's an empty "next" slot, insert new pair there
-      else if (strcmp(ht->storage[target_index]->key, key) != 0 && ht->storage[target_index]->next == NULL) {
-        ht->storage[target_index]->next = new_pair;
+      // 2. if there's an empty "next" slot, insert new pair there
+      if (current->next == NULL) {
+        current->next = new_pair;
         break;
       }
-      // 3. If neither of the terminating conditionals activates, must mean that it's a new linked list node to be attached
+      // 3. If neither conditionals catches, must mean that it's a new linked list node
       // continue with while loop until there are matching keys or there's an empty "next" slot
-      ht->storage[target_index] = ht->storage[target_index]->next;
+      current = current->next;
     }
   }
 }
@@ -127,21 +128,48 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 void hash_table_remove(HashTable *ht, char *key)
 {
   unsigned int target_index = hash(key, ht->capacity);
-  LinkedPair *current = ht->storage[target_index]; // shortens the name and serve as marker
+  LinkedPair *current = ht->storage[target_index];
+  LinkedPair *previous = NULL;
 
-  while (current != 0) { // LOOP while there's a current node
-    if (strcmp(current->key, key) == 0 && current->next == 0) { // EXIT 1 if strings are the same and there's NOT a linked node
-      destroy_pair(current);
-      break;
-    }
-    else if (strcmp(current->key, key) == 0 && current->next != 0) { // EXIT 2 if strings are same and there IS a linked node
-      current->key = current->next->key;
-      current->value = current->next->value;
-      current->next = current->next->next;
-      break;
-    }
-    current = current->next; // ITERATOR Move to the next linked node and continue with while loop to check
+  while (current != NULL && strcmp(current->key, key) != 0) { // traverses until gets to last node or an equal key
+    previous = current;
+    current = current->next;
   }
+
+  if (previous == NULL) { // if it's the first and only node
+    ht->storage[target_index] = current->next;
+  }
+  else { // unlinks the current node then stitch the ends or also removes last node from list
+    previous->next = current->next;
+  }
+
+  // while (current != NULL && strcmp(current->key, key) != 0) { // LOOP while there's a current node
+  //   // if (strcmp(current->key, key) == 0 && current->next == NULL) { // EXIT 1 if strings are the same and there's NOT a linked node
+  //   //   printf("line 135");
+  //   //   destroy_pair(current);
+  //   //   break;
+  //   // }
+  //   previous = current;
+  //   current = current->next;
+
+  //   // if (strcmp(current->key, key) == 0 && current->next != NULL) { // EXIT 2 if strings are same and there IS a linked node
+  //   //   printf("line 139");
+  //   //   previous = current;
+  //   //   current = current->next;
+
+  //   //   // current->value = current->next->value;
+  //   //   // current->next = current->next->next;
+  //   //   break;
+  //   // }
+  // // destroy_pair(previous);
+  //   // current = current->next; // ITERATOR Move to the next linked node and continue with while loop to check
+  // }
+
+  // if (previous == NULL) {  // Removing the first element in the Linked List
+  //   ht->storage[target_index] = current->next;
+  // } else {
+  //   previous->next = current->next;
+  // }
 }
 
 /****
@@ -155,18 +183,27 @@ void hash_table_remove(HashTable *ht, char *key)
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
   unsigned int target_index = hash(key, ht->capacity);
-  LinkedPair *current = ht->storage[target_index]; // shortens the name and serve as marker
+  LinkedPair *current = ht->storage[target_index];
 
-  while (current->key != 0) { // LOOP while there's a current node
+  while (current != NULL) { // LOOP while there's a current node
     if (strcmp(current->key, key) == 0) { // EXIT 1 if keys match, return the value
       return current->value;
     }
-    else if (strcmp(current->key, key) != 0 && current->next == 0) { // EXIT 2 if no key matches and no linked node, return NULL
-      return NULL;
-    }
-    current = current->next; // ITERATOR Move to the next linked node and continue with while loop to check
+    current = current->next; // ITERATOR if no match, check at the next node
   }
-  return 0;
+
+  return NULL;
+
+  // while (current != NULL) { // LOOP while there's a current node
+  //   if (strcmp(current->key, key) == 0) { // EXIT 1 if keys match, return the value
+  //     return current->value;
+  //   }
+  //   // else if (strcmp(current->key, key) != 0 && current->next == NULL) { // EXIT 2 if no key matches and no linked node, return NULL
+  //   //   return NULL;
+  //   // }
+  //   current = current->next; // ITERATOR Move to the next linked node and continue with while loop to check
+  // }
+  // return NULL;
 }
 
 /****
@@ -212,18 +249,6 @@ int main(void)
 {
   struct HashTable *ht = create_hash_table(2);
 
-  // MY TESTS
-  hash_table_insert(ht, "tim", "texas\n"); // inserts index 1
-  printf("%s\n", hash_table_retrieve(ht, "tim")); // returns texas
-
-  hash_table_insert(ht, "josh", "mexico\n"); // inserts index 1 -> INDEX COLLISION, sets on existing node's "next"
-  printf("%s\n", hash_table_retrieve(ht, "josh")); // returns mexico
-
-  hash_table_insert(ht, "tim", "california\n"); // inserts index 1 -> INDEX & KEY COLLISION, set on exisiting node's "value"
-  printf("%s\n", hash_table_retrieve(ht, "tim")); // returns california
-  // hash_table_remove(ht, "tim"); // removes tim from the 1st node and shift josh to 1st node
-  // hash_table_remove(ht, "josh"); // removes josh from the 2nd node
-
   // DEFAULT
   // hash_table_insert(ht, "line_1", "Tiny hash table\n");
   // hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
@@ -234,10 +259,56 @@ int main(void)
   // int old_capacity = ht->capacity;
   // ht = hash_table_resize(ht);
   // int new_capacity = ht->capacity;
-
   // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  destroy_hash_table(ht);
+  // // MY TESTS
+  // hash_table_insert(ht, "tim", "texas\n"); // inserts index 1
+  // printf("%s\n", hash_table_retrieve(ht, "tim")); // returns texas
+  // hash_table_insert(ht, "josh", "mexico\n"); // inserts index 1 -> INDEX COLLISION, sets on existing node's "next"
+  // printf("%s\n", hash_table_retrieve(ht, "josh")); // returns mexico
+  // hash_table_insert(ht, "tim", "california\n"); // inserts index 1 -> INDEX & KEY COLLISION, set on exisiting node's "value"
+  // printf("%s\n", hash_table_retrieve(ht, "tim")); // returns california
+  // // hash_table_remove(ht, "tim"); // removes tim from the 1st node and shift josh to 1st node
+  // // hash_table_remove(ht, "josh"); // removes josh from the 2nd node
+
+  // SYSTEM TESTS
+  // struct HashTable *ht = create_hash_table(8);
+  // char *return_value = hash_table_retrieve(ht, "key-0");
+  // printf("%s\n", return_value);
+  // mu_assert(return_value == NULL, "Initialized value is not NULL");
+  // hash_table_insert(ht, "key-0", "val-0");
+  // hash_table_insert(ht, "key-1", "val-1");
+  // hash_table_insert(ht, "key-2", "val-2");
+  // hash_table_insert(ht, "key-3", "val-3");
+  // hash_table_insert(ht, "key-4", "val-4");
+  // hash_table_insert(ht, "key-5", "val-5");
+  // hash_table_insert(ht, "key-6", "val-6");
+  // hash_table_insert(ht, "key-7", "val-7");
+  // hash_table_insert(ht, "key-8", "val-8");
+  // hash_table_insert(ht, "key-9", "val-9");
+  // hash_table_insert(ht, "key-0", "new-val-0");
+  // hash_table_insert(ht, "key-1", "new-val-1");
+  // hash_table_insert(ht, "key-2", "new-val-2");
+  // hash_table_insert(ht, "key-3", "new-val-3");
+  // hash_table_insert(ht, "key-4", "new-val-4");
+  // hash_table_insert(ht, "key-5", "new-val-5");
+  // hash_table_insert(ht, "key-6", "new-val-6");
+  // hash_table_insert(ht, "key-7", "new-val-7");
+  // hash_table_insert(ht, "key-8", "new-val-8");
+  // hash_table_insert(ht, "key-9", "new-val-9");
+  // hash_table_remove(ht, "key-9");
+  // hash_table_remove(ht, "key-8");
+  // hash_table_remove(ht, "key-7");
+  // hash_table_remove(ht, "key-6");
+  // hash_table_remove(ht, "key-5");
+  // hash_table_remove(ht, "key-4");
+  // hash_table_remove(ht, "key-3");
+  // hash_table_remove(ht, "key-2");
+  // hash_table_remove(ht, "key-1");
+  // hash_table_remove(ht, "key-0");
+  // return_value = hash_table_retrieve(ht, "key-0");
+  // printf("%s\n", return_value);
+
   return 0;
 }
 #endif
