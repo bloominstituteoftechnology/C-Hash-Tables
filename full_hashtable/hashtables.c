@@ -95,7 +95,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   LinkedPair *p = ht->storage[hash(key, ht->capacity)];
   while(p != NULL)
   {
-    if(strcmp(key, *p->key))
+    if(strcmp(key, p->key))
     {
       p = p->next;
     }
@@ -125,7 +125,7 @@ void hash_table_remove(HashTable *ht, char *key)
     return;
   }
   LinkedPair *previous;
-  while(strcmp(*p->key, key))
+  while(strcmp(p->key, key))
   {
     previous = p;
     p = p->next;
@@ -135,8 +135,8 @@ void hash_table_remove(HashTable *ht, char *key)
       return;
     }
   }
+  previous->next = p->next;
   destroy_pair(p);
-  previous->next = NULL;
 }
 
 /****
@@ -149,7 +149,20 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  LinkedPair *p = ht->storage[hash(key, ht->capacity)];
+  if(p == NULL)
+  {
+    return NULL;
+  }
+  while(strcmp(p->key, key))
+  {
+    p = p->next;
+    if(p == NULL)
+    {
+      return NULL;
+    }
+  }
+  return p->value;
 }
 
 /****
@@ -159,7 +172,24 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for(int i=0; i<ht->capacity; i++)
+  {
+    if(ht->storage[i] == NULL)
+    {
+      continue;
+    }
+    LinkedPair *p = ht->storage[i];
+    LinkedPair *p_next = ht->storage[i]->next;
+    while(p_next != NULL)
+    {
+      destroy_pair(p);
+      p = p_next;
+      p_next = p->next;
+    }
+    destroy_pair(p);
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
@@ -173,7 +203,28 @@ void destroy_hash_table(HashTable *ht)
 HashTable *hash_table_resize(HashTable *ht)
 {
   HashTable *new_ht;
-
+  int new_capacity = ht->capacity*2;
+  new_ht = create_hash_table(new_capacity);
+  for(int i=0; i<ht->capacity; i++)
+  {
+    if(ht->storage[i] == NULL)
+    {
+      continue;
+    }
+    LinkedPair *p = ht->storage[i];
+    LinkedPair *p_next = ht->storage[i]->next;
+    while(p_next != NULL)
+    {
+      hash_table_insert(new_ht, p->key, p->value);
+      destroy_pair(p);
+      p = p_next;
+      p_next = p->next;
+    }
+    destroy_pair(p);
+    hash_table_insert(new_ht, p->key, p->value);
+  }
+  free(ht->storage);
+  free(ht);
   return new_ht;
 }
 
