@@ -70,7 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -85,8 +87,36 @@ HashTable *create_hash_table(int capacity)
   the value in th existing LinkedPair list.
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
-{
+{  
+  // 1. Hash key
+  unsigned int hash_key = hash(key, ht->capacity);
 
+  // 2. Check IF the bucket at that index is occupied
+  // --> if (ht->storage[index] != NULL)
+  LinkedPair *current_pair = ht->storage[hash_key];
+  LinkedPair *last_pair;
+  
+
+  // 4. IF OCCUPIED --> walk through the LinkedPairs to see if you find:
+    // - A pair with the same key        
+  while (current_pair != NULL && strcmp( current_pair->key, key ) != 0) {
+    last_pair = current_pair; // --> setting last pair to the current pair
+    current_pair = last_pair->next; // --> setting current pair to tail of the last pair
+    // this will continue until @ end of linked list or our keys match
+      // aka our current pair is holding a pair that matches
+  }
+    
+  if (current_pair != NULL) {
+    // --> if true: overwrite value
+    current_pair->value = value;
+  } else {
+    // --> if false: create new pair and add to LinkedList
+    // 3. IF NOT occupied --> add a new LinkedPair to bucket
+    LinkedPair *new_pair = create_pair(key, value);
+    new_pair->next = ht->storage[hash_key];
+    ht->storage[hash_key] = new_pair;
+  }  
+  
 }
 
 /****
@@ -99,7 +129,17 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  // 1. Get hash
+  unsigned int hash_key = hash(key, ht->capacity);
 
+  // 2. Search entire list of LinkedPairs for the key that matches and remove
+  if (ht->storage[hash_key] != NULL) {
+    destroy_pair(ht->storage[hash_key]);
+    ht->storage[hash_key] = NULL;
+  } else { // --> Meaning the key couldn't be found
+    printf("There is no such key inside memory ( invalid key error )");
+    exit(1);
+  }
 }
 
 /****
@@ -112,7 +152,9 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  // 1. Get hash
+  unsigned int hash_key = hash(key, ht->capacity);
+  
 }
 
 /****
@@ -122,7 +164,15 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  // 1. Grab all pairs in storage and destroy the pairs
+  for (int i = 0; i < ht->capacity; i++) {
+    ht->storage[i] = NULL; // NOTE: this solved our `pointer being freed not allocated error
+    destroy_pair(ht->storage[i]);    
+  }
 
+  // 2. Free storage -> Free hash table
+  free(ht->storage);
+  free(ht);
 }
 
 /****
@@ -135,8 +185,16 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  // 1. Create new hash table with double capacity
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
 
+  // 2. Copy elements into new storage
+  for (int i = 0; i < ht->capacity; i++) {
+    new_ht->storage[i] = ht->storage[i];
+  }     
+  
+  // 3. Destroy old hash table
+  destroy_hash_table(ht);
   return new_ht;
 }
 
