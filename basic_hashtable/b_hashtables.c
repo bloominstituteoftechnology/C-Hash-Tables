@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Basic hash table key/value pair
  ****/
@@ -84,11 +83,12 @@ BasicHashTable *create_hash_table(int capacity)
 
   Don't forget to free any malloc'ed memory!
  ****/
+
+
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   unsigned int index = hash(key, ht->capacity);
   Pair *pair = create_pair(key, value);
-
   Pair *stored_pair = ht->storage[index];
   if (stored_pair != NULL){
     if(strcmp(key, stored_pair->key) != 0){
@@ -104,6 +104,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 
   Don't forget to free any malloc'ed memory!
  ****/
+
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   unsigned int index = hash(key, ht->capacity);
