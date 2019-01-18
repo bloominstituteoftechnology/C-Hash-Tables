@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Hash table key/value pair with linked list pointer
  ****/
-typedef struct LinkedPair {
+typedef struct LinkedPair
+{
   char *key;
   char *value;
   struct LinkedPair *next;
@@ -15,8 +15,10 @@ typedef struct LinkedPair {
 /****
   Hash table with linked pairs
  ****/
-typedef struct HashTable {
+typedef struct HashTable
+{
   int capacity;
+  int count;
   LinkedPair **storage;
 } HashTable;
 
@@ -38,7 +40,8 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) {
+  if (pair != NULL)
+  {
     free(pair->key);
     free(pair->value);
     free(pair);
@@ -54,9 +57,10 @@ unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
   int c;
-  unsigned char * u_str = (unsigned char *)str;
+  unsigned char *u_str = (unsigned char *)str;
 
-  while ((c = *u_str++)) {
+  while ((c = *u_str++))
+  {
     hash = ((hash << 5) + hash) + c;
   }
 
@@ -70,8 +74,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
+  HashTable *ht = malloc(capacity * sizeof(LinkedPair));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair));
   return ht;
 }
 
@@ -86,7 +91,27 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int ind = hash(key, ht->capacity);
 
+  LinkedPair *current_pair = ht->storage[ind];
+  LinkedPair *last_pair;
+
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0)
+  {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
+
+  if (current_pair != NULL)
+  {
+    current_pair->value = value;
+  }
+  else
+  {
+    LinkedPair *new_pair = create_pair(key, value);
+    new_pair->next = ht->storage[ind];
+    ht->storage[ind] = new_pair;
+  }
 }
 
 /****
@@ -99,7 +124,22 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int ind = hash(key, ht->capacity);
 
+  LinkedPair *current_pair = ht->storage[ind];
+
+  if (current_pair != NULL)
+  {
+    while (strcmp(current_pair->key, key) != 0 && current_pair->next != NULL)
+    {
+      current_pair = current_pair->next;
+    }
+    if (strcmp(current_pair->key, key) == 0)
+    {
+      destroy_pair(current_pair);
+      current_pair = NULL;
+    }
+  }
 }
 
 /****
@@ -122,7 +162,6 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
 }
 
 /****
@@ -139,7 +178,6 @@ HashTable *hash_table_resize(HashTable *ht)
 
   return new_ht;
 }
-
 
 #ifndef TESTING
 int main(void)
