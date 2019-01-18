@@ -91,7 +91,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   unsigned int target_index = hash(key, ht->capacity); // creates an array index for node to be inserted into
 
   if (ht->storage[target_index] != NULL){ // If the node at the index is not empty
-    printf("You're overwriting an existing value value!\n"); // give warning
+    fprintf(stderr, "You're overwriting an existing value value!\n");
     destroy_pair(ht->storage[target_index]); // free up the memory at that index
     ht->storage[target_index] = new_pair; // insert new node into target index
   }
@@ -109,9 +109,11 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 {
   unsigned int hashed_key = hash(key, ht->capacity); // hash the incoming key to find the index
 
-  if (ht->storage[hashed_key] != NULL) { // if the index at storage is not empty
-    destroy_pair(ht->storage[hashed_key]); // free up the memory at that index
+  if (ht->storage[hashed_key] == NULL) { // if the index at storage is empty, return a message
+    fprintf(stderr, "Unable to remove entry with provided key.");
   }
+
+  ht->storage[hashed_key] = NULL; // otherwise set the current node to NULL
 }
 
 /****
@@ -152,28 +154,28 @@ int main(void)
   struct BasicHashTable *ht = create_hash_table(16);
 
   // MY TESTS
-  hash_table_insert(ht, "tim", "texas\n"); // index 15
-  hash_table_insert(ht, "josh", "mexico\n"); // index 9
-  hash_table_insert(ht, "alex", "missouri\n"); // also index 15, collision -> will override tim
-  printf("%s", hash_table_retrieve(ht, "josh")); // returns mexico
-  hash_table_remove(ht, "josh"); // removes the specified key
-  printf("%s", hash_table_retrieve(ht, "josh")); // returns nothing since it was deleted
-  destroy_hash_table(ht);
+  // hash_table_insert(ht, "tim", "texas\n"); // index 15
+  // hash_table_insert(ht, "josh", "mexico\n"); // index 9
+  // hash_table_insert(ht, "alex", "missouri\n"); // also index 15, collision -> will override tim
+  // printf("%s", hash_table_retrieve(ht, "josh")); // returns mexico
+  // hash_table_remove(ht, "josh"); // removes the specified key
+  // printf("%s", hash_table_retrieve(ht, "josh")); // returns nothing since it was deleted
+  // destroy_hash_table(ht);
 
   // DEFAULT TESTS
-  // hash_table_insert(ht, "line", "Here today...\n");
+  hash_table_insert(ht, "line", "Here today...\n");
 
-  // printf("%s", hash_table_retrieve(ht, "line"));
+  printf("%s", hash_table_retrieve(ht, "line"));
 
-  // hash_table_remove(ht, "line");
+  hash_table_remove(ht, "line");
 
-  // if (hash_table_retrieve(ht, "line") == NULL) {
-  //   printf("...gone tomorrow. (success)\n");
-  // } else {
-  //   fprintf(stderr, "ERROR: STILL HERE\n");
-  // }
+  if (hash_table_retrieve(ht, "line") == NULL) {
+    printf("...gone tomorrow. (success)\n");
+  } else {
+    fprintf(stderr, "ERROR: STILL HERE\n");
+  }
 
-  // destroy_hash_table(ht);
+  destroy_hash_table(ht);
 
   return 0;
 }
