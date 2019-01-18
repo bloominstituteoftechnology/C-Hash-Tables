@@ -90,7 +90,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   int hashIndex = hash(key, ht->capacity);
   if (ht->storage[hashIndex] != NULL) {
-    printf("Existing key, value has been overwritten");
+    printf("Existing key, value has been overwritten\n");
     destroy_pair(ht->storage[hashIndex]);
   }
   ht->storage[hashIndex] = create_pair(key, value);
@@ -127,7 +127,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
    if (ht->storage[hashIndex] !=0) {
     return ht->storage[hashIndex]->value;
   } else {
-    printf("Unable to locate Key");
+    printf("Unable to locate Key\n");
     
   return NULL;
   }
