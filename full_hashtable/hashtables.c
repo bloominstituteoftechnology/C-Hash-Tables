@@ -175,6 +175,19 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    LinkedPair *current_pair = ht->storage[i];
+    LinkedPair *next_pair;
+    while (current_pair->next != NULL)
+    {
+      next_pair = current_pair->next;
+      destroy_pair(current_pair);
+      current_pair = next_pair;
+      free(current_pair->next);
+    }
+    destroy_pair(current_pair);
+  }
 }
 
 /****
@@ -187,9 +200,19 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *resized = create_hash_table(ht->capacity * 2);
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    LinkedPair *current_pair = ht->storage[i];
+    while (current_pair != NULL)
+    {
+      hash_table_insert(resized, current_pair->key, current_pair->value);
+      current_pair = current_pair->next;
+    }
+  }
+  destroy_hash_table(ht);
 
-  return new_ht;
+  return resized;
 }
 
 #ifndef TESTING
