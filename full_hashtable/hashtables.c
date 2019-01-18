@@ -91,33 +91,22 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   LinkedPair *pair = create_pair(key, value);
   unsigned int hashed_key = hash(key, ht->capacity);
   LinkedPair *destination = ht->storage[hashed_key];
-  if (destination) {
-    while (destination) {
-      if (strcmp(destination->key, key) == 0) {
-        LinkedPair *next = destination->next;
-        printf("rewrote old value of key: %s\n", destination->key);
-        destination->key = pair->key;
-        destination->value = pair->value;
-        destination->next = next;
-        printf("new value of key: %s is value: %s\n", destination->key, destination->value);
+  if (destination) { // if the slot is full
+    while (destination) { // traverse until the first empty slot
+      if (strcmp(destination->key, key) == 0) { // unless the key has been used already
+        destination->value = pair->value; // then rewrite the value
         break;
       } else {
-        if (destination->next) {
-          printf("cycled through\n");
+        if (destination->next) { // keep traversing if possible
           destination = destination->next;
-        } else {
-          printf("assigned value to a next\n");
+        } else { // otherwise add to the list
           destination->next = pair;
-          printf("key: %s, value: %s\n", destination->next->key, destination->next->value);
           break;
         }
       }
     }
-  } else {
-    printf("no value for key; assigned in place\n");
+  } else { // if the slot is empty to begin with, fill it!
     ht->storage[hashed_key] = pair;
-    // printf("key: %s, value: %s\n", destination->key, destination->value);
-    printf("key: %s, value: %s\n", ht->storage[hashed_key]->key, ht->storage[hashed_key]->value);
   }
 }
 
@@ -131,43 +120,32 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  printf(">>>starting to destroy with key: %s\n", key);
+
   unsigned int hashed_key = hash(key, ht->capacity);
   LinkedPair *destination = ht->storage[hashed_key];
-  LinkedPair *previous = NULL;
 
+  // traverse through linked list while keeping track of latest node
+  LinkedPair *previous = NULL;
   while (strcmp(destination->key, key) != 0) {
-    printf("inside while loop\n");
     if (destination->next) {
-      printf("key mismatch; traversing linked list\n");
-      printf(">> setting previous\n");
       previous = destination;
       destination = destination->next;
     } else {
-      printf("about to break\n");
       break;
     }
   }
 
   if (strcmp(destination->key, key) == 0) {
-    printf("match found, checking for next\n");
+
+    // keep a pointer to next for reassignment below
     LinkedPair *next = NULL;
-
     if (destination->next) {
-      // printf("<< setting previous\n");
-      // previous = destination;
-      printf(">> setting next in reserve\n");
       next = destination->next;
-
     }
 
-    printf("destroying pair: key %s value %s\n", destination->key, destination->value);
-
-
-
+    // destroy the ostensible focus of the remove function
     destroy_pair(destination);
-  destination->next = NULL;
-    printf("destroyed pair: key %s value %s\n", destination->key, destination->value);
+    destination->next = NULL;
     destination = NULL;
 
     // four-way assignment of logical predecessors and successors
@@ -199,31 +177,20 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 {
   unsigned int hashed_key = hash(key, ht->capacity);
   LinkedPair *result = NULL;
-  // printf("first found >key: %s, >value: %s\n", ht->storage[hashed_key]->key, ht->storage[hashed_key]->value);
-  if (ht->storage[hashed_key] != NULL) {
+  if (ht->storage[hashed_key]) { // is there anything at the hash mark?
     result = ht->storage[hashed_key];
-    printf("first result >key: %s, >value: %s\n", result->key, result->value);
   }
-  if (result) {
-  printf("inside if statement\n");
-    while (strcmp(result->key, key) != 0) {
-      printf("inside while statement\n");
-      printf("does result->next %s exist?\n", result->next);
-      if (result->next) {
-        printf("cycled through nexts\n");
+  if (result) { // if so ...
+    while (strcmp(result->key, key) != 0) { // ... does the key match?
+      if (result->next) { // traverse the list until the key matches ...
         result = result->next;
-      } else {
-        printf("do we want to return NULL?");
+      } else { // ... or we run out of nodes
         return NULL;
-        // break;
       }
     }
-    if (strcmp(result->key, key) == 0) {
-      printf("found matching key: %s\n", result->key);
-      return result->value;
-    }
+    return result->value; // the key matches, so return the value
   }
-  return NULL;
+  return NULL; // if there was no result, return NULL
 }
 
 /****
@@ -233,23 +200,20 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-  for (int i = 0; i < ht->capacity; i++) {
+  for (int i = 0; i < ht->capacity; i++) { // traverse each element in the backing array
     if (ht->storage[i]) {
       LinkedPair *pair = ht->storage[i];
-      while (pair->next) {
+      while (pair->next) { // traverse the list, destroying as we go
         LinkedPair *next = pair->next;
-        printf("about to destroy pair key: %s\n", pair->key);
         destroy_pair(pair);
-        printf("cycling to next\n");
+        pair->next = NULL;
         pair = next;
       }
-      printf("about to destroy pair key: %s\n", pair->key);
-      destroy_pair(pair);
-    } else  {
-      printf("nothing inside\n");
+      destroy_pair(pair); // destroy the last pair as well
+      pair->next = NULL;
     }
   }
-  free(ht->storage);
+  free(ht->storage); // free everything else too
   free(ht);
 }
 
@@ -263,28 +227,23 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+  HashTable *new_ht = create_hash_table(ht->capacity * 2); // new table twice as big
 
-  for (int i = 0; i < ht->capacity; i++) {
+  for (int i = 0; i < ht->capacity; i++) { // reinsert everything
     if (ht->storage[i]) {
       LinkedPair *pair = ht->storage[i];
-      while (pair->next) {
+      while (pair->next) { // traverse the list
         LinkedPair *next = pair->next;
-        printf("about to reassign pair key: %s\n", pair->key);
         hash_table_insert(new_ht, pair->key, pair->value);
-        printf("cycling to next\n");
         pair = next;
       }
-      printf("about to reassign pair key: %s\n", pair->key);
-      hash_table_insert(new_ht, pair->key, pair->value);
-    } else  {
-      printf("nothing inside\n");
+      hash_table_insert(new_ht, pair->key, pair->value); // don't forget the final node
     }
   }
 
-  destroy_hash_table(ht);
+  destroy_hash_table(ht); // destroy the old table
 
-  return new_ht;
+  return new_ht; // and return the new
 }
 
 
