@@ -104,7 +104,7 @@ Due to this performance degradation, most languages, such as Python, will automa
 ## DAY 1
 Your assignment is to implement a basic hash table in the `basic_hash_table` directory. You should be able to insert, read, and delete elements from the hash table. You do not need to handle collisions but should print a warning when you are overwriting an existing value.
 
-Build your code by typing `make` then `./b_hashtable` in the terminal.
+Build your code by typing `make` then `./b_hashtable` in the terminal
 
 Run tests by typing `make tests`.
 
