@@ -162,6 +162,8 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
   Don't forget to free any malloc'ed memory!
  ****/
+
+ 
 void hash_table_remove(HashTable *ht, char *key)
 {
 	unsigned int index = hash(key, ht->capacity);
@@ -187,6 +189,7 @@ void hash_table_remove(HashTable *ht, char *key)
  		}	 
 
 }
+
 
 
 /****
