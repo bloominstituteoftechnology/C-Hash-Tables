@@ -91,26 +91,30 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+
   int index = hash(key,ht->capacity-1);
-  
   if (ht->storage[index] != NULL){
+    
     LinkedPair *current = ht->storage[index];
     //loop through LinkedList one by one
-    while(current->next != NULL){
-
+    while(current != NULL){
       if(strcmp(current->key, key) == 0){
         // insert value with existing key
-        printf("%s was replaced with %s at key %s\n",ht->storage[index]->value,value,key );
         current->value = value;
         return;
       }
+      
       //current key does not match insert key
+      
+      if (current->next == NULL){
+        //we've reached the last element of linkedlist
+        //insert value with new key at end of linked list
+        LinkedPair *new_element = create_pair(key,value);
+        current->next = new_element;
+      }
+      //increments
       current = current->next; 
     }
-    //we've reached end of linkedlist
-    //insert value with new key at end of linked list
-    LinkedPair *new_element = create_pair(key,value);
-    current->next = new_element;
   } else {
     LinkedPair *new_element = create_pair(key,value);
     ht->storage[index] = new_element;
