@@ -92,19 +92,26 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   unsigned int hashed_key = hash(key, ht->capacity);
   LinkedPair *destination = ht->storage[hashed_key];
   if (destination) {
-    if (strcmp(destination->key, key) == 0) {
-      LinkedPair *next = destination->next;
-      printf("rewrote old value\n");
-      destination = pair;
-      destination->next = next;
-    } else {
-      while (destination->next) {
-        destination = destination->next;
-        printf("cycled through LinkedPairs\n");
+    while (destination) {
+      if (strcmp(destination->key, key) == 0) {
+        LinkedPair *next = destination->next;
+        printf("rewrote old value of key: %s\n", destination->key);
+        destination->key = pair->key;
+        destination->value = pair->value;
+        destination->next = next;
+        printf("new value of key: %s is value: %s\n", destination->key, destination->value);
+        break;
+      } else {
+        if (destination->next) {
+          printf("cycled through\n");
+          destination = destination->next;
+        } else {
+          printf("assigned value to a next\n");
+          destination->next = pair;
+          printf("key: %s, value: %s\n", destination->next->key, destination->next->value);
+          break;
+        }
       }
-      printf("assigned value to a next\n");
-      destination->next = pair;
-      printf("key: %s, value: %s\n", destination->next->key, destination->next->value);
     }
   } else {
     printf("no value for key; assigned in place\n");
@@ -155,8 +162,11 @@ void hash_table_remove(HashTable *ht, char *key)
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
   unsigned int hashed_key = hash(key, ht->capacity);
-  LinkedPair *result = ht->storage[hashed_key];
-  printf("first result >key: %s, >value: %s\n", result->key, result->value);
+  LinkedPair *result;
+  if (ht->storage[hashed_key]) {
+    result = ht->storage[hashed_key];
+    printf("first result >key: %s, >value: %s\n", result->key, result->value);
+  }
   if (result) {
     while (strcmp(result->key, key) != 0) {
       if (result->next) {
