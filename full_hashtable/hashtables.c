@@ -211,7 +211,26 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+
+  for (int i = 0; i < ht->capacity; i++) {
+    if (ht->storage[i]) {
+      LinkedPair *pair = ht->storage[i];
+      while (pair->next) {
+        LinkedPair *next = pair->next;
+        printf("about to reassign pair key: %s\n", pair->key);
+        hash_table_insert(new_ht, pair->key, pair->value);
+        printf("cycling to next\n");
+        pair = next;
+      }
+      printf("about to reassign pair key: %s\n", pair->key);
+      hash_table_insert(new_ht, pair->key, pair->value);
+    } else  {
+      printf("nothing inside\n");
+    }
+  }
+
+  destroy_hash_table(ht);
 
   return new_ht;
 }
@@ -230,11 +249,11 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 // printf("storage[0]->value: %s\n", ht->storage[0]->value);
-  // int old_capacity = ht->capacity;
-  // ht = hash_table_resize(ht);
-  // int new_capacity = ht->capacity;
-  //
-  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  int old_capacity = ht->capacity;
+  ht = hash_table_resize(ht);
+  int new_capacity = ht->capacity;
+
+  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
   destroy_hash_table(ht);
 
