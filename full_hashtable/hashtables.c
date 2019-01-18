@@ -174,18 +174,18 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-  for(int i = 0; i < ht->capacity; i++){
+  for(int i = 0; i < ht->capacity; i++){ // iterate over the LinkedList
     if(ht->storage[i] != NULL){
-      LinkedPair *next_pair = ht->storage[i]->next;
-      while(next_pair != NULL){
+      LinkedPair *next_pair = ht->storage[i]->next; // keep track of the next pair for traversal
+      while(next_pair != NULL){ // remove current element from the linked list and free its memory, then move to the next pair in the list
         free(ht->storage[i]);
         ht->storage[i] = next_pair;
         next_pair = ht->storage[i]->next;
       }
     }
   }
-  free(ht->storage);
-  free(ht);
+  free(ht->storage); // free the storage array
+  free(ht); // free the hash table
 }
 
 /****
@@ -198,20 +198,20 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht = create_hash_table(ht->capacity * 2);
-  for(int i = 0; i < ht->capacity; i++){
+  HashTable *new_ht = create_hash_table(ht->capacity * 2); // initialize a new hashtable with 2x capacity
+  for(int i = 0; i < ht->capacity; i++){ // iterate over the old linked list
     LinkedPair *current_pair = ht->storage[i];
     if(current_pair != NULL){
       while(current_pair != NULL){
-        hash_table_insert(new_ht, current_pair->key, current_pair->value);
+        hash_table_insert(new_ht, current_pair->key, current_pair->value); // copy over the elements from the old hash table
         current_pair = current_pair->next;
       }
     }
   }
 
-  destroy_hash_table(ht);
+  destroy_hash_table(ht); // free the old hash table's memory
 
-  return new_ht;
+  return new_ht; // return the newly resized hash table
 }
 
 
