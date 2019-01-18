@@ -131,23 +131,57 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  printf(">>>starting to destroy with key: %s\n", key);
   unsigned int hashed_key = hash(key, ht->capacity);
   LinkedPair *destination = ht->storage[hashed_key];
+  LinkedPair *previous = NULL;
+
   while (strcmp(destination->key, key) != 0) {
+    printf("inside while loop\n");
     if (destination->next) {
+      printf("key mismatch; traversing linked list\n");
+      printf(">> setting previous\n");
+      previous = destination;
       destination = destination->next;
     } else {
+      printf("about to break\n");
       break;
     }
   }
+
   if (strcmp(destination->key, key) == 0) {
-    LinkedPair *next = destination->next;
-    free(destination);
-    if (next) {
-      destination = next;
-    } else {
-      destination = NULL;
+    printf("match found, checking for next\n");
+    LinkedPair *next = NULL;
+
+    if (destination->next) {
+      // printf("<< setting previous\n");
+      // previous = destination;
+      printf(">> setting next in reserve\n");
+      next = destination->next;
     }
+
+    printf("destroying pair: key %s value %s\n", destination->key, destination->value);
+    destroy_pair(destination);
+    destination = NULL;
+
+
+    if (next) {
+      if (previous) {
+        previous->next = next;
+      } else {
+        next = ht->storage[hashed_key];
+      }
+    }
+    // 
+    // destination = NULL;
+    // if (next) {
+    //   printf("bringing next in from reserve\n");
+    //   destination = next;
+    // }
+    // else {
+    //   printf("setting destination to NULL\n");
+    //   destination = NULL;
+    // }
   }
 }
 
@@ -162,7 +196,7 @@ void hash_table_remove(HashTable *ht, char *key)
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
   unsigned int hashed_key = hash(key, ht->capacity);
-  LinkedPair *result;
+  LinkedPair *result = NULL;
   if (ht->storage[hashed_key]) {
     result = ht->storage[hashed_key];
     printf("first result >key: %s, >value: %s\n", result->key, result->value);
