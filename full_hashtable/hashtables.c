@@ -108,7 +108,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     }
   } else {
     printf("no value for key; assigned in place\n");
-    ht->storage[hashed_key] = create_pair(key, value);
+    ht->storage[hashed_key] = pair;
     // printf("key: %s, value: %s\n", destination->key, destination->value);
     printf("key: %s, value: %s\n", ht->storage[hashed_key]->key, ht->storage[hashed_key]->value);
   }
@@ -156,7 +156,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 {
   unsigned int hashed_key = hash(key, ht->capacity);
   LinkedPair *result = ht->storage[hashed_key];
-  printf("result->key: %s, result->value: %s\n", result->key, result->value);
+  printf("first result >key: %s, >value: %s\n", result->key, result->value);
   if (result) {
     while (strcmp(result->key, key) != 0) {
       if (result->next) {
@@ -181,7 +181,24 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for (int i = 0; i < ht->capacity; i++) {
+    if (ht->storage[i]) {
+      LinkedPair *pair = ht->storage[i];
+      while (pair->next) {
+        LinkedPair *next = pair->next;
+        printf("about to destroy pair key: %s\n", pair->key);
+        destroy_pair(pair);
+        printf("cycling to next\n");
+        pair = next;
+      }
+      printf("about to destroy pair key: %s\n", pair->key);
+      destroy_pair(pair);
+    } else  {
+      printf("nothing inside\n");
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
@@ -213,11 +230,11 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 // printf("storage[0]->value: %s\n", ht->storage[0]->value);
-  int old_capacity = ht->capacity;
-  ht = hash_table_resize(ht);
-  int new_capacity = ht->capacity;
-
-  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  // int old_capacity = ht->capacity;
+  // ht = hash_table_resize(ht);
+  // int new_capacity = ht->capacity;
+  //
+  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
   destroy_hash_table(ht);
 
