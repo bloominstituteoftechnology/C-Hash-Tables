@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../utils/minunit.h"
 
 /****
   Hash table key/value pair with linked list pointer
@@ -89,25 +90,29 @@ HashTable *create_hash_table(int capacity)
   Inserting values to the same index with existing keys can overwrite
   the value in th existing LinkedPair list.
  ****/
-void hash_table_insert(HashTable *ht, char *key, char *value) //create hash, see if something is at key, if not insert, if occ add new pair as *next
+void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-  unsigned int hashedkey = hash(key, ht->capacity);
-  LinkedPair *newnode = create_pair(key, value);
-  if (ht->storage[hashedkey] == NULL) //empty index, insert value
-  {
-    ht->storage[hashedkey] = newnode;
-    printf("Inserted into empty index [%d]\n", hashedkey);
-  }
-  else if (strcmp(key, ht->storage[hashedkey]->key) == 0) //if you reach node with same key as passed in key just change value
-  {
-    ht->storage[hashedkey]->value = strdup(value);
-    printf("Just overwrote a value of a node with same key at index [%d]\n", hashedkey);
-  }
-  else if (ht->storage[hashedkey]->next == NULL) //If the end is reached add node as next to existing last node
-  {
-    ht->storage[hashedkey]->next = newnode;
-    printf("just added a node as a linked list [%d]\n ", hashedkey);
-  }
+    unsigned int index = hash(key, ht->capacity);
+
+    LinkedPair *current_pair = ht->storage[index];
+    LinkedPair *last_pair;
+
+    while (current_pair != NULL && strcmp(current_pair->key, key) != 0)
+    {
+        last_pair = current_pair;
+        current_pair = last_pair->next;
+    }
+
+    if (current_pair != NULL)
+    {
+        current_pair->value = strdup(value);
+    }
+    else
+    {
+        LinkedPair *new_pair = create_pair(key, value);
+        new_pair->next = ht->storage[index];
+        ht->storage[index] = new_pair;
+    }
 }
 
 /****
@@ -120,29 +125,36 @@ void hash_table_insert(HashTable *ht, char *key, char *value) //create hash, see
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  unsigned int hashedkey = hash(key, ht->capacity);
+    unsigned int index = hash(key, ht->capacity);
 
-  LinkedPair *currentpair = ht->storage[hashedkey];
-  LinkedPair *oldpair;
+    LinkedPair *current_pair = ht->storage[index];
+    LinkedPair *previous_pair = NULL;
 
-  while (currentpair != NULL)
-  {
-    if (strcmp(key, currentpair->key) == 0 && currentpair->next == NULL)
+    while (current_pair != NULL && strcmp(current_pair->key, key) != 0)
     {
-      free(currentpair->key);
-      free(currentpair->value);
-      free(currentpair);
+        previous_pair = current_pair;
+        current_pair = current_pair->next;
     }
-    else if (strcmp(key, currentpair->key) == 0 && currentpair->next != NULL)
+
+    if (current_pair == NULL)
     {
-      oldpair->next = currentpair->next;
-      free(currentpair->key);
-      free(currentpair->value);
-      free(currentpair);
+
+        fprintf(stderr, "Unable to remove entry with key: %s\n", key);
     }
-    oldpair = currentpair;
-    currentpair = oldpair->next;
-  }
+    else
+    {
+
+        if (previous_pair == NULL)
+        { // Removing the first element in the Linked List
+            ht->storage[index] = current_pair->next;
+        }
+        else
+        {
+            previous_pair->next = current_pair->next;
+        }
+
+        destroy_pair(current_pair);
+    }
 }
 
 /****
@@ -153,40 +165,23 @@ void hash_table_remove(HashTable *ht, char *key)
 
   Return NULL if the key is not found.
  ****/
-// char *hash_table_retrieve(HashTable *ht, char *key)
-// {
-//   unsigned int hashedkey = hash(key, ht->capacity);
-//   while (ht->storage[hashedkey] != NULL)
-//   {
-//     if (strcmp(key, ht->storage[hashedkey]->key) == 0)
-//     {
-
-//       return ht->storage[hashedkey]->value;
-//     }
-//     else if (ht->storage[hashedkey]->next != NULL)
-//     {
-//       ht->storage[hashedkey] = ht->storage[hashedkey]->next;
-//     } ////traverse linked lists to check if key matches
-//   }
-//   return NULL;
-// }
 
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-    unsigned int index = hash(key, ht->capacity);
+  unsigned int index = hash(key, ht->capacity); //get has
 
-    LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *current_pair = ht->storage[index]; //use hash to set current pair
 
-    while (current_pair != NULL)
+  while (current_pair != NULL) //loop as long as current pair exists
+  {
+    if (strcmp(current_pair->key, key) == 0) // if key is the same at the index change value;
     {
-        if (strcmp(current_pair->key, key) == 0)
-        {
-            return current_pair->value;
-        }
-        current_pair = current_pair->next;
+      return current_pair->value; //
     }
-    return NULL;
-    }
+    current_pair = current_pair->next; //
+  }
+  return NULL;
+}
 
 /****
   Fill this in.
@@ -219,12 +214,14 @@ void destroy_hash_table(HashTable *ht) //How to kill capacity->next?
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht = create_hash_table(2 * ht->capacity);
+  HashTable *new_ht = create_hash_table(2 * ht->capacity); //make ht with double capacity
 
   LinkedPair *current_pair;
-  for (int i = 0 ; i < ht->capacity ; i++) {
+  for (int i = 0; i < ht->capacity; i++)
+  { //loop through every index
     current_pair = ht->storage[i];
-    while (current_pair != NULL) {
+    while (current_pair != NULL)
+    {
       hash_table_insert(new_ht, current_pair->key, current_pair->value);
       current_pair = current_pair->next;
     }
@@ -237,26 +234,74 @@ HashTable *hash_table_resize(HashTable *ht)
 #ifndef TESTING
 int main(void)
 {
-  struct HashTable *ht = create_hash_table(2);
+  struct HashTable *ht = create_hash_table(8);
 
-  hash_table_insert(ht, "line_1", "Tiny hash table\n");
-  hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
-  hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
+  char *return_value = hash_table_retrieve(ht, "key-0");
+  mu_assert(return_value == NULL, "Initialized value is not NULL");
 
-  printf("Retrieved: %s", hash_table_retrieve(ht, "line_1"));
-  printf("Retrieved: %s", hash_table_retrieve(ht, "line_2"));
-  printf("Retrieved: %s", hash_table_retrieve(ht, "line_3"));
+  hash_table_insert(ht, "key-0", "val-0");
+  hash_table_insert(ht, "key-1", "val-1");
+  hash_table_insert(ht, "key-2", "val-2");
+  hash_table_insert(ht, "key-3", "val-3");
+  hash_table_insert(ht, "key-4", "val-4");
+  hash_table_insert(ht, "key-5", "val-5");
+  hash_table_insert(ht, "key-6", "val-6");
+  hash_table_insert(ht, "key-7", "val-7");
+  hash_table_insert(ht, "key-8", "val-8");
+  hash_table_insert(ht, "key-9", "val-9");
 
-  int old_capacity = ht->capacity;
-  ht = hash_table_resize(ht);
-  int new_capacity = ht->capacity;
+  return_value = hash_table_retrieve(ht, "key-0");
+  mu_assert(strcmp(return_value, "val-0") == 0, "Value is not stored correctly");
+  return_value = hash_table_retrieve(ht, "key-1");
+  mu_assert(strcmp(return_value, "val-1") == 0, "Value is not stored correctly");
+  return_value = hash_table_retrieve(ht, "key-2");
+  mu_assert(strcmp(return_value, "val-2") == 0, "Value is not stored correctly");
+  return_value = hash_table_retrieve(ht, "key-3");
+  mu_assert(strcmp(return_value, "val-3") == 0, "Value is not stored correctly");
+  return_value = hash_table_retrieve(ht, "key-4");
+  mu_assert(strcmp(return_value, "val-4") == 0, "Value is not stored correctly");
+  return_value = hash_table_retrieve(ht, "key-5");
+  mu_assert(strcmp(return_value, "val-5") == 0, "Value is not stored correctly");
+  return_value = hash_table_retrieve(ht, "key-6");
+  mu_assert(strcmp(return_value, "val-6") == 0, "Value is not stored correctly");
+  return_value = hash_table_retrieve(ht, "key-7");
+  mu_assert(strcmp(return_value, "val-7") == 0, "Value is not stored correctly");
+  return_value = hash_table_retrieve(ht, "key-8");
+  mu_assert(strcmp(return_value, "val-8") == 0, "Value is not stored correctly");
+  return_value = hash_table_retrieve(ht, "key-9");
+  mu_assert(strcmp(return_value, "val-9") == 0, "Value is not stored correctly");
 
-  printf("Should be tiny hash table = %s \n", hash_table_retrieve(ht, "line_1"));
-  printf("Filled beyond capacity = %s \n", hash_table_retrieve(ht, "line_2"));
-  printf("Linked lists save lives = %s \n", hash_table_retrieve(ht, "line_3"));
-  printf("Resizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  hash_table_insert(ht, "key-0", "new-val-0");
+  hash_table_insert(ht, "key-1", "new-val-1");
+  hash_table_insert(ht, "key-2", "new-val-2");
+  hash_table_insert(ht, "key-3", "new-val-3");
+  hash_table_insert(ht, "key-4", "new-val-4");
+  hash_table_insert(ht, "key-5", "new-val-5");
+  hash_table_insert(ht, "key-6", "new-val-6");
+  hash_table_insert(ht, "key-7", "new-val-7");
+  hash_table_insert(ht, "key-8", "new-val-8");
+  hash_table_insert(ht, "key-9", "new-val-9");
 
-  destroy_hash_table(ht);
+  return_value = hash_table_retrieve(ht, "key-0");
+  mu_assert(strcmp(return_value, "new-val-0") == 0, "Value is not overwritten correctly");
+  return_value = hash_table_retrieve(ht, "key-1");
+  mu_assert(strcmp(return_value, "new-val-1") == 0, "Value is not overwritten correctly");
+  return_value = hash_table_retrieve(ht, "key-2");
+  mu_assert(strcmp(return_value, "new-val-2") == 0, "Value is not overwritten correctly");
+  return_value = hash_table_retrieve(ht, "key-3");
+  mu_assert(strcmp(return_value, "new-val-3") == 0, "Value is not overwritten correctly");
+  return_value = hash_table_retrieve(ht, "key-4");
+  mu_assert(strcmp(return_value, "new-val-4") == 0, "Value is not overwritten correctly");
+  return_value = hash_table_retrieve(ht, "key-5");
+  mu_assert(strcmp(return_value, "new-val-5") == 0, "Value is not overwritten correctly");
+  return_value = hash_table_retrieve(ht, "key-6");
+  mu_assert(strcmp(return_value, "new-val-6") == 0, "Value is not overwritten correctly");
+  return_value = hash_table_retrieve(ht, "key-7");
+  mu_assert(strcmp(return_value, "new-val-7") == 0, "Value is not overwritten correctly");
+  return_value = hash_table_retrieve(ht, "key-8");
+  mu_assert(strcmp(return_value, "new-val-8") == 0, "8Value is not overwritten correctly");
+  return_value = hash_table_retrieve(ht, "key-9");
+  mu_assert(strcmp(return_value, "new-val-9") == 0, "9Value is not overwritten correctly");
 
   return 0;
 }
