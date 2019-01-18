@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 typedef struct LinkedPair {
   char *key;
   char *value;
@@ -20,7 +21,6 @@ LinkedPair *create_pair(char *key, char *value)
   pair->key = strdup(key);
   pair->value = strdup(value);
   pair->next = NULL;
-
   return pair;
 }
 
@@ -83,29 +83,44 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   }
 }
 
+
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
 
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *previous_pair = NULL;
+
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0) {
+    previous_pair = current_pair; 
+    current_pair = current_pair->next;
+  }
+
+  if (current_pair == NULL) {
+    printf("Unable to remove entry with key: %s\n", key);
+  } else {
+    if (previous_pair == NULL) {
+      ht->storage[index] = current_pair->next;
+    } else {
+      previous_pair->next = current_pair->next;
+    }
+    current_pair = NULL;
+  }
 }
 
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  unsigned int index = hash(key, ht->capacity);
-  if (ht->storage[index] == NULL){
-    printf("No Value Present");
-    return NULL;
-  }
+  int hashKey=hash(key, ht->capacity);
+  LinkedPair *pair = ht->storage[hashKey];
 
-  LinkedPair *current_pair = ht->storage[index];
-
-  while(current_pair->key != key){
-    if (current_pair->next == NULL){
-      break;
+  while(pair){
+    printf("%s", pair->key);
+    if(!strcmp(pair->key, key)){
+      return pair->value;
     }
-    current_pair = current_pair->next;
+    pair = pair->next;
   }
-
-  return current_pair->value;
+  return NULL;
 }
 
 void destroy_hash_table(HashTable *ht)
@@ -121,51 +136,43 @@ void destroy_hash_table(HashTable *ht)
 
 HashTable *hash_table_resize(HashTable *ht)
 {
-
   HashTable *new_ht = malloc(sizeof(HashTable));
-  new_ht->capacity = ht->capacity * 2;
+  new_ht->capacity = ht->capacity *2;
   new_ht->storage = calloc(new_ht->capacity, sizeof(LinkedPair *));
 
-  //looping through the old hash table and get my new keys
-  for (int i = 0; i < ht->capacity; i++){
-    //is the index spot empty?
-    if (ht->storage[i] != NULL){
-      //get my key new and put the old pair in the new hash table storage index
-      
-      LinkedPair *current = ht->storage[i];
-      while(current->next != NULL){
-        hash_table_insert(new_ht, current->key, current->value);
-        if (current->next == NULL){
-          break;
+  //get dem values up
+  for (int j = 0; j < ht->capacity; j++){
+    if(ht->storage[j] != NULL){
+      LinkedPair *current_pair = ht->storage[j];
+      //LinkedPair *new_pair = create_pair(current_pair, value);
+      // LinkedPair *create_pair(char *key, char *value)
+      if (current_pair->next == NULL){
+        hash_table_insert(new_ht, current_pair->key, current_pair->value);
+      } else {
+        while (current_pair != NULL){
+          hash_table_insert(new_ht, current_pair->key, current_pair->value);
+          current_pair = current_pair->next;
         }
-        current = current->next;
       }
-    } else {
-      hash_table_insert(new_ht, ht->storage[i]->key, ht->storage[i]->value);
     }
   }
 
-  
-
-  // for (int j = 0; j < ht->capacity; j++){
-  //   //is there a linked list?
-  //   if (ht->storage[j]->next == NULL){
-  //     destroy_pair(ht->storage[j]);
-  //   } else {
-  //     //since there is a linked list we need to destroy them all
-  //     LinkedPair *next;
-  //     LinkedPair *current = ht->storage[j];
-  //     while(current->next != NULL){
-  //       if (current->next == NULL){
-  //         break;
-  //       }
-  //       next = current->next;
-  //       destroy_pair(current->next);
-  //       current = next;
-  //     }
-  //   }
-  // }
-  // destroy_hash_table(ht);
+  //destroy them all
+  for (int i = 0; i < ht->capacity; i++){
+    if (ht->storage[i] != NULL){
+      LinkedPair *current = ht->storage[i];
+      LinkedPair *prev = NULL;
+      if (current->next == NULL){
+        destroy_pair(current);
+      } else {
+        while (current != NULL){
+          prev = current; 
+          current = current->next;
+          destroy_pair(prev);
+        }
+      }
+    }
+  }
   return new_ht;
 }
 
@@ -174,21 +181,28 @@ int main(void)
 {
   struct HashTable *ht = create_hash_table(2);
 
-  hash_table_insert(ht, "line_1", "Tiny hash table\n");
-  hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
-  hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
+    hash_table_insert(ht, "key-0", "val-0");
+    hash_table_insert(ht, "key-1", "val-1");
+    hash_table_insert(ht, "key-2", "val-2");
+    hash_table_insert(ht, "key-3", "val-3");
+    hash_table_insert(ht, "key-4", "val-4");
+    hash_table_insert(ht, "key-5", "val-5");
+    hash_table_insert(ht, "key-6", "val-6");
+    hash_table_insert(ht, "key-7", "val-7");
+    hash_table_insert(ht, "key-8", "val-8");
+    hash_table_insert(ht, "key-9", "val-9");
 
-  printf("%s", hash_table_retrieve(ht, "line_1"));
-  // printf("%s", hash_table_retrieve(ht, "line_2"));
-  // printf("%s", hash_table_retrieve(ht, "line_3"));
+    hash_table_remove(ht, "key-6");
+    printf("\n%s", hash_table_retrieve(ht, "key-4"));
 
-  // int old_capacity = ht->capacity;
+  
+  int old_capacity = ht->capacity;
   ht = hash_table_resize(ht);
-  // int new_capacity = ht->capacity;
+  int new_capacity = ht->capacity;
 
-  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  // destroy_hash_table(ht);
+  destroy_hash_table(ht);
 
   return 0;
 }
