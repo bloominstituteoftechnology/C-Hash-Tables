@@ -26,8 +26,8 @@ typedef struct HashTable {
 LinkedPair *create_pair(char *key, char *value)
 {
   LinkedPair *pair = malloc(sizeof(LinkedPair));
-  pair->key = strdup(key);
-  pair->value = strdup(value);
+  pair->key = key;
+  pair->value = value;
   pair->next = NULL;
 
   return pair;
@@ -38,11 +38,7 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) {
-    free(pair->key);
-    free(pair->value);
-    free(pair);
-  }
+  if (pair != NULL) free(pair);
 }
 
 /****
@@ -152,10 +148,11 @@ char *hash_table_retrieve(HashTable *ht, char *key)
     last_pair = current_pair;
     current_pair = last_pair->next;
   }
+  
   if (current_pair != NULL) {
     return current_pair->value;
   }
-  printf("Unable to locate value with key: %s\n", key);
+  printf("Unable to locate value with - %s\n", key);
   return NULL;
 }
 
@@ -166,6 +163,16 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  LinkedPair *current;
+  for (int i=0; i< ht->capacity; i++) {
+    current = ht->storage[i];
+    if (current != NULL) {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+
+  free(ht->storage);
+  free(ht);
 
 }
 
@@ -179,7 +186,17 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+  LinkedPair *current;
+  for (int i=0; i<ht->capacity; i++) {
+    current = ht->storage[i];
+    while (current != NULL) {
+      hash_table_insert(new_ht, current->key, current->value);
+      current = current->next;
+    }
+  }
+  destroy_hash_table(ht);
+
 
   return new_ht;
 }
