@@ -72,7 +72,12 @@ HashTable *create_hash_table(int capacity)
 {
   HashTable *ht;
 
+  ht = malloc(sizeof(HashTable));
+  ht->storage = calloc(capacity,sizeof(LinkedPair*));
+  ht->capacity = capacity;
+
   return ht;
+
 }
 
 /****
@@ -86,7 +91,30 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  int index = hash(key,ht->capacity-1);
+  
+  if (ht->storage[index] != NULL){
+    LinkedPair *current = ht->storage[index];
+    //loop through LinkedList one by one
+    while(current->next != NULL){
 
+      if(strcmp(current->key, key) == 0){
+        // insert value with existing key
+        printf("%s was replaced with %s at key %s\n",ht->storage[index]->value,value,key );
+        current->value = value;
+        return;
+      }
+      //current key does not match insert key
+      current = current->next; 
+    }
+    //we've reached end of linkedlist
+    //insert value with new key at end of linked list
+    LinkedPair *new_element = create_pair(key,value);
+    current->next = new_element;
+  } else {
+    LinkedPair *new_element = create_pair(key,value);
+    ht->storage[index] = new_element;
+  }
 }
 
 /****
@@ -99,7 +127,31 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  int index = hash(key,ht->capacity-1);
+  if (ht->storage[index] == NULL){
+    //There is no key in hash table
+    fprintf(stderr, "Key not found: no value with key %s\n", key);
+    return;
+  } 
+  //array index is occuped so loop through linkedlist to find match
+  
+  LinkedPair *previous = NULL;
+  LinkedPair *current = ht->storage[index];
 
+  while(current->next != NULL){
+    if(strcmp(current->key,key) == 0){
+      //match found
+      if(previous != NULL){
+        //element is not head of linkedlist so fix links
+        previous->next = current->next;
+      }
+      destroy_pair(current);
+      return;
+    }
+    previous = current;
+    current = current->next;
+  }
+  fprintf(stderr, "Key not found: no value with key %s\n",key);
 }
 
 /****
@@ -112,6 +164,25 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+
+  int index = hash(key,ht->capacity-1);
+  if (ht->storage[index] == NULL){
+    //There is no key in hash table
+    fprintf(stderr, "Key not found: no value with key %s\n", key);
+    return;
+  } 
+  //hash value found so loop to find match
+  
+  LinkedPair *current = ht->storage[index];
+
+  while(current->next != NULL){
+    if(strcmp(current->key,key) == 0){
+      //match found
+      return current->value;
+    }
+    current = current->next;
+  }
+  fprintf(stderr, "Key not found: no value with key %s\n",key);
   return NULL;
 }
 
