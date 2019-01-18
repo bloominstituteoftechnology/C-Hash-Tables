@@ -99,7 +99,8 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
   // 4. IF OCCUPIED --> walk through the LinkedPairs to see if you find:
     // - A pair with the same key        
-  while (current_pair != NULL && strcmp( current_pair->key, key ) != 0) {
+  while (current_pair != NULL && strcmp( current_pair->key, key ) != 0) 
+  {
     last_pair = current_pair; // --> setting last pair to the current pair
     current_pair = last_pair->next; // --> setting current pair to tail of the last pair
     // this will continue until @ end of linked list or our keys match
@@ -132,22 +133,15 @@ void hash_table_remove(HashTable *ht, char *key)
   // 1. Get hash
   unsigned int hash_key = hash(key, ht->capacity);
   LinkedPair *current_pair = ht->storage[hash_key];  
+  LinkedPair *last_pair;
 
-  if (current_pair == NULL) {
-    printf("Given key is invalid ( invalid key error )");
-    exit(1);
-  } 
-  
-  if ( strcmp(current_pair->key, key) == 0 ) { // --> If keys match, destroy pair, but set the index to the next value
-    ht->storage[hash_key] = current_pair->next;
-    destroy_pair(current_pair);
-  } else {
-    while ( current_pair->next != NULL ) { // --> Lets traverse the memory
-      if ( strcmp(current_pair->next->key, key) == 0 ) { // --> if the next element's key matches:
-        current_pair->next = current_pair->next->next; // --> We set the next pointer to the one after that (1->2->3) --> (1->3)
-        destroy_pair(current_pair->next); // --> Continuation of last line: destroy "2"
-      }
-      current_pair = current_pair->next; // --> Iteration of the while loop
+  while (current_pair != NULL && strcmp( current_pair->key, key ) != 0) 
+  { // --> If current index key doesn't match given key search list until keys match and destroy the pair
+    if (strcmp( current_pair->key, key ) == 0) { // --> Here we found the correct pair
+      destroy_pair(current_pair);
+    } else {
+      last_pair = current_pair; // Hold current pair for use as a tail to next
+      current_pair = last_pair->next; // Traversal
     }
   }
 
@@ -172,16 +166,14 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   LinkedPair *current_index = ht->storage[hash_key];
 
 
-  while (current_index != 0) {
+  while (current_index != NULL) {
     if ( strcmp(current_index->key, key) == 0 ) { // --> Case for matching keys
       return current_index->value;
-    } else if ( strcmp(current_index->key, key) != 0 && current_index->next == 0 ) { // --> Case for no matching keys & no node after ( aka end of list )
-      return NULL;
     }
     // Here we want to move down the storage array ( iterate )
     current_index = current_index->next;
   }
-  return 0;
+  return NULL;
 }
 
 /****
