@@ -93,8 +93,13 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   LinkedPair *destination = ht->storage[hashed_key];
   if (destination) {
     if (strcmp(destination->key, key) == 0) {
+      LinkedPair *next = destination->next;
       destination = pair;
+      destination->next = next;
     } else {
+      while (destination->next) {
+        destination = destination->next;
+      }
       destination->next = pair;
     }
   } else {
@@ -112,7 +117,9 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  unsigned int hashed_key = hash(key, ht->capacity);
+  free(ht->storage[hashed_key]);
+  ht->storage[hashed_key] = NULL;
 }
 
 /****
