@@ -96,12 +96,13 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   // if  a LinkedPair is already stored at this index
   if (ht->storage[hash_index] != NULL){
     // if this LinkedPair has the same key, overwrite the value only
-    // no need to modify key or the next pair. key and current's pair LinkedPair may remain as they are.
+    // no need to modify key or the next pair. key and  LinkedPair may remain as they are.
     if (strcmp(ht->storage[hash_index]->key, key) == 0){
       printf("\nWarning: overwriting previous Pair with current Pair\n");
       printf("PREVIOUS key, value, next: %s %3s %3s\n", ht->storage[hash_index]->key, ht->storage[hash_index]->value, ht->storage[hash_index]->next);
-      ht->storage[hash_index]->value = value;
-      printf("OVERWRITTEN linked pair key, value, next: %s %3s %3s\n", linked_pair->key, linked_pair->value, linked_pair->next);
+      free( ht->storage[hash_index]->value);
+      ht->storage[hash_index]->value = strdup(value);
+      printf("OVERWRITTEN linked pair key, value, next: %s %3s %3s\n", ht->storage[hash_index]->key, ht->storage[hash_index]->value, ht->storage[hash_index]->next);
     }
     // if keys are not the same, check if there's a linked pair
     else if (ht->storage[hash_index]->next == NULL) {
@@ -115,6 +116,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
       while(current_pair->next != NULL){
         if (strcmp(current_pair->next->key, key)==0){
           printf("got it, overwrite linked pair with same key\n");
+          free(current_pair->next);
           current_pair->next = linked_pair;
           return;
         } else { current_pair = current_pair->next; }
@@ -272,7 +274,7 @@ int main(void)
   struct HashTable *ht = create_hash_table(2);
 
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
-  // hash_table_insert(ht, "line_1", "HUGE hash table\n");
+  hash_table_insert(ht, "line_1", "HUGE hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
 
