@@ -54,11 +54,9 @@ unsigned int hash(char *str, int max)
   unsigned long hash = 5381;
   int c;
   unsigned char * u_str = (unsigned char *)str;
-
   while ((c = *u_str++)) {
     hash = ((hash << 5) + hash) + c;
   }
-
   return hash % max;
 }
 
@@ -99,22 +97,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   // 3. Insert new Pair into our specified index
   ht->storage[hash_key] = new_pair;
 
-
-  // unsigned int hash_index = hash(key, ht->capacity);   //hash the key to get an array index
-  // //check if the bucket at the index is occupied
-  // //if not occupied, create new pair and point to it
-  // if (ht->storage[hash_index] == NULL){ 
-  //   ht->storage[hash_index] = create_pair(key, value);
-  // }
-  // else {
-  //   if (strcmp(ht->storage[hash_index]->value, value) != 0){
-  //     ht->storage[hash_index]->value = value;
-  //   }
-  //   else{
-  //     printf("warning!!\n");
-  //   }
-  // }
-  // ht->count++;
+  ht->count++;
 }
 
 /****
@@ -177,9 +160,9 @@ int main(void)
   hash_table_insert(ht, "line", "Here today...");
   printf("%s\n", hash_table_retrieve(ht, "line"));
 
-  hash_table_insert(ht, "plane", "Here tomorrow...");
+  hash_table_insert(ht, "line", "Here tomorrow...");
 
-  printf("%s\n", hash_table_retrieve(ht, "plane"));
+  printf("%s\n", hash_table_retrieve(ht, "line"));
 
   hash_table_remove(ht, "line");
  
