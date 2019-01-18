@@ -193,7 +193,19 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++){
+    if(ht->storage[i] != NULL){
+      LinkedPair *current = ht->storage[i];
+      LinkedPair *next;
+      while(current != NULL){
+        next = current->next;
+        destroy_pair(current);
+        current = next;
+      }
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
@@ -207,7 +219,31 @@ void destroy_hash_table(HashTable *ht)
 HashTable *hash_table_resize(HashTable *ht)
 {
   HashTable *new_ht;
+  new_ht = create_hash_table(ht->capacity*2);
 
+  for(int i = 0; i < ht->capacity; i++){
+    if(ht->storage[i] != NULL){
+      
+      //create first link in new linkedlist
+      LinkedPair *firstLink = create_pair(ht->storage[i]->key,ht->storage[i]->value);
+      new_ht->storage[i] = firstLink;
+
+      //create iterators for new and old ht
+      LinkedPair *newCurrent = firstLink;
+
+      //loop through linked list and copy the rest
+      LinkedPair *oldCurrent = ht->storage[i];
+      
+      while(oldCurrent->next != NULL){
+        LinkedPair *copyNext = create_pair(oldCurrent->next->key,oldCurrent->next->value);
+        newCurrent->next = copyNext;
+
+        oldCurrent = oldCurrent->next;
+        newCurrent = newCurrent->next;
+      }
+    }
+  }
+  destroy_hash_table(ht);
   return new_ht;
 }
 
