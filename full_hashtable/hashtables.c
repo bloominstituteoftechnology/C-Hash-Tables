@@ -164,25 +164,29 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 
 /****
   Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
   Fill this in.
-
   Should create a new hash table with double the capacity
   of the original and copy all elements into the new hash table.
-
   Don't forget to free any malloc'ed memory!
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+  for(int i = 0; i < ht->capacity; i++){
+    new_ht->storage[i] = ht->storage[i];
+  }
 
   return new_ht;
 }
