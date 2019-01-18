@@ -87,7 +87,9 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  Pair *pair = create_pair(key, value);
+  unsigned int hashed_key = hash(key, ht->capacity);
+  ht->storage[hashed_key] = pair;
 }
 
 /****
