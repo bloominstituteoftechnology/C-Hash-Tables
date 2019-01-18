@@ -139,7 +139,6 @@ void hash_table_remove(HashTable *ht, char *key)
         current_pair = current_pair->next;
       }
     }
-    // printf("nothing to remove\n");
 
   } else {
     printf("could not remove\n");
@@ -157,7 +156,23 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+  if (ht->storage[index] != NULL) {
+    LinkedPair *current_pair = ht->storage[index];
+    while (current_pair != NULL) {
+      if (strcmp(current_pair->key, key) == 0) {
+        return current_pair->value;
+      } else {
+        current_pair = current_pair->next;
+      }
+    }
+    printf("key not found\n");
+    return NULL;
+  } else {
+
   return NULL;
+  }
+  
 }
 
 /****
@@ -167,7 +182,20 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for (int i=0; i<ht->capacity; i++) {
+    if (ht->storage[i] != NULL) {
+      LinkedPair *current_pair = ht->storage[i];
+      LinkedPair *next_pair = ht->storage[i]->next;
+      while (next_pair != NULL) {
+        destroy_pair(current_pair);
+        current_pair = next_pair;
+        next_pair = current_pair->next;
+      }
+    }
+  }
 
+  free(ht->storage);
+  free(ht);
 }
 
 /****
