@@ -92,20 +92,20 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-  LinkedPair *p = ht->storage[hash(key, ht->capacity)];
-  while(p != NULL)
+  LinkedPair **p = &ht->storage[hash(key, ht->capacity)];
+  while(*p != NULL)
   {
-    if(strcmp(key, p->key))
+    if(strcmp(key, (*p)->key))
     {
-      p = p->next;
+      p = &(*p)->next;
     }
     else
     {
-      destroy_pair(p);
+      destroy_pair(*p);
       break;
     }
   }
-  p = create_pair(key, value);
+  *p = create_pair(key, value);
 }
 
 /****
@@ -118,24 +118,24 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  LinkedPair *p = ht->storage[hash(key, ht->capacity)];
-  if(p == NULL)
-  {
-    printf("Key of %s does not exist in table.\n", key);
+  int index = hash(key, ht->capacity);
+  LinkedPair *p = ht->storage[index];
+  if(p == NULL){
+    printf("%s not found\n", key);
     return;
   }
-  LinkedPair *previous;
-  while(strcmp(p->key, key))
-  {
-    previous = p;
+  int first = 1;
+  LinkedPair *prev;
+  while(strcmp(p->key, key)){
+    first = 0;
+    prev = p;
     p = p->next;
-    if(p == NULL)
-    {
-      printf("Key of %s does not exist in table.\n", key);
-      return;
-    }
   }
-  previous->next = p->next;
+  if(first){
+    ht->storage[index] = p->next;
+  }else{
+    prev->next = p->next;
+  }
   destroy_pair(p);
 }
 
@@ -241,6 +241,10 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
+
+  hash_table_remove(ht, "line_1");
+  printf("remove success\n");
+  printf("%s", hash_table_retrieve(ht, "line_1"));
 
   int old_capacity = ht->capacity;
   ht = hash_table_resize(ht);
