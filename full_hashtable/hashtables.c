@@ -76,7 +76,7 @@ HashTable *create_hash_table(int capacity)
 {
   HashTable *ht = malloc(sizeof(HashTable));
   ht->capacity = capacity;
-  ht->storage = calloc(ht->capacity, sizeof(LinkedPair));
+  ht->storage = calloc(ht->capacity, sizeof(LinkedPair *));
   return ht;
 }
 
@@ -100,7 +100,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value) //create hash, see
   }
   else if (strcmp(key, ht->storage[hashedkey]->key) == 0) //if you reach node with same key as passed in key just change value
   {
-    ht->storage[hashedkey]->value = value;
+    ht->storage[hashedkey]->value = strdup(value);
     printf("Just overwrote a value of a node with same key at index [%d]\n", hashedkey);
   }
   else if (ht->storage[hashedkey]->next == NULL) //If the end is reached add node as next to existing last node
@@ -153,23 +153,40 @@ void hash_table_remove(HashTable *ht, char *key)
 
   Return NULL if the key is not found.
  ****/
+// char *hash_table_retrieve(HashTable *ht, char *key)
+// {
+//   unsigned int hashedkey = hash(key, ht->capacity);
+//   while (ht->storage[hashedkey] != NULL)
+//   {
+//     if (strcmp(key, ht->storage[hashedkey]->key) == 0)
+//     {
+
+//       return ht->storage[hashedkey]->value;
+//     }
+//     else if (ht->storage[hashedkey]->next != NULL)
+//     {
+//       ht->storage[hashedkey] = ht->storage[hashedkey]->next;
+//     } ////traverse linked lists to check if key matches
+//   }
+//   return NULL;
+// }
+
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  unsigned int hashedkey = hash(key, ht->capacity);
-  while (ht->storage[hashedkey] != NULL)
-  {
-    if (strcmp(key, ht->storage[hashedkey]->key) == 0)
-    {
+    unsigned int index = hash(key, ht->capacity);
 
-      return ht->storage[hashedkey]->value;
-    }
-    else if (ht->storage[hashedkey]->next != NULL)
+    LinkedPair *current_pair = ht->storage[index];
+
+    while (current_pair != NULL)
     {
-      ht->storage[hashedkey] = ht->storage[hashedkey]->next;
-    } ////traverse linked lists to check if key matches
-  }
-  return NULL;
-}
+        if (strcmp(current_pair->key, key) == 0)
+        {
+            return current_pair->value;
+        }
+        current_pair = current_pair->next;
+    }
+    return NULL;
+    }
 
 /****
   Fill this in.
@@ -202,27 +219,18 @@ void destroy_hash_table(HashTable *ht) //How to kill capacity->next?
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht = create_hash_table(ht->capacity * 2);
-  for (int i = 0; i < ht->capacity; i++) // For loop length of old hashtable
-  { 
-    LinkedPair *currentpair = ht->storage[i];
-    LinkedPair *oldpair;
+  HashTable *new_ht = create_hash_table(2 * ht->capacity);
 
-    if (currentpair != NULL) //Skip over null hashtable indices
-    {
-      new_ht->storage[i] = currentpair; //Place node into new hashtable
-      printf("inserted string:%s at index %d\n", new_ht->storage[i]->value, i);
-     
-      while (currentpair->next != NULL) //Check if there is a linked node
-      { 
-        oldpair = currentpair; //set oldpair to current
-        currentpair = currentpair->next; //set current to next
-
-        hash_table_insert(new_ht, currentpair->key, currentpair->value); //insert next node into hashtable
-      }
-      
+  LinkedPair *current_pair;
+  for (int i = 0 ; i < ht->capacity ; i++) {
+    current_pair = ht->storage[i];
+    while (current_pair != NULL) {
+      hash_table_insert(new_ht, current_pair->key, current_pair->value);
+      current_pair = current_pair->next;
     }
   }
+  destroy_hash_table(ht);
+
   return new_ht;
 }
 
@@ -246,8 +254,7 @@ int main(void)
   printf("Should be tiny hash table = %s \n", hash_table_retrieve(ht, "line_1"));
   printf("Filled beyond capacity = %s \n", hash_table_retrieve(ht, "line_2"));
   printf("Linked lists save lives = %s \n", hash_table_retrieve(ht, "line_3"));
-
-  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  printf("Resizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
   destroy_hash_table(ht);
 
