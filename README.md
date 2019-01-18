@@ -102,3 +102,4 @@ Update your HashTable to automatically double in size when it grows past a load 
 Update your HashTable to automatically half in size when it shrinks past a load factor of 0.2. This should only occur if the HashTable has been resized past the initial size.
 
 Refactor tests to pass with your resizing HashTable.
+https://github.com/LambdaSchool/Hash-Tables/pull/96 
