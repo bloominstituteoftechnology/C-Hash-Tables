@@ -89,18 +89,18 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  int i = hash(key, ht->capacity-1); // created the key
+  int i = hash(key, ht->capacity); // created the key
   Pair * np = create_pair(key, value); // created pair to be inserted
 
-  if ( ht->storage[i] == NULL ) {
-    printf("Succesful!");
+  // if ( ht->storage[i] != NULL ) {
+  //   printf("Succesful!");
+  //   ht->storage[i] = np;
+  // } else {
+  //   free(ht->storage[i]);
+  //   fprintf(stderr, "Warning, you've overwritten a value");
+  //   ht->storage[i] = np;
+  // }
     ht->storage[i] = np;
-  } else {
-    free(ht->storage[i]);
-    fprintf(stderr, "Warning, you've overwritten a value");
-    ht->storage[i] = np;
-  }
-
 }
 
 /****
@@ -110,14 +110,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  int i = hash(key, ht->capacity-1); // created the key
-  printf("%s %s \n", ht->storage[i]->key, key );
-  if ( ht->storage[i]->key == key) {
+  int i = hash(key, ht->capacity); // created the key
+  
+  // if ( ht->storage[i]->key == key) {
     destroy_pair(ht->storage[i]);
     ht->storage[i] = NULL;
-  } else {
-    printf("That key is invalid");
-  }
+  // } else {
+  //   printf("That key is invalid");
+  // }
 
 }
 
@@ -128,13 +128,11 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  int i = hash(key, ht->capacity-1);
-  if (ht->storage[i] == NULL) {
-    printf("Index is empty");
-    return NULL;
-  } else {
+  int i = hash(key, ht->capacity);
+  if (ht->storage[i] != NULL) {
     return ht->storage[i]->value;
   }
+  return NULL;
 }
 
 /****
