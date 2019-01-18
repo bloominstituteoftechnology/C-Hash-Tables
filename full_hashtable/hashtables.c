@@ -171,7 +171,6 @@ void hash_table_remove(HashTable *ht, char *key)
   	LinkedPair *current_pair = ht->storage[index];
   	LinkedPair *last_pair;
 
-  	for(int i=0; i<ht->capacity; i++){
     	
 		while (current_pair != NULL && strcmp(current_pair->key, key) != 0) {
     			last_pair = current_pair;
@@ -186,7 +185,6 @@ void hash_table_remove(HashTable *ht, char *key)
     			destroy_pair(ht->storage[index]);
     			ht->storage[index] = NULL;
   		}
- 		}	 
 
 }
 
