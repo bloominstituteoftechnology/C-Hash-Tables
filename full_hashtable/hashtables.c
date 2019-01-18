@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "../utils/minunit.h"
 
 /****
   Hash table key/value pair with linked list pointer
@@ -39,6 +39,8 @@ LinkedPair *create_pair(char *key, char *value)
 void destroy_pair(LinkedPair *pair)
 {
   if (pair != NULL) {
+    pair->key = NULL;
+    pair->value = NULL;
     free(pair->key);
     free(pair->value);
     free(pair);
@@ -47,7 +49,6 @@ void destroy_pair(LinkedPair *pair)
 
 /****
   djb2 hash function
-
   Do not modify this!
  ****/
 unsigned int hash(char *str, int max)
@@ -218,6 +219,7 @@ HashTable *hash_table_resize(HashTable *ht)
 #ifndef TESTING
 int main(void)
 {
+  // ***** Original Tests ******
   struct HashTable *ht = create_hash_table(2);
   int capacity = ht->capacity;
   printf("Hash table created with capacity == %d\n", capacity);
