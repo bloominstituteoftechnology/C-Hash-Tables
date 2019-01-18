@@ -131,15 +131,30 @@ void hash_table_remove(HashTable *ht, char *key)
 {
   // 1. Get hash
   unsigned int hash_key = hash(key, ht->capacity);
+  LinkedPair *current_pair = ht->storage[hash_key];  
 
-  // 2. Search entire list of LinkedPairs for the key that matches and remove
-  if (ht->storage[hash_key] != NULL) {
-    destroy_pair(ht->storage[hash_key]);
-    ht->storage[hash_key] = NULL;
-  } else { // --> Meaning the key couldn't be found
-    printf("There is no such key inside memory ( invalid key error )");
+  if (current_pair == NULL) {
+    printf("Given key is invalid ( invalid key error )");
     exit(1);
+  } 
+  
+  if ( strcmp(current_pair->key, key) == 0 ) { // --> If keys match, destroy pair, but set the index to the next value
+    ht->storage[hash_key] = current_pair->next;
+    destroy_pair(current_pair);
+  } else {
+    while ( current_pair->next != NULL ) { // --> Lets traverse the memory
+      if ( strcmp(current_pair->next->key, key) == 0 ) { // --> if the next element's key matches:
+        current_pair->next = current_pair->next->next; // --> We set the next pointer to the one after that (1->2->3) --> (1->3)
+        destroy_pair(current_pair->next); // --> Continuation of last line: destroy "2"
+      }
+      current_pair = current_pair->next; // --> Iteration of the while loop
+    }
   }
+
+
+
+  
+  
 }
 
 /****
@@ -152,9 +167,21 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  // 1. Get hash
+  // 1. Get hash && point to ht->storage[key]
   unsigned int hash_key = hash(key, ht->capacity);
-  
+  LinkedPair *current_index = ht->storage[hash_key];
+
+
+  while (current_index != 0) {
+    if ( strcmp(current_index->key, key) == 0 ) { // --> Case for matching keys
+      return current_index->value;
+    } else if ( strcmp(current_index->key, key) != 0 && current_index->next == 0 ) { // --> Case for no matching keys & no node after ( aka end of list )
+      return NULL;
+    }
+    // Here we want to move down the storage array ( iterate )
+    current_index = current_index->next;
+  }
+  return 0;
 }
 
 /****
