@@ -152,6 +152,19 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int ind = hash(key, ht->capacity);
+  LinkedPair *current_pair = ht->storage[ind];
+  while (current_pair != NULL)
+  {
+    if (strcmp(current_pair->key, key) == 0)
+    {
+      return current_pair->value;
+    }
+    else
+    {
+      current_pair = current_pair->next;
+    }
+  }
   return NULL;
 }
 
