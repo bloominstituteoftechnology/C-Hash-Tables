@@ -118,8 +118,19 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 void hash_table_remove(HashTable *ht, char *key)
 {
   unsigned int hashed_key = hash(key, ht->capacity);
-  free(ht->storage[hashed_key]);
-  ht->storage[hashed_key] = NULL;
+  LinkedPair *destination = ht->storage[hashed_key];
+  while (strcmp(destination->key, key) != 0) {
+    destination = destination->next;
+  }
+  if (strcmp(destination->key, key) == 0) {
+    LinkedPair *next = destination->next;
+    free(destination);
+    if (next) {
+      destination = next;
+    } else {
+      destination = NULL;
+    }
+  }
 }
 
 /****
