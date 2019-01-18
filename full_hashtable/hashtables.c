@@ -158,30 +158,32 @@ void hash_table_remove(HashTable *ht, char *key)
       // previous = destination;
       printf(">> setting next in reserve\n");
       next = destination->next;
+
     }
 
     printf("destroying pair: key %s value %s\n", destination->key, destination->value);
+
+
+
     destroy_pair(destination);
+  destination->next = NULL;
+    printf("destroyed pair: key %s value %s\n", destination->key, destination->value);
     destination = NULL;
 
-
+    // four-way assignment of logical predecessors and successors
     if (next) {
       if (previous) {
         previous->next = next;
       } else {
         next = ht->storage[hashed_key];
       }
+    } else {
+      if (previous) {
+        previous->next = NULL;
+      } else {
+        ht->storage[hashed_key] = NULL;
+      }
     }
-    // 
-    // destination = NULL;
-    // if (next) {
-    //   printf("bringing next in from reserve\n");
-    //   destination = next;
-    // }
-    // else {
-    //   printf("setting destination to NULL\n");
-    //   destination = NULL;
-    // }
   }
 }
 
@@ -197,17 +199,23 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 {
   unsigned int hashed_key = hash(key, ht->capacity);
   LinkedPair *result = NULL;
-  if (ht->storage[hashed_key]) {
+  // printf("first found >key: %s, >value: %s\n", ht->storage[hashed_key]->key, ht->storage[hashed_key]->value);
+  if (ht->storage[hashed_key] != NULL) {
     result = ht->storage[hashed_key];
     printf("first result >key: %s, >value: %s\n", result->key, result->value);
   }
   if (result) {
+  printf("inside if statement\n");
     while (strcmp(result->key, key) != 0) {
+      printf("inside while statement\n");
+      printf("does result->next %s exist?\n", result->next);
       if (result->next) {
         printf("cycled through nexts\n");
         result = result->next;
       } else {
-        break;
+        printf("do we want to return NULL?");
+        return NULL;
+        // break;
       }
     }
     if (strcmp(result->key, key) == 0) {
