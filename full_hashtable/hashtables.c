@@ -94,16 +94,23 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   if (destination) {
     if (strcmp(destination->key, key) == 0) {
       LinkedPair *next = destination->next;
+      printf("rewrote old value\n");
       destination = pair;
       destination->next = next;
     } else {
       while (destination->next) {
         destination = destination->next;
+        printf("cycled through LinkedPairs\n");
       }
+      printf("assigned value to a next\n");
       destination->next = pair;
+      printf("key: %s, value: %s\n", destination->next->key, destination->next->value);
     }
   } else {
-    destination = pair;
+    printf("no value for key; assigned in place\n");
+    ht->storage[hashed_key] = create_pair(key, value);
+    // printf("key: %s, value: %s\n", destination->key, destination->value);
+    printf("key: %s, value: %s\n", ht->storage[hashed_key]->key, ht->storage[hashed_key]->value);
   }
 }
 
@@ -120,7 +127,11 @@ void hash_table_remove(HashTable *ht, char *key)
   unsigned int hashed_key = hash(key, ht->capacity);
   LinkedPair *destination = ht->storage[hashed_key];
   while (strcmp(destination->key, key) != 0) {
-    destination = destination->next;
+    if (destination->next) {
+      destination = destination->next;
+    } else {
+      break;
+    }
   }
   if (strcmp(destination->key, key) == 0) {
     LinkedPair *next = destination->next;
@@ -143,6 +154,23 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int hashed_key = hash(key, ht->capacity);
+  LinkedPair *result = ht->storage[hashed_key];
+  printf("result->key: %s, result->value: %s\n", result->key, result->value);
+  if (result) {
+    while (strcmp(result->key, key) != 0) {
+      if (result->next) {
+        printf("cycled through nexts\n");
+        result = result->next;
+      } else {
+        break;
+      }
+    }
+    if (strcmp(result->key, key) == 0) {
+      printf("found matching key: %s\n", result->key);
+      return result->value;
+    }
+  }
   return NULL;
 }
 
@@ -184,7 +212,7 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
-
+// printf("storage[0]->value: %s\n", ht->storage[0]->value);
   int old_capacity = ht->capacity;
   ht = hash_table_resize(ht);
   int new_capacity = ht->capacity;
