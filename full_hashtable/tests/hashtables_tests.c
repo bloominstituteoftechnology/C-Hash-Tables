@@ -123,7 +123,7 @@ char *hash_table_resizing_test() {
     hash_table_insert(ht, "resize-key-9", "resize-val-9");
 
     ht = hash_table_resize(ht);
-    char *return_value = hash_table_retrieve(ht, "resize-key");
+    char *return_value;
 
     mu_assert(ht->capacity == 16, "Resized hash table did not double capacity");
 
