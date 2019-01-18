@@ -102,7 +102,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   while (current_pair != NULL && strcmp( current_pair->key, key ) != 0) 
   {
     last_pair = current_pair; // --> setting last pair to the current pair
-    current_pair = last_pair->next; // --> setting current pair to tail of the last pair
+    current_pair = last_pair->next; // --> setting current pair to tail of the last pair (traversal)
     // this will continue until @ end of linked list or our keys match
       // aka our current pair is holding a pair that matches
   }
@@ -137,12 +137,12 @@ void hash_table_remove(HashTable *ht, char *key)
 
   while (current_pair != NULL && strcmp( current_pair->key, key ) != 0) 
   { // --> If current index key doesn't match given key search list until keys match and destroy the pair
-    if (strcmp( current_pair->key, key ) == 0) { // --> Here we found the correct pair
-      destroy_pair(current_pair);
-    } else {
-      last_pair = current_pair; // Hold current pair for use as a tail to next
-      current_pair = last_pair->next; // Traversal
-    }
+    if (strcmp( current_pair->key, key ) == 0) { // --> Here we found the correct pair      
+      // current_pair = NULL;
+      destroy_pair(current_pair);      
+    } 
+    last_pair = current_pair; // Hold current pair for use as a tail to next
+    current_pair = last_pair->next; // Traversal    
   }
 
 
@@ -183,10 +183,18 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  LinkedPair *current_pair;
+  LinkedPair *last_pair;
   // 1. Grab all pairs in storage and destroy the pairs
   for (int i = 0; i < ht->capacity; i++) {
-    ht->storage[i] = NULL; // NOTE: this solved our `pointer being freed not allocated error
-    destroy_pair(ht->storage[i]);    
+    current_pair = ht->storage[i];
+
+    while (current_pair != NULL) { // --> while the current index is occupied
+      last_pair = current_pair; // --> Using the same method of swapping here to get rid of previous pair while traversing at the same time via `->next`
+      current_pair = current_pair->next;
+      // last_pair = NULL;
+      destroy_pair(last_pair);
+    }
   }
 
   // 2. Free storage -> Free hash table
@@ -206,10 +214,16 @@ HashTable *hash_table_resize(HashTable *ht)
 {
   // 1. Create new hash table with double capacity
   HashTable *new_ht = create_hash_table(ht->capacity * 2);
+  LinkedPair *current_pair;
 
   // 2. Copy elements into new storage
   for (int i = 0; i < ht->capacity; i++) {
-    new_ht->storage[i] = ht->storage[i];
+    current_pair = ht->storage[i];
+
+    while (current_pair != NULL) {
+      hash_table_insert(new_ht, current_pair->key, current_pair->value);
+      current_pair = current_pair->next;       
+    }
   }     
   
   // 3. Destroy old hash table
