@@ -39,7 +39,7 @@ char *basic_hash_table_test()
     mu_assert(strcmp(return_value, "val-8") == 0, "Value is not stored correctly");
     return_value = hash_table_retrieve(ht, "key-9");
     mu_assert(strcmp(return_value, "val-9") == 0, "Value is not stored correctly");
-
+    printf("\nInsert tests PASSED\n"); 
 
     hash_table_insert(ht, "key-0", "new-val-0");
     hash_table_insert(ht, "key-1", "new-val-1");
@@ -72,6 +72,7 @@ char *basic_hash_table_test()
     mu_assert(strcmp(return_value, "new-val-8") == 0, "Value is not overwritten correctly");
     return_value = hash_table_retrieve(ht, "key-9");
     mu_assert(strcmp(return_value, "new-val-9") == 0, "Value is not overwritten correctly");
+    printf("\nReplace tests PASSED\n"); 
 
     hash_table_remove(ht, "key-9");
     hash_table_remove(ht, "key-8");

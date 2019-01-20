@@ -72,6 +72,9 @@ BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
 
+  ht = malloc(sizeof(BasicHashTable));
+  ht->storage = calloc(capacity,sizeof(Pair*));
+  ht->capacity = capacity;
   return ht;
 }
 
@@ -84,7 +87,14 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  int index = hash(key,ht->capacity-1);
+  
+  if (ht->storage[index] != NULL){
+    printf("Warning: You have overwritten \"%s\n\"", ht->storage[index]->value);
+    free(ht->storage[index]);
+  } 
+  Pair *new_element = create_pair(key,value);
+  ht->storage[index] = new_element;
 }
 
 /****
@@ -94,6 +104,13 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  int index = hash(key,ht->capacity-1);
+  if (ht->storage[index] == NULL || strcmp(ht->storage[index]->key,key)!=0){
+    fprintf(stderr, "No value with key: %s\n", key);
+  } else {
+    destroy_pair(ht->storage[index]);
+    ht->storage[index] = NULL;
+  }
 
 }
 
@@ -104,7 +121,14 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  int index = hash(key, ht->capacity-1);
+  if (ht->storage[index] == NULL){
+    fprintf(stderr, "Key not found\n");
+    return NULL;
+  } else {
+    return ht->storage[index]->value;
+  }
+  
 }
 
 /****
@@ -114,7 +138,13 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++){
+    if(ht->storage[i] != NULL){
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
