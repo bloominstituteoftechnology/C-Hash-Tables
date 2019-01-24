@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Basic hash table key/value pair
  ****/
@@ -90,10 +89,13 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   int index = hash(key, ht->capacity);
   if(ht->storage[index] != NULL) {
-    printf("error");
+    printf("error\n");
     destroy_pair(ht->storage[index]);
+    ht->storage[index] = create_pair(key, value);
   }
-  ht->storage[index] = create_pair(key, value);
+  else {
+    ht->storage[index] = create_pair(key, value);
+  }
 }
 
 /****
@@ -103,8 +105,9 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  ht->storage = NULL;
-  free(ht->storage);
+  int index = hash(key, ht->capacity);
+  destroy_pair(ht->storage[index]);
+  ht->storage[index] = NULL;
 }
 
 /****
@@ -114,9 +117,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  if(ht->storage = NULL) {
-    printf("no key found");
+  int index = hash(key, ht->capacity);
+  if((ht->storage[index]) != NULL)
+  {
+    return ht->storage[index]->value;
+  }
   return NULL;
+  printf("no key found\n");
 }
 
 /****
