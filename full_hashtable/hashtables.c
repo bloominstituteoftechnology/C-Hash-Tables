@@ -89,7 +89,7 @@ HashTable *create_hash_table(int capacity)
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   int index = hash(key, ht->capacity);
-  if(ht-<.storage[index] != NULL) {
+  if(ht->storage[index] != NULL) {
     printf("error");
     destroy_pair(ht->storage[index]);
   }
