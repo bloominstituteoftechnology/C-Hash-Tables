@@ -20,19 +20,18 @@ typedef struct BasicHashTable {
 } BasicHashTable;
 
 /****
-  Create a key/value pair to be stored in the hash table.
+  This Creates a key/value pair to be stored in the hash table.
  ****/
 Pair *create_pair(char *key, char *value)
 {
   Pair *pair = malloc(sizeof(Pair));
-  pair->key = strdup(key);
-  pair->value = strdup(value);
-
+  pair->key = strdup(key); // when we strdup you need to free()
+  pair->value = strdup(value); // when we strdup you need to free()
   return pair;
 }
 
 /****
-  Use this function to safely destroy a hashtable pair.
+  Use this function to safely destroy a hash table pair.
  ****/
 void destroy_pair(Pair *pair)
 {
@@ -41,6 +40,7 @@ void destroy_pair(Pair *pair)
     free(pair->value);
     free(pair);
   }
+
 }
 
 /****
@@ -57,7 +57,6 @@ unsigned int hash(char *str, int max)
   while ((c = *u_str++)) {
     hash = ((hash << 5) + hash) + c;
   }
-
   return hash % max;
 }
 
@@ -71,6 +70,9 @@ unsigned int hash(char *str, int max)
 BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
+  ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc( capacity, sizeof(Pair*));
 
   return ht;
 }
@@ -84,7 +86,10 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  if (  = ht->key) {
+      fprintf(stderr, "overwriting key\n");
+      exit(1);
+  }
 }
 
 /****
