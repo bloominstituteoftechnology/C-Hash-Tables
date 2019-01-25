@@ -47,7 +47,7 @@ void destroy_pair(LinkedPair *pair)
 
 /****
   djb2 hash function
-
+  
   Do not modify this!
  ****/
 unsigned int hash(char *str, int max)
@@ -70,8 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
   return ht;
 }
 
@@ -86,7 +87,23 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  int hashed_key = hash(key,ht->capacity);
+  if (ht->storage[hashed_key] != NULL) {
+    LinkedPair *chk_pair=ht->storage[hashed_key];
+    while (chk_pair!=NULL) {
+      if (chk_pair->key == key) {
+        chk_pair->value = value;
+        break;
+      } else if (chk_pair->next==NULL) {
+        chk_pair->next = create_pair(key,value);
+        break;
+      } else {
+        chk_pair = chk_pair->next;
+      }
+    }
+  } else {
+    ht->storage[hashed_key] = create_pair(key,value);
+  }
 }
 
 /****
@@ -99,7 +116,25 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  int hashed_key = hash(key,ht->capacity);
+  if (ht->storage[hashed_key] != NULL) {
+    LinkedPair *chk_pair = ht->storage[hashed_key];
+    LinkedPair *prev_pair = NULL;
+    while (chk_pair != NULL) {
+      if (chk_pair->key == key) {
+        if (prev_pair == NULL) {
+          ht->storage[hashed_key] = chk_pair->next;
+        } else {
+          prev_pair->next = chk_pair->next;
+        }
+        destroy_pair(chk_pair);
+        break;
+      } else {
+        prev_pair = chk_pair;
+        chk_pair = chk_pair->next;
+      }
+    }
+  }
 }
 
 /****
@@ -112,6 +147,16 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int hashed_key = hash(key, ht->capacity);
+  LinkedPair *chk_pair = ht->storage[hashed_key];
+
+  while (chk_pair != NULL){
+    if (strcmp(chk_pair->key, key) == 0){
+      return chk_pair->value;
+    }
+    chk_pair = chk_pair->next;
+  }
+
   return NULL;
 }
 
@@ -122,11 +167,15 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
-  Fill this in.
+  Fill this in. 
 
   Should create a new hash table with double the capacity
   of the original and copy all elements into the new hash table.
@@ -135,7 +184,11 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table(ht->capacity*2);
+  for (int i = 0; i < ht->capacity; i++){
+    new_ht->storage[i] = ht->storage[i];
+  }
+  destroy_hash_table(ht);
 
   return new_ht;
 }
