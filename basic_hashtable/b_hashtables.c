@@ -86,7 +86,7 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  int h = hash(key. ht->capacity);
+  int h = hash(key, ht->capacity);
   if (ht->storage[h] != NULL) {
     printf("Warning: You are overwriting an existing value\n");
     destroy_pair(ht->storage[h]);
@@ -103,7 +103,13 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int h = hash(key, ht->capacity);
+  if (ht->storage[h] != NULL) {
+    destroy_pair(ht->storage[h]);
+    ht->storage[h] = NULL;
+  } else {
+    printf("Index %d does not exit in the hash table\n", h);
+  }
 }
 
 /****
