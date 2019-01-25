@@ -61,7 +61,6 @@ unsigned int hash(char *str, int max)
   return hash % max;
 }
 
-
 /****
   Fill this in.
 
@@ -69,9 +68,9 @@ unsigned int hash(char *str, int max)
   (hint: look up `calloc`)
  ****/
 BasicHashTable *create_hash_table(int capacity)
-{
-  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
-  ht->storage = calloc(capacity, sizeof(Pair *));
+{                                                       // aprtment example: landlord is the hash table
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable)); // malloc is the apartment building with the apartments built in
+  ht->storage = calloc(capacity, sizeof(Pair *)); // calloc is the apartment building wih no apartments built yet
   ht->capacity = capacity;
 
   return ht;
@@ -86,10 +85,11 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  int index = hash(key, ht->capacity);
+  int index = hash(key, ht->capacity); 
 
   if (ht->storage[index] != NULL) {
-    printf("Index already in use.\n");
+    // error handling
+    printf("Index already in use, will be overwritten!!!!!!\n");
     destroy_pair(ht->storage[index]);
     ht->storage[index] = create_pair(key, value);
   } else {
