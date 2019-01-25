@@ -89,7 +89,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   int index = hash(key, ht->capacity);
   LinkedPair *pair = ht->storage[index];  
-  if((pair) = NULL) {
+  if (pair = NULL) {
     LinkedPair *newpair = create_pair(key, value);
     ht->storage[index] = newpair;
   }
@@ -183,9 +183,10 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-  int *new_ht->new_capacity = 2 * (ht->capacity);
-  for (i = 0; i++; i < mblen(new_ht -> capacity)) {
+  int i;
+  HashTable *new_ht = create_hash_table(2 * (ht->capacity));
+  
+  for (i = 0; i < ht->capacity; i++) {
     new_ht->storage[i] = ht->storage[i];
   }
   free(ht->storage);
