@@ -1,6 +1,6 @@
 # Hash Tables
 
-Hash tables are arguably the single most important data structures in existence. Used to implement everything from objects in JavaScript and dictionaries in Python to Memcached over a distributed computer network, hash tables are beloved by programmers for providing key/value storage with constant big-O time complexity for insertion, deletion and search.
+Hash tables are arguably the single most important data structures in existence. Used to implement everything from objects in JavaScript and dictionaries in Python to Memcached over a distributed computer network, hash tables are beloved by programmers for providing key/value storage with constant big-O time complexity for insertion, deletion, and access.
 
 ## What is a hash table?
 
