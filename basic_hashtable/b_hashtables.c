@@ -141,6 +141,16 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  // loops through the storage and uses destroy pair
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    // destroys each Pair struct at index
+    destroy_pair(ht->storage[i]);
+  }
+  // frees alloc memory of storage
+  free(ht->storage);
+  // frees alloc memory of Hash Table
+  free(ht);
 }
 
 #ifndef TESTING
