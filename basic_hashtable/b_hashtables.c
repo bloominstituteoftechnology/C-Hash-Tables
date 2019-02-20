@@ -105,6 +105,17 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int hp = hash(key, ht->capacity);
+  if (ht->storage[hp])
+  {
+    destroy_pair(ht->storage[hp]);
+    ht->storage[hp] = NULL;
+  }
+  else
+  {
+    fprintf(stderr, "Unable to find the pair for removal\n");
+    return;
+  }
 }
 
 /****
@@ -114,7 +125,15 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int hp = hash(key, ht->capacity);
+  if (ht->storage[hp])
+  {
+    return ht->storage[hp];
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 /****
