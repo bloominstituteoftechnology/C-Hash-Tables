@@ -101,7 +101,12 @@ void ht_insert(ht_hash_table* ht, const char* key, const char* value) {
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int hashed_key_pair = hash(key, ht->capacity);
+  if (ht->storage[hashed_key_pair] != NULL)
+  {
+    free(ht->storage[hashed_key_pair]);
+    ht->storage[hashed_key_pair] = NULL;
+  }
 }
 
 /****
@@ -126,7 +131,23 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  if (ht->storage != NULL)
+  {
+    for (int i = 0; i < ht->capacity; i++)
+    {
+      if (ht->storage[i])
+      {
+        int hashed_key_pair = hash(ht->storage[i]->key, ht->capacity);
+        destroy_pair(ht->storage[hashed_key_pair]);
+        free(ht->storage[i]);
+      }
+    }
+  }
 
+  if (ht != NULL)
+  {
+    free(ht);
+  }
 }
 
 
