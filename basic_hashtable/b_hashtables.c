@@ -74,7 +74,7 @@ BasicHashTable *create_hash_table(int capacity)
 
   ht->capacity = capacity;
   ht->storage = calloc(capacity, sizeof(Pair *));
-  
+
   return ht;
 }
 
@@ -87,7 +87,26 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  //create index by hashing table size and key
+  unsigned int index = hash(key, ht->capacity);
+  // create a pair with the key and value
+  Pair *pair = create_pair(key, value);
+  // get the key value that are currently in the index in storage
+  Pair *stored_pair = ht->storage[index];
+  // if there is a pair currently in index
+  if(stored_pair != NULL)
+  {
+    // if the key and the stored key are different
+    if(strcmp(key, stored_pair->key) != 0)
+    {
+      // print warning
+      printf("You are overwriting the current pair at %d, %s, %s with %s,%s",
+       index, stored_pair->key, stored_pair->value, key, value);
 
+    }
+  }
+  // store the pair at the given index
+  ht->storage[index] = pair;
 }
 
 /****
