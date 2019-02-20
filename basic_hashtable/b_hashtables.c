@@ -70,9 +70,12 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+    BasicHashTable *ht;
+    //void *calloc(size_t nunber_of_items, size_t size)
+    ht = calloc(capacity, sizeof(Pair))
+    printf("\nBasic hash table..\n");
 
-  return ht;
+    return ht;
 }
 
 /****
