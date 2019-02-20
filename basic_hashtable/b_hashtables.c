@@ -116,7 +116,21 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  //create index by hashing table size and key
+  unsigned int index = hash(key, ht->capacity);
+  // if there is no pair stored with the given key, print warning
+  if(ht->storage[index] == NULL)
+  {
+    printf("Nothing to remove\n");
+  }
+  // use the destroy_pair function to remove the key and value from the index
+  // set the index to NULL
+  else
+  {
+    destroy_pair(ht->storage[index]);
+    ht->storage[index] = NULL;
+  }
+  
 }
 
 /****
@@ -126,7 +140,16 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  //create index by hashing table size and key
+  unsigned int index = hash(key, ht->capacity);
+  // if the key is not found, return NULL
+  if(ht->storage[index] == NULL)
+  {
+    printf("No value to return");
+    return NULL;
+  }
+  // return the value stored at the index 
+  return ht->storage[index]->value;
 }
 
 /****
@@ -136,7 +159,13 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for (int i = 0; i< ht->capacity; i++){
+    if(ht->storage[i] != NULL) {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
