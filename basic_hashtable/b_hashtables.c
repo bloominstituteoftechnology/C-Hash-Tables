@@ -104,6 +104,17 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int i = hash(key, ht->capacity);
+  Pair *pair = ht->storage[i];
+  if (!pair)
+  {
+    printf("This key-value doesnt exist in the hash table");
+  }
+  else
+  {
+    ht->storage[i] = NULL;
+    destroy_pair(pair);
+  }
 }
 
 /****
