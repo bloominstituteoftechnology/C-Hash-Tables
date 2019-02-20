@@ -72,7 +72,10 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = calloc(sizeof(BasicHashTable), capacity);
+  ht->capacity = capacity;
+
+  ht->storage = calloc(sizeof(Pair), capacity);
 
   return ht;
 }
@@ -86,6 +89,17 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  int hash_key = hash(key, ht->capacity);
+  Pair *pair = create_pair(key, value);
+  if (ht->storage[hash_key])
+  {
+    printf("Replacing existing key");
+    ht->storage[hash_key] = pair;
+  }
+  else
+  {
+    ht->storage[hash_key] = pair;
+  }
 }
 
 /****
