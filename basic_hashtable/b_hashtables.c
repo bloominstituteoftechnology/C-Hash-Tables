@@ -89,11 +89,9 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  char *hash_key;
   int i;
 
-  hash_key = strdup(key);
-  i = hash(hash_key, ht->capacity);
+  i = hash(key, ht->capacity);
 
   if (ht->storage[i] != NULL)
   {
@@ -109,11 +107,9 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  char *hash_key;
   int i;
 
-  hash_key = strdup(key);
-  i = hash(hash_key, ht->capacity);
+  i = hash(key, ht->capacity);
 
   if (ht->storage[i] == NULL)
   {
@@ -134,10 +130,8 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
   int i;
-  char *hash_key;
 
-  hash_key = strdup(key);
-  i = hash(hash_key, ht->capacity);
+  i = hash(key, ht->capacity);
 
   if (ht->storage[i] == NULL)
   {
