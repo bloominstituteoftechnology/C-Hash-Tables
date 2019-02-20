@@ -117,6 +117,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
   else
   {
     printf("\nIndex %d does not exit in the hash table\n", h);
+    exit(1);
   }
 }
 
