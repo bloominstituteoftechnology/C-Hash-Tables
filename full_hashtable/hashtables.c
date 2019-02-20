@@ -80,7 +80,7 @@ void append_to_end_of_pairs(LinkedPair *slp, LinkedPair *elp)
 {
     if (strcmp(elp->key, slp->key) == 0)
     {
-        // key already exists so return
+        fprintf(stderr, "Key already exists\n");
         return;
     }
     LinkedPair *next = slp->next;
@@ -109,6 +109,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     if (slp)
     {
         append_to_end_of_pairs(slp, elp);
+        return;
     }
     ht->storage[i] = elp;
 }
@@ -116,6 +117,11 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 /// Returns pair before query
 LinkedPair *find_pair(LinkedPair *lp, char *query)
 {
+    // Should only be true if the first is the same as the query
+    if (strcmp(query, lp->key) == 0)
+    {
+        return lp;
+    }
     LinkedPair *next = lp->next;
     if (lp->next)
     {
@@ -124,11 +130,6 @@ LinkedPair *find_pair(LinkedPair *lp, char *query)
             return lp;
         }
         find_pair(lp, query);
-    }
-    // Should only be true if a single pair is present and is the same as the query
-    if (strcmp(query, lp->key) == 0)
-    {
-        return lp;
     }
     // Couldn't find the query
     return NULL;
@@ -155,6 +156,12 @@ void hash_table_remove(HashTable *ht, char *key)
     if (!plp)
     {
         fprintf(stderr, "Key not found\n");
+        return;
+    }
+    if (strcmp(plp->key, key) == 0)
+    {
+        ht->storage[i] = plp->next;
+        destroy_pair(plp);
         return;
     }
     LinkedPair *lp = plp->next;
@@ -184,6 +191,10 @@ char *hash_table_retrieve(HashTable *ht, char *key)
     if (!lp)
     {
         return NULL;
+    }
+    if (strcmp(lp->key, key) == 0)
+    {
+        return lp->value;
     }
     return lp->next->value;
 }
@@ -225,7 +236,8 @@ HashTable *hash_table_resize(HashTable *ht)
 {
     HashTable *new_ht = malloc(sizeof(HashTable));
     new_ht->capacity = ht->capacity * 2;
-    new_ht->storage = realloc(ht->storage, ht->capacity * sizeof(LinkedPair *));
+    ht->storage = realloc(ht->storage, ht->capacity * sizeof(LinkedPair *));
+    new_ht->storage = ht->storage;
     destroy_hash_table(ht);
     return new_ht;
 }
@@ -240,7 +252,7 @@ int main(void)
     hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
     hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
 
-    printf("%s\n", hash_table_retrieve(ht, "line_1"));
+    printf("%s", hash_table_retrieve(ht, "line_1"));
     printf("%s", hash_table_retrieve(ht, "line_2"));
     printf("%s", hash_table_retrieve(ht, "line_3"));
 
@@ -250,7 +262,7 @@ int main(void)
 
     printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-    destroy_hash_table(ht);
+    // destroy_hash_table(ht);
 
     return 0;
 }
