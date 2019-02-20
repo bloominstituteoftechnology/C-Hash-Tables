@@ -91,6 +91,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
     printf("Previous pair overwritten\n");
     free(ht -> storage[i]);
   }
+  ht -> storage[i] = create_pair(key, value);
 }
 
 /****
@@ -100,7 +101,9 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  unsigned int i = hash(key, ht -> capacity);
+  destroy_pair(ht -> storage[i]);
+  ht -> storage[i] = NULL;
 }
 
 /****
