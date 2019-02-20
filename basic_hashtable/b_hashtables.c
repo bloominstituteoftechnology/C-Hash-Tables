@@ -25,7 +25,7 @@ typedef struct BasicHashTable {
 Pair *create_pair(char *key, char *value)
 {
   Pair *pair = malloc(sizeof(Pair));
-  pair->key = strdup(key);
+  pair->key = strdup(key); 
   pair->value = strdup(value);
 
   return pair;
