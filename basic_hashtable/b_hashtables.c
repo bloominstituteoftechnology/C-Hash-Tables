@@ -124,7 +124,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int i = hash(key, ht->capacity);
+  Pair *pair = ht->storage[i];
+  if (!pair)
+  {
+    return NULL;
+  }
+  return pair->value;
 }
 
 /****
@@ -134,6 +140,11 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    free(ht->storage);
+    free(ht);
+  }
 }
 
 #ifndef TESTING
