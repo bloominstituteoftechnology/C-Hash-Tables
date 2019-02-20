@@ -90,8 +90,8 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 
 void ht_insert(ht_hash_table* ht, const char* key, const char* value) {
   Pair *pair = create_pair(key, value);
-  int hash_key_pair = hash(pair->key, ht->capacity);
-  ht->storage[hash_key_pair] = pair;
+  int hashed_key_pair = hash(pair->key, ht->capacity);
+  ht->storage[hashed_key_pair] = pair;
 }
 
 /****
@@ -111,6 +111,11 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int hashed_key_pair = hash(key, ht->capacity);
+  Pair *retrieved_pair = ht->storage[hashed_key_pair];
+  if (retrieved_pair != NULL) {
+    return retrieved_pair->value;
+  }
   return NULL;
 }
 
