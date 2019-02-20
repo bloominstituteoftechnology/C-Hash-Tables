@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L // POSIX extension for strdup()
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -70,7 +71,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -84,7 +87,9 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  Pair *pair = create_pair(key, value);
+  int hashed_key = hash(pair->key, ht->capacity);
+  ht->storage[hashed_key] = pair;
 }
 
 /****
@@ -92,10 +97,10 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void hash_table_remove(BasicHashTable *ht, char *key)
-{
+// void hash_table_remove(BasicHashTable *ht, char *key)
+// {
 
-}
+// }
 
 /****
   Fill this in.
@@ -104,6 +109,11 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int hashed_key = hash(key, ht->capacity);
+  Pair *copy = ht->storage[hashed_key];
+  if (copy != NULL) {
+    return copy->value;
+  }
   return NULL;
 }
 
@@ -112,10 +122,10 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void destroy_hash_table(BasicHashTable *ht)
-{
+// void destroy_hash_table(BasicHashTable *ht)
+// {
 
-}
+// }
 
 
 #ifndef TESTING
@@ -127,15 +137,15 @@ int main(void)
 
   printf("%s", hash_table_retrieve(ht, "line"));
 
-  hash_table_remove(ht, "line");
+  // hash_table_remove(ht, "line");
 
-  if (hash_table_retrieve(ht, "line") == NULL) {
-    printf("...gone tomorrow. (success)\n");
-  } else {
-    fprintf(stderr, "ERROR: STILL HERE\n");
-  }
+  // if (hash_table_retrieve(ht, "line") == NULL) {
+  //   printf("...gone tomorrow. (success)\n");
+  // } else {
+  //   fprintf(stderr, "ERROR: STILL HERE\n");
+  // }
 
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
 
   return 0;
 }
