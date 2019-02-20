@@ -86,8 +86,8 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  unsigned int index = hash(key, ht->capacity);
-  if(ht->storage[index]){
+  unsigned int hashkey = hash(key, ht->capacity);
+  if(ht->storage[hashkey]){
     printf("No stop you\'ll kill him");
   } else {
     create_pair(key, value);
@@ -102,8 +102,9 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  int hashkey = hash(key,ht->capacity);
-  destroy_pair(hashkey)
+  unsigned int hashkey = hash(key,ht->capacity);
+  destroy_pair(hashkey);
+  ht->storage[hashkey] = NULL;
 
 }
 
