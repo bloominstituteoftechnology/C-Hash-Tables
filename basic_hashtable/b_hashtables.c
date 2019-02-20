@@ -118,7 +118,20 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  int i;
+  char *hash_key;
+
+  hash_key = strdup(key);
+  i = hash(hash_key, ht->capacity);
+
+  if (ht->storage[i] == NULL)
+  {
+    return NULL;
+  }
+  else
+  {
+    return ht->storage[i]->value;
+  }
 }
 
 /****
