@@ -135,6 +135,21 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    if (ht->storage[i] != NULL)
+    {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  if (ht->storage != NULL)
+  {
+    free(ht->storage);
+  }
+  if (ht != NULL)
+  {
+    free(ht);
+  }
 }
 
 #ifndef TESTING
@@ -157,7 +172,7 @@ int main(void)
   //   fprintf(stderr, "ERROR: STILL HERE\n");
   // }
 
-  // destroy_hash_table(ht);
+  destroy_hash_table(ht);
 
   return 0;
 }
