@@ -123,7 +123,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
   int hashed = hash(key, ht->capacity);
   if(ht->storage[hashed] == NULL){
-    printf("Value is not retrievable, returns NULL");
+    return NULL;
   }else{
     return(ht->storage[hashed]->value); //returns only the value of the pair with speciefied key
   }
@@ -141,7 +141,7 @@ void destroy_hash_table(BasicHashTable *ht)
     destroy_pair(ht->storage[i]); //goes through each pair and destroys it (so evil mwhahaha)
   }
   free(ht->storage);
-  free(ht);
+  free(ht); // wouldn't let me free(ht-> capacity) so I just free'd the whole thing
 }
 
 
