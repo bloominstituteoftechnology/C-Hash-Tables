@@ -109,7 +109,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
   if(ht->storage[hashed] == NULL){
     printf("The value with that key is null");
   }else{
-    destroy_pair(ht->storage[hashed]); //destroys pair
+    destroy_pair(ht->storage[hashed]); //destroys pair / free's all the malloc'd memory
     ht->storage[hashed] = NULL; //resets value back to NULL
   }
 }
@@ -121,6 +121,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int hashed = hash(key, ht->capacity);
+  if(ht->storage[hashed] == NULL){
+    printf("Value is not retrievable, returns NULL");
+  }else{
+    return(ht->storage[hashed]->value); //returns only the value of the pair with speciefied key
+  }
   return NULL;
 }
 
@@ -131,7 +137,11 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++){
+    destroy_pair(ht->storage[i]); //goes through each pair and destroys it (so evil mwhahaha)
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
