@@ -103,7 +103,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   unsigned int hashkey = hash(key,ht->capacity);
-  destroy_pair(hashkey);
+  destroy_pair(ht->storage[hashkey]);
   ht->storage[hashkey] = NULL;
 
 }
