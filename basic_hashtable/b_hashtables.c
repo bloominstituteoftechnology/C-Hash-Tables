@@ -74,13 +74,13 @@ BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(char *) * capacity);
+  ht->storage = calloc(capacity, sizeof(char **) * capacity);
 
   return ht;
 }
 
 /****
-  Fill this in.
+  Fill this in.`
 
   If you are overwriting a value with a different key, print a warning.
 
@@ -88,6 +88,14 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  // create pair
+  Pair *new_pair = create_pair(key, value);
+  // hash key to find index
+  int index = hash(key, ht->capacity);
+  if (ht->storage[index] == NULL)
+  {
+    ht->storage[index] = new_pair;
+  }
 }
 
 /****
@@ -106,7 +114,18 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  // hash
+  int index = hash(key, ht->capacity);
+  char *value = ht->storage[index]->value;
+
+  if (value != NULL)
+  {
+    return value;
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 /****
@@ -127,18 +146,18 @@ int main(void)
 
   printf("%s", hash_table_retrieve(ht, "line"));
 
-  hash_table_remove(ht, "line");
+  // hash_table_remove(ht, "line");
 
-  if (hash_table_retrieve(ht, "line") == NULL)
-  {
-    printf("...gone tomorrow. (success)\n");
-  }
-  else
-  {
-    fprintf(stderr, "ERROR: STILL HERE\n");
-  }
+  // if (hash_table_retrieve(ht, "line") == NULL)
+  // {
+  //   printf("...gone tomorrow. (success)\n");
+  // }
+  // else
+  // {
+  //   fprintf(stderr, "ERROR: STILL HERE\n");
+  // }
 
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
 
   return 0;
 }
