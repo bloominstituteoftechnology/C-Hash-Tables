@@ -88,7 +88,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   if(key == NULL || value == NULL){
     printf("Either the key or value is NULL");
   }
-  int hashed = hash(value, ht->capacity);//creates an index value
+  int hashed = hash(key, ht->capacity);//creates an index value
   if(ht->storage[hashed] != NULL){
     printf("That index already has a value");
     exit(1);
@@ -105,7 +105,13 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int hashed = hash(key, ht->capacity);
+  if(ht->storage[hashed] == NULL){
+    printf("The value with that key is null");
+  }else{
+    destroy_pair(ht->storage[hashed]); //destroys pair
+    ht->storage[hashed] = NULL; //resets value back to NULL
+  }
 }
 
 /****
