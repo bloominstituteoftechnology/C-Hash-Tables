@@ -109,6 +109,21 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  char *hash_key;
+  int i;
+
+  hash_key = strdup(key);
+  i = hash(hash_key, ht->capacity);
+
+  if (ht->storage[i] == NULL)
+  {
+    printf("The key, %s, has nothing there.\n", key);
+  }
+  else
+  {
+    destroy_pair(ht->storage[i]);
+    ht->storage[i] = NULL;
+  }
 }
 
 /****
