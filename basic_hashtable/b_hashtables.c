@@ -90,6 +90,15 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  unsigned hash_idx = hash(key, ht->capacity);
+
+  if (ht->storage[hash_idx])
+  {
+    fprintf(stderr, "Warning: Overwriting a value with a different key");
+    destroy_pair(ht->storage[hash_idx]);
+  }
+
+  ht->storage[hash_idx] = create_pair(key, value);
 }
 
 /****
@@ -108,7 +117,14 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned hash_idx = hash(key, ht->capacity);
+
+  if (ht->storage[hash_idx] == NULL)
+  {
+    return NULL;
+  }
+
+  return ht->storage[hash_idx]->value;
 }
 
 /****
@@ -129,18 +145,18 @@ int main(void)
 
   printf("%s", hash_table_retrieve(ht, "line"));
 
-  hash_table_remove(ht, "line");
+  // hash_table_remove(ht, "line");
 
-  if (hash_table_retrieve(ht, "line") == NULL)
-  {
-    printf("...gone tomorrow. (success)\n");
-  }
-  else
-  {
-    fprintf(stderr, "ERROR: STILL HERE\n");
-  }
+  // if (hash_table_retrieve(ht, "line") == NULL)
+  // {
+  //   printf("...gone tomorrow. (success)\n");
+  // }
+  // else
+  // {
+  //   fprintf(stderr, "ERROR: STILL HERE\n");
+  // }
 
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
 
   return 0;
 }
