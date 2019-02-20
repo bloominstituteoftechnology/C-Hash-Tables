@@ -62,13 +62,13 @@ Now, let's say our hash function maps the keys like so:
 
 Our array would look something like this:
 
-`0` = `<"a", "aardvark">  ->  NULL`
+`0` = `<"a", "aardvark"> -> NULL`
 
-`1` = `<"b", "bear">  ->  NULL`
+`1` = `<"b", "bear"> -> NULL`
 
-`2` = `<"c", "cat">  ->  <"e", "elephant">  ->  NULL`
+`2` = `<"c", "cat"> -> <"e", "elephant"> -> NULL`
 
-`3` = `<"d", "dog">  ->  NULL`
+`3` = `<"d", "dog"> -> NULL`
 
 Now if we want to find the value stored for "e", we would first find it's hashed index (2), then travel through the linked list until we find the key/value pair with a matching key and return the value.
 
@@ -78,11 +78,10 @@ Note that while searching with a hashed index has time complexity of O(1), searc
 
 Due to this performance degradation, most languages, such as Python, will automatically resize the hash table when it reaches a certain capacity. This is done by creating a new hash table (usually doubling in size) and copying each element one-by-one into the new hash table.
 
-
 # Assignments
 
-
 ## DAY 1
+
 Your assignment is to implement a basic hash table in the `basic_hash_table` directory. You should be able to insert, read, and delete elements from the hash table. You do not need to handle collisions but should print a warning when you are overwriting an existing value.
 
 Build your code by typing `make` then `./b_hashtable` in the terminal.
@@ -90,6 +89,7 @@ Build your code by typing `make` then `./b_hashtable` in the terminal.
 Run tests by typing `make tests`.
 
 ## DAY 2
+
 Your assignment is to upgrade your basic hash table to handle collisions with linked list chaining. You should be able to insert an arbitrary amount of elements into your hash table, regardless of table size, and read them back without any data loss. You should also implement a resizing function that doubles the size of your hash table and copies all elements into the new data structure.
 
 Build your code by typing `make` then `./hashtable` in the terminal.
@@ -97,6 +97,7 @@ Build your code by typing `make` then `./hashtable` in the terminal.
 Run tests by typing `make tests`.
 
 ## STRETCH GOALS
+
 Update your HashTable to automatically double in size when it grows past a load factor of 0.7.
 
 Update your HashTable to automatically halve in size when it shrinks past a load factor of 0.2. This should only occur if the HashTable has been resized past the initial size.
