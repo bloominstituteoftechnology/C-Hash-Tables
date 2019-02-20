@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Basic hash table key/value pair
  ****/
-typedef struct Pair {
+typedef struct Pair
+{
   char *key;
   char *value;
 } Pair;
@@ -15,7 +15,8 @@ typedef struct Pair {
 /****
   Basic hash table
  ****/
-typedef struct BasicHashTable {
+typedef struct BasicHashTable
+{
   int capacity;
   Pair **storage;
 } BasicHashTable;
@@ -37,7 +38,8 @@ Pair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(Pair *pair)
 {
-  if (pair != NULL) {
+  if (pair != NULL)
+  {
     free(pair->key);
     free(pair->value);
     free(pair);
@@ -53,15 +55,15 @@ unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
   int c;
-  unsigned char * u_str = (unsigned char *)str;
+  unsigned char *u_str = (unsigned char *)str;
 
-  while ((c = *u_str++)) {
+  while ((c = *u_str++))
+  {
     hash = ((hash << 5) + hash) + c;
   }
 
   return hash % max;
 }
-
 
 /****
   Fill this in.
@@ -74,7 +76,6 @@ BasicHashTable *create_hash_table(int capacity)
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
   ht->capacity = capacity;
   ht->storage = calloc(capacity, sizeof(Pair *));
-
   return ht;
 }
 
@@ -97,10 +98,15 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 
   Don't forget to free any malloc'ed memory!
  ****/
-// void hash_table_remove(BasicHashTable *ht, char *key)
-// {
-
-// }
+void hash_table_remove(BasicHashTable *ht, char *key)
+{
+  int hashed_key = hash(key, ht->capacity);
+  if (ht->storage[hashed_key] != NULL)
+  {
+    free(ht->storage[hashed_key]);
+    ht->storage[hashed_key] = NULL;
+  }
+}
 
 /****
   Fill this in.
@@ -110,9 +116,9 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
   int hashed_key = hash(key, ht->capacity);
-  Pair *copy = ht->storage[hashed_key];
-  if (copy != NULL) {
-    return copy->value;
+  if (ht->storage[hashed_key] != NULL)
+  {
+    return ht->storage[hashed_key]->value;
   }
   return NULL;
 }
@@ -122,11 +128,27 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 
   Don't forget to free any malloc'ed memory!
  ****/
-// void destroy_hash_table(BasicHashTable *ht)
-// {
+void destroy_hash_table(BasicHashTable *ht)
+{
+  if (ht->storage != NULL)
+  {
+    for (int i = 0; i < ht->capacity; i++)
+    {
+      if (ht->storage[i])
+      {
+        int hashed_key = hash(ht->storage[i]->key, ht->capacity);
+        destroy_pair(ht->storage[hashed_key]);
+        free(ht->storage[i]);
+      }
+    }
+    free(ht->storage);
+  }
 
-// }
-
+  if (ht != NULL)
+  {
+    free(ht);
+  }
+}
 
 #ifndef TESTING
 int main(void)
@@ -137,15 +159,18 @@ int main(void)
 
   printf("%s", hash_table_retrieve(ht, "line"));
 
-  // hash_table_remove(ht, "line");
+  hash_table_remove(ht, "line");
 
-  // if (hash_table_retrieve(ht, "line") == NULL) {
-  //   printf("...gone tomorrow. (success)\n");
-  // } else {
-  //   fprintf(stderr, "ERROR: STILL HERE\n");
-  // }
+  if (hash_table_retrieve(ht, "line") == NULL)
+  {
+    printf("...gone tomorrow. (success)\n");
+  }
+  else
+  {
+    fprintf(stderr, "ERROR: STILL HERE\n");
+  }
 
-  // destroy_hash_table(ht);
+  destroy_hash_table(ht);
 
   return 0;
 }
