@@ -71,6 +71,9 @@ unsigned int hash(char *str, int max)
 BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
+  ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -84,6 +87,14 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  unsigned int hash_key = hash(key, ht->capacity);
+  Pair *pair = create_pair(key, value);
+
+  if (ht->storage[hash_key] != NULL){
+    printf("Collision warning\n");
+  }
+  ht->storage[hash_key] = pair;
+
 
 }
 
@@ -94,6 +105,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int hash_key = hash(key, ht->capacity);
+  if (ht->storage[hash_key] == NULL){
+    printf("nothing here to remove\n");
+    return;
+  } else {
+    destroy_pair(ht->storage[hash_key]);
+    ht->storage[hash_key] = NULL;
+  }
 
 }
 
@@ -104,7 +123,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int hash_key = hash(key, ht->capacity);
+  if (ht->storage[hash_key] == NULL){
+    printf("nothing here\n");
+    return NULL;
+  } else {
+    return ht->storage[hash_key]->value;
+  }
 }
 
 /****
@@ -114,7 +139,10 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for (int i=0; i<ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht);
 }
 
 
