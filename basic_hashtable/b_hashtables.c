@@ -132,11 +132,10 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   // hash key to find index
   unsigned int hash_key = hash(key, ht->capacity); 
 
-  if (ht->storage[hash_key] != NULL) { //if storage is occupied...
-
-    return ht->storage[hash_key]->value; // ...return it's contents
-
-  }
+  if (strcmp(ht->storage[hash_key]->key, key) == 0) {
+      return ht->storage[hash_key]->value;
+    }
+    
   return NULL;
 }
 
