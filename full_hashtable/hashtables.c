@@ -143,6 +143,32 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  // Get hash value
+  int hashvalue = hash(key, ht->capacity);
+  // Prepare to search through linked list by setting current pair and previous pair.
+  LinkedPair *currentpair = ht->storage[hashvalue];
+  LinkedPair *previouspair = NULL;
+
+  // Search for match
+  while (currentpair != NULL && strcmp(currentpair->key, key) != 0)
+  {
+    previouspair = currentpair;
+    currentpair = currentpair->next;
+  }
+
+  // if previous pair exists
+  if (previouspair)
+  {
+    // set previous next as current next
+    previouspair->next = currentpair->next;
+  }
+  else
+  {
+    // if no previous pair
+    // set first as current next
+    ht->storage[hashvalue] = currentpair->next;
+  }
+  currentpair = NULL;
 }
 
 /****
