@@ -94,12 +94,22 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   int i;
   LinkedPair *pair;
+  LinkedPair *node;
 
   i = hash(key, ht->capacity);
-  printf("hash:%d\n", i);
   if (ht->storage[i] != NULL)
   {
-    return NULL;
+    node = ht->storage[i];
+    while (node != NULL)
+    {
+
+      if (node->next == NULL)
+      {
+        pair = create_pair(key, value);
+        node->next = pair;
+        break;
+      }
+    }
   }
   else
   {
@@ -205,11 +215,11 @@ int main(void)
 
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
-  // hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
+  hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
 
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
-  // printf("%s", hash_table_retrieve(ht, "line_3"));
+  printf("%s", hash_table_retrieve(ht, "line_3"));
 
   // int old_capacity = ht->capacity;
   // ht = hash_table_resize(ht);
