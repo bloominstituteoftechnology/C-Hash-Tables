@@ -91,6 +91,44 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  // create linked pair
+  LinkedPair *new_pair = create_pair(key, value);
+  // hash its index
+  int index = hash(key, ht->capacity);
+
+  // if there is a linked pair at that index
+  if (ht->storage[index] != NULL)
+  {
+    LinkedPair *current_node = ht->storage[index];
+    // Check if key exists
+    while (1)
+    {
+      // IF KEYS ARE EQUAL
+      if (strcmp(current_node->key, key) == 0)
+      {
+        free(current_node->value);
+        current_node->value = strdup(value);
+        break;
+      }
+      // MOVE TO NEXT NODE
+      if (current_node->next != NULL)
+      {
+        current_node = current_node->next;
+      }
+      // BREAK OUT OF LOOP
+      else
+      {
+        break;
+      }
+    }
+    //
+    current_node->next = new_pair;
+  }
+  // If it's a NULL space in array
+  else
+  {
+    ht->storage[index] = new_pair;
+  }
 }
 
 /****
@@ -115,7 +153,26 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  // hash to get index
+  int index = hash(key, ht->capacity);
+
+  if (ht->storage[index] != NULL)
+  {
+    LinkedPair *current_node = ht->storage[index];
+
+    while (current_node != NULL)
+    {
+      if (strcmp(current_node->key, key) == 0)
+      {
+        return ht->storage[index]->value;
+      }
+      current_node = current_node->next;
+    }
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 /****
@@ -155,13 +212,13 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  int old_capacity = ht->capacity;
-  ht = hash_table_resize(ht);
-  int new_capacity = ht->capacity;
+  // int old_capacity = ht->capacity;
+  // ht = hash_table_resize(ht);
+  // int new_capacity = ht->capacity;
 
-  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
 
   return 0;
 }
