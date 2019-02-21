@@ -130,6 +130,43 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  // get the index of the hashed key
+  unsigned int index = hash(key, ht->capacity);
+
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *previous_pair = NULL;
+
+  // while the current pair has a value and the keys are diff
+  while(current_pair != NULL && strcmp(current_pair->key, key) != 0)
+  {
+    // set previous pair to our current pair
+    // set the current pair to our prevs next
+    previous_pair = current_pair;
+    current_pair = current_pair->next;
+  }
+  // if our current pair is empty
+  if(current_pair == NULL)
+  {
+    // print warning
+    printf("Cannot remove the entry with the key of: %s\n", key);
+  }
+  else
+  {
+    // else if our previous pair is NULL
+    if(previous_pair == NULL)
+    {
+      // set index in storage to the next value of our current pair
+      ht->storage[index] = current_pair->next;
+    }
+    else
+    {
+      // else our previous pair next is our current pair next
+      previous_pair->next = current_pair->next;
+    }
+    current_pair = NULL;
+    
+  }
+  
 
 }
 
