@@ -72,7 +72,7 @@ HashTable *create_hash_table(int capacity)
 {
     HashTable *ht = malloc(sizeof(HashTable));
     ht->capacity = capacity;
-    ht->storage = calloc(capacity, sizeof(LinkedPair));
+    ht->storage = calloc(capacity, sizeof(LinkedPair *));
     return ht;
 }
 
@@ -87,16 +87,25 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-    LinkedPair *newPair = create_pair(key, value);
     unsigned int index = hash(key, ht->capacity);
+    LinkedPair *newPair = create_pair(key, value);
     if (ht->storage[index]) {
         LinkedPair *lastPair = ht->storage[index];
-        while (lastPair->next) {
-            lastPair = &lastPair->next;
+        while (1) {
+            if (strcmp(lastPair->key, key) == 0) {
+                lastPair->value = value;
+                break;
+            }
+            if (lastPair->next) {
+                lastPair = lastPair->next;
+            } else {
+                break;
+            }
         }
-        lastPair->next = &newPair;
+        lastPair->next = newPair;
+    } else {
+        ht->storage[index] = newPair;
     }
-    ht->storage[index] = newPair;
 }
 
 /****
@@ -109,17 +118,36 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-    unsigned int index = hash(key, ht->capacity);
-    LinkedPair *pairToRemove = ht->storage[index];
+    unsigned int hashed_key = hash(key, ht->capacity);
     
-    while (strcmp(key, pairToRemove->key)) {
-        pairToRemove = &pairToRemove->next;
+    if (ht->storage[hashed_key] == NULL)
+    {
+        printf("Key not found!\n");
+        return;
     }
     
-    LinkedPair *tmpPair = &pairToRemove;
-    pairToRemove = &pairToRemove->next;
-    destroy_pair(tmpPair);
+    LinkedPair *current = ht->storage[hashed_key];
+    
+    if (strcmp(current->key, key) == 0)
+    {
+        ht->storage[hashed_key] = current->next;
+        destroy_pair(current);
+        return;
+    }
+    
+    while (current != NULL)
+    {
+        if (strcmp(current->next->key, key) == 0)
+        {
+            LinkedPair *to_destroy = current->next;
+            current->next = current->next->next;
+            destroy_pair(to_destroy);
+            return;
+        }
+        current = current->next;
+    }
 }
+
 
 /****
   Fill this in.
@@ -132,10 +160,17 @@ void hash_table_remove(HashTable *ht, char *key)
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
     unsigned int index = hash(key, ht->capacity);
-    LinkedPairs *pair = ht->storage[index];
     if (ht->storage[index]) {
+        LinkedPair *pair = ht->storage[index];
         
-        return ht->storage[index]->value;
+        while (pair) {
+            if (!strcmp(key, pair->key)) {
+                return pair->value;
+            } else {
+                pair = pair->next;
+            }
+        }
+        
     } else {
         return NULL;
     }
@@ -149,14 +184,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 void destroy_hash_table(HashTable *ht)
 {
     for (int i = 0; i < ht->capacity; i++) {
-        LinkedPair *pairToRemove = ht->storage[i];
-        LinkedPair *nextPairToRemove = ht->storage[i]->next;
-        
-        while (pairToRemove->next) {
-            free(pairToRemove);
-            pairToRemove = &nextPairToRemove;
-            nextPairToRemove = &nextPairToRemove->next;
-        }
+        destroy_pair(ht->storage[i]);
     }
     free(ht->storage);
     free(ht);
@@ -172,12 +200,15 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-    HashTable *new_ht = malloc(sizeof(HashTable));
-    new_ht->capacity = ht->capacity * 2;
-    new_ht->storage = realloc(ht->storage, ht->capacity * sizeof(LinkedPair *));
+    HashTable *resized_ht = create_hash_table(ht->capacity * 2);
+    for (int i = 0; i < ht->capacity; i++) {
+        if (!ht->storage[i]) {
+            resized_ht->storage[i] = ht->storage[i];
+        }
+    }
+    
     destroy_hash_table(ht);
-
-    return new_ht;
+    return resized_ht;
 }
 
 
