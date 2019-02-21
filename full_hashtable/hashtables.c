@@ -243,8 +243,28 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
+  // Initialize new hash table
   HashTable *new_ht;
+  new_ht = create_hash_table(ht->capacity * 2);
+  // Set up current pair to traverse through linked list
+  LinkedPair *currentpair;
 
+  // For each hashvalue
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    currentpair = ht->storage[i];
+    // while current pair is not NULL
+    while (currentpair != NULL)
+    {
+      // insert current pair into new hash table
+      hash_table_insert(new_ht, currentpair->key, currentpair->value);
+      // iterate through linked list
+      currentpair = currentpair->next;
+    }
+  }
+  // destroy old hash table
+  destroy_hash_table(ht);
+  // return new hashtable
   return new_ht;
 }
 
@@ -262,11 +282,11 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  // int old_capacity = ht->capacity;
-  // ht = hash_table_resize(ht);
-  // int new_capacity = ht->capacity;
+  int old_capacity = ht->capacity;
+  ht = hash_table_resize(ht);
+  int new_capacity = ht->capacity;
 
-  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
   destroy_hash_table(ht);
   printf("=== End Test ===\n\n");

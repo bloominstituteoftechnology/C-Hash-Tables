@@ -40,7 +40,6 @@ char *basic_hash_table_test()
     return_value = hash_table_retrieve(ht, "key-9");
     mu_assert(strcmp(return_value, "val-9") == 0, "Value is not stored correctly");
 
-
     hash_table_insert(ht, "key-0", "new-val-0");
     hash_table_insert(ht, "key-1", "new-val-1");
     hash_table_insert(ht, "key-2", "new-val-2");
@@ -108,7 +107,8 @@ char *basic_hash_table_test()
     return NULL;
 }
 
-char *hash_table_resizing_test() {
+char *hash_table_resizing_test()
+{
     struct HashTable *ht = create_hash_table(8);
 
     hash_table_insert(ht, "resize-key-0", "resize-val-0");
@@ -151,14 +151,12 @@ char *hash_table_resizing_test() {
     return NULL;
 }
 
-
-
-
 char *all_tests()
 {
     mu_suite_start();
 
     mu_run_test(basic_hash_table_test);
+    mu_run_test(hash_table_resizing_test);
 
     return NULL;
 }
