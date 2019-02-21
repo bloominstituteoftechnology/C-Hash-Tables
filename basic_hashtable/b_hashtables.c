@@ -128,6 +128,11 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int h = hash(key, ht->capacity);
+  if (ht->storage[h] != NULL)
+  {
+    return ht->storage[h]->value;
+  }
   return NULL;
 }
 
