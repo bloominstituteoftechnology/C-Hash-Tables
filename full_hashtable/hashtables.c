@@ -19,7 +19,7 @@ typedef struct HashTable {
   int capacity;
   LinkedPair **storage;
 } HashTable;
-
+//
 /****
   Create a key/value linked pair to be stored in the hash table.
  ****/
