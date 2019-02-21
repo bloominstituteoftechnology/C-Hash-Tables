@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,17 +88,26 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  
   int hashed = hash(key, ht->capacity);
+  
   LinkedPair *newpair = create_pair(key, value);
+  
   LinkedPair *iteratepair = ht->storage[hashed];
+  
+ 
   if (ht->storage[hashed] != NULL) {
+    
     while(iteratepair->next != NULL && iteratepair->key != key) {
       iteratepair = iteratepair->next;
     }
-    //Add them or overwrite.
+    iteratepair->next = newpair;
     
   } else if (ht->storage[hashed] == NULL) {
+      
     ht->storage[hashed] = newpair;
+    fprintf(stderr, "Test %s\n", ht->storage[hashed]->value);
+    
   }
 
 }
@@ -140,7 +150,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
     iteratepair = iteratepair->next;
   }
   if(iteratepair != NULL) {
-    return iteratepair->key;
+    return iteratepair->value;
   }
   return NULL;
   
@@ -153,13 +163,14 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+    
   for(int i = 0; i < ht->capacity; i++) {
-    while(ht->storage != NULL) {
+    while(ht->storage[i] != NULL) {
+      LinkedPair *hold = ht->storage[i]->next;
       free(ht->storage[i]);
-      ht->storage[i] = ht->storage[i]->next;
+      ht->storage[i] = hold;
     }
   }
-  free(ht->capacity);
   free(ht->storage);
   free(ht);
 
@@ -175,8 +186,24 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-
+  HashTable *new_ht = malloc(sizeof(HashTable));
+  new_ht->capacity = ht->capacity * 2;
+  new_ht->storage = calloc(ht->capacity * 2, sizeof(LinkedPair));
+  
+  for(int i = 0; i < ht->capacity; i++) {
+    fprintf(stderr, "Hello\n");
+    LinkedPair *iterator = ht->storage[i];
+    
+    while(iterator != NULL) {
+      fprintf(stderr, "Last");
+      hash_table_insert(new_ht, iterator->key, iterator->value);
+      fprintf(stderr, "Testeee");
+      iterator = iterator->next;
+      fprintf(stderr, "Check\n %s", iterator);
+    }
+  }
+  
+  destroy_hash_table(ht);
   return new_ht;
 }
 
@@ -189,15 +216,16 @@ int main(void)
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
-
+  
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
-
+  
+  
   int old_capacity = ht->capacity;
   ht = hash_table_resize(ht);
   int new_capacity = ht->capacity;
-
+  
   printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
   destroy_hash_table(ht);
