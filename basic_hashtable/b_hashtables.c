@@ -102,14 +102,13 @@ Don't forget to free any malloc'ed memory!
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
     unsigned int i = hash(key, ht->capacity);
-    Pair *pair = ht->storage[i];
-    if (!pair)
+    if (!ht->storage[i])
     {
         fprintf(stderr, "Key not found\n");
         return;
     }
+    destroy_pair(ht->storage[i]);
     ht->storage[i] = NULL;
-    destroy_pair(pair);
 }
 
 /****
