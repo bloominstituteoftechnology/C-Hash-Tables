@@ -111,6 +111,29 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int i = hash(key, ht->capacity);
+  LinkedPair *subject_lp = ht->storage[i];
+  if (!subject_lp)
+  {
+    fprintf(stderr, "Key not found\n");
+    return;
+  }
+  LinkedPair *plp = find_pair(subject_lp, key);
+  if (!plp)
+  {
+    fprintf(stderr, "Key not found\n");
+    return;
+  }
+  if (strcmp(plp->key, key) == 0)
+  {
+    ht->storage[i] = plp->next;
+    destroy_pair(plp);
+    return;
+  }
+  LinkedPair *lp = plp->next;
+  LinkedPair *nlp = lp->next;
+  plp->next = nlp;
+  destroy_pair(lp);
 }
 
 /****
