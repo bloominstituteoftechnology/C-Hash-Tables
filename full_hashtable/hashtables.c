@@ -164,7 +164,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
       // printf("line 164 else statement");
       LinkedPair *head = ht->storage[hashed];
       // printf("%s", head->next->key);
-      while(head != NULL){
+      while(head != NULL){ //what a stupid mistake I had head->next so it would never move to the last value
         // printf("inside while 167: head->key = %s",head->key);
         // printf("inside while 167: key = %s",key);
         if(strcmp(head->key , key) == 0){
@@ -184,7 +184,11 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++){
+    destroy_pair(ht->storage[i]); 
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
@@ -197,9 +201,14 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-
-  return new_ht;
+  HashTable *double_capacity = malloc(sizeof(HashTable));
+  double_capacity->storage = calloc(ht->capacity * 2, sizeof(LinkedPair *));
+  for(int i = 0; i < ht->capacity; i++){
+    double_capacity->storage[i] = ht->storage[i];
+  }
+  double_capacity->capacity = ht->capacity * 2;
+  destroy_hash_table(ht);
+  return double_capacity;
 }
 
 
@@ -222,7 +231,7 @@ int main(void)
 
   printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  // destroy_hash_table(ht);
+  destroy_hash_table(ht);
 
   return 0;
 }
