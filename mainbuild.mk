@@ -26,7 +26,7 @@ SO_TARGET=$(patsubst %.a,%.so,$(TARGET))
 # The Target Build
 tests: clean $(TARGET) $(SO_TARGET) tests2
 
-dev: CFLAGS=-g -std=c99 -Wall -Isrc -Wall -Wextra %(OPTFLAGS)
+dev: CFLAGS=-g -Wall -Isrc -Wall -Wextra %(OPTFLAGS)
 dev: all
 
 $(TARGET): CFLAGS += -fPIC

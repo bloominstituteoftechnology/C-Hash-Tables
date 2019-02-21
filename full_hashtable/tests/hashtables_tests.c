@@ -7,7 +7,6 @@ char *basic_hash_table_test()
 
     char *return_value = hash_table_retrieve(ht, "key-0");
     mu_assert(return_value == NULL, "Initialized value is not NULL");
-
     hash_table_insert(ht, "key-0", "val-0");
     hash_table_insert(ht, "key-1", "val-1");
     hash_table_insert(ht, "key-2", "val-2");
@@ -73,16 +72,19 @@ char *basic_hash_table_test()
     return_value = hash_table_retrieve(ht, "key-9");
     mu_assert(strcmp(return_value, "new-val-9") == 0, "Value is not overwritten correctly");
 
+        // printf("here!!!\n");
     hash_table_remove(ht, "key-9");
     hash_table_remove(ht, "key-8");
+
     hash_table_remove(ht, "key-7");
-    hash_table_remove(ht, "key-6");
+    hash_table_remove(ht, "key-6"); 
     hash_table_remove(ht, "key-5");
     hash_table_remove(ht, "key-4");
     hash_table_remove(ht, "key-3");
     hash_table_remove(ht, "key-2");
     hash_table_remove(ht, "key-1");
     hash_table_remove(ht, "key-0");
+
 
     return_value = hash_table_retrieve(ht, "key-0");
     mu_assert(return_value == NULL, "Deleted value is not NULL");
