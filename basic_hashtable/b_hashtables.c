@@ -89,10 +89,11 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  printf("\nIN INSERT....\n");
       //first generate a HASH-KEY for given key using hash function which will be an index.
       int hash_key_index = hash(key, ht->capacity);
       //check for generated hash_key already value present?
-      if(! ht->storage[hash_key_index]) {
+      if(ht->storage[hash_key_index] != NULL) {
             //if yes print warning of overwriting.
             printf("\nOVERWRITING.........\n");
             //Don't forget to free any malloc'ed memory ..create_pair()
@@ -112,8 +113,8 @@ void hash_table_remove(BasicHashTable *ht, char *key)
       //generate hash_key for given key 
       int hash_key_index = hash(key, ht->capacity);
       //check for key-value
-      if(! ht->storage[hash_key_index]) {
-            //ht->storage[hash_key_index] = NULL;
+      if(ht->storage[hash_key_index] != NULL) {
+            ht->storage[hash_key_index] = NULL;
             //Don't forget to free any malloc'ed memory.
             destroy_pair(ht->storage[hash_key_index]);
       } 
@@ -169,13 +170,13 @@ void destroy_hash_table(BasicHashTable *ht)
 #ifndef TESTING
 int main(void)
 {
-  struct BasicHashTable *ht = create_hash_table(16);
+  struct BasicHashTable *ht = create_hash_table(16); //Basic hash table..
 
-  hash_table_insert(ht, "line", "Here today...\n");
+  hash_table_insert(ht, "line", "Here today...\n");//IN INSERT
 
-  printf("%s", hash_table_retrieve(ht, "line"));
+  printf("%s", hash_table_retrieve(ht, "line")); // Here today
 
-  hash_table_remove(ht, "line");
+  hash_table_remove(ht, "line"); //line :here today removed..
 
   if (hash_table_retrieve(ht, "line") == NULL) {
     printf("...gone tomorrow. (success)\n");
