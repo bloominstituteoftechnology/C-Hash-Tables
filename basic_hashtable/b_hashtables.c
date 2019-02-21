@@ -70,7 +70,14 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  // Allocate memory for the BasicHashTable struct
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+
+  // Set initial value for capacity
+  ht->capacity = capacity;
+
+  // Allocate memory for storage
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -84,7 +91,36 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  // Create a hashed key
+  unsigned int hashed_key = hash(key, ht->capacity);
 
+  // If the space is occupied
+  if (ht->storage[hashed_key] != NULL)
+  {
+    // and if the keys do not match
+    if (strcmp(ht->storage[hashed_key]->key, key) != 0)
+    {
+      // print a warning stating that the key will be overwritten
+      printf("Previous key is being overwritten.\n");
+    }
+    // else if the keys match
+    else
+    {
+      // and if the values match
+      if (strcmp(ht->storage[hashed_key]->value, value) == 0)
+      {
+        // print an error stating that the key/value pair already exists and exit
+        fprintf(stderr, "Key '%s' and value '%s' already exist.\n", key, value);
+        exit(1);
+      }
+    }
+
+    // then free the occupied space
+    destroy_pair(ht->storage[hashed_key]);
+  }
+
+  // finally, create a new key/value pair and insert it into that space
+  ht->storage[hashed_key] = create_pair(key, value);
 }
 
 /****
@@ -94,7 +130,25 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  // create a hashed key
+  unsigned int hashed_key = hash(key, ht->capacity);
 
+  // if that space is not empty
+  if (ht->storage[hashed_key] != NULL)
+  {
+    // and if the keys match up
+    if (strcmp(ht->storage[hashed_key]->key, key) == 0)
+    {
+      // free up the memory held in that space, set to NULL, and return
+      destroy_pair(ht->storage[hashed_key]);
+      ht->storage[hashed_key] = NULL;
+      return;
+    }
+  }
+
+  // otherwise, print a key not found error and exit
+  fprintf(stderr, "Key '%s' not found.\n", key);
+  exit(1);
 }
 
 /****
@@ -104,6 +158,21 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  // create a hashed key
+  unsigned int hashed_key = hash(key, ht->capacity);
+
+  // if the space is not empty
+  if (ht->storage[hashed_key] != NULL)
+  {
+    // and if the keys match
+    if (strcmp(ht->storage[hashed_key]->key, key) == 0)
+    {
+      // return the value at that space
+      return ht->storage[hashed_key]->value;
+    }
+  }
+
+  // otherwise return NULL as the key will not have been found
   return NULL;
 }
 
@@ -114,7 +183,21 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  // free up any and all key/value pairs in storage
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    if (ht->storage[i] != NULL)
+    {
+      destroy_pair(ht->storage[i]);
+      ht->storage[i] = NULL;
+    }
+  }
 
+  // free up storage
+  if (ht->storage != NULL) free(ht->storage);
+
+  // free up the hash table
+  if (ht != NULL) free(ht);
 }
 
 
