@@ -70,7 +70,10 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht =malloc(sizeof(HashTable));
+
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(char *));
 
   return ht;
 }
@@ -86,6 +89,33 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+   //create new node using Pair struct from above
+  LinkedPair *new_node = create_pair(key, value); 
+
+  // create array index to insert new node into 
+  unsigned int new_index = hash(key, ht->capacity); 
+
+  if (ht->storage[new_index] == 0) { // if current index is empty, insert new_node
+    ht->storage[new_index] = new_node;
+  }
+
+   else {
+    while (ht->storage[new_index] != 0) { 
+      // if the keys are the same, replace current value with new value
+      if (strcmp(ht->storage[new_index]->key, key) == 0) { 
+        ht->storage[new_index]->value = value;
+        break;
+      }
+      // if keys are different AND there's an available "next" slot, insert in next slot
+      else if (strcmp(ht->storage[new_index]->key, key) != 0 && ht->storage[new_index]->next == NULL) {
+        ht->storage[new_index]->next = new_node;
+        break;
+      }
+      //attach linked list node
+      ht->storage[new_index] = ht->storage[new_index]->next;
+    }
+  }
+
 
 }
 
@@ -99,7 +129,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  
 }
 
 /****
@@ -112,7 +142,7 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  
 }
 
 /****
