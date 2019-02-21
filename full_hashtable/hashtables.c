@@ -87,7 +87,30 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  if(key == NULL || value == NULL){
+    printf("Either the key or value is NULL");
+  }
+  int hashed = hash(key, ht->capacity);//creates an index value
+  if(ht->storage[hashed] != NULL){
+    printf("That index already has a value");
+    exit(1);
+  }else{
+    LinkedPair *p = create_pair(key, value); //creates a new pair
+    if(ht->storage[hashed] == NULL){ //if index is already empty just place in there
+      ht->storage[hashed] = p;
+    }else{
+      LinkedPair *head = ht->storage[hashed];
+      int b_continue = 0;
+      while(!b_continue){//use arrows notation not dot
+        if(head->next == NULL){
+          head->next = p;
+          b_continue = 1;
+        }
+        head = head->next;
+      }
+    }
+    
+  }
 }
 
 /****
