@@ -99,7 +99,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   if (ht->storage[index])
   {
     LinkedPair *pair = ht->storage[index];
-    while (pair->key)
+    while (pair != NULL)
     {
       if (strcmp(pair->key, key) == 0)
       {
@@ -107,7 +107,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
         break;
       }
-      else if (!pair->next)
+      else if (pair->next == NULL)
       {
         pair->next = new_pair;
 
@@ -142,11 +142,11 @@ void hash_table_remove(HashTable *ht, char *key)
     if (strcmp(pair->key, key) == 0)
     {
       destroy_pair(pair);
-      ht->storage[index] = NULL;
+      ht->storage[index] == NULL;
     }
     else
     {
-      while (pair->next)
+      while (pair->next != NULL)
       {
         if (strcmp(pair->next->key, key) == 0)
         {
@@ -158,7 +158,7 @@ void hash_table_remove(HashTable *ht, char *key)
 
           break;
         }
-        else if (!pair->next->next)
+        else if (pair->next->next == NULL)
         {
           printf("no element with that key");
 
@@ -191,7 +191,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   {
     LinkedPair *pair = ht->storage[index];
 
-    while (pair->key)
+    while (pair != NULL)
     {
       if (strcmp(pair->key, key) == 0)
       {
@@ -212,6 +212,31 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  if (ht != NULL)
+  {
+    for (int i = 0; i < ht->capacity; i++)
+    {
+      destroy_pair_chain(ht->storage[i]);
+    }
+
+    free(ht->capacity);
+    free(ht->storage);
+    free(ht);
+  }
+}
+
+void destroy_pair_chain(LinkedPair *pair)
+{
+  if (pair != NULL)
+  {
+    LinkedPair *next_pair = pair->next;
+
+    destroy_pair(pair);
+    if (next_pair != NULL)
+    {
+      destroy_pair_chain(next_pair);
+    }
+  }
 }
 
 /****
