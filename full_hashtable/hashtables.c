@@ -125,7 +125,17 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  // get that hash
+  unsigned int hash_key = hash(key, ht->capacity);
 
+  // go through linked pair list for the key that matches and remove it
+  if (ht->storage[hash_key] != NULL) {
+    destroy_pair(ht->storage[hash_key]);
+    ht->storage[hash_key] = NULL;
+  } else { 
+    printf("No key found");
+    exit(1);
+  }
 }
 
 /****
