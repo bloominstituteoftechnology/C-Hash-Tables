@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Hash table key/value pair with linked list pointer
  ****/
-typedef struct LinkedPair {
+typedef struct LinkedPair
+{
   char *key;
   char *value;
   struct LinkedPair *next;
@@ -15,7 +15,8 @@ typedef struct LinkedPair {
 /****
   Hash table with linked pairs
  ****/
-typedef struct HashTable {
+typedef struct HashTable
+{
   int capacity;
   LinkedPair **storage;
 } HashTable;
@@ -38,7 +39,8 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) {
+  if (pair != NULL)
+  {
     free(pair->key);
     free(pair->value);
     free(pair);
@@ -54,9 +56,10 @@ unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
   int c;
-  unsigned char * u_str = (unsigned char *)str;
+  unsigned char *u_str = (unsigned char *)str;
 
-  while ((c = *u_str++)) {
+  while ((c = *u_str++))
+  {
     hash = ((hash << 5) + hash) + c;
   }
 
@@ -72,7 +75,8 @@ HashTable *create_hash_table(int capacity)
 {
   HashTable *ht = malloc(sizeof(HashTable));
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(LinkedPair *));;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
+  ;
 
   return ht;
 }
@@ -88,31 +92,32 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-   // get that hash
+  // get that hash
   unsigned int hash_key = hash(key, ht->capacity);
 
-   //  see if index is occupied
+  //  see if index is occupied
   // --> if (ht->storage[index] != NULL)
   LinkedPair *current_pair = ht->storage[hash_key];
   LinkedPair *last_pair;
 
-
-   // if it is occupied go through linkedpairs to find a pari that has the same key     
-  while (current_pair != NULL && strcmp( current_pair->key, key ) != 0) {
-    last_pair = current_pair; 
-    current_pair = last_pair->next; 
+  // if it is occupied go through linkedpairs to find a pari that has the same key
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0)
+  {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
   }
 
-   if (current_pair != NULL) {
+  if (current_pair != NULL)
+  {
     current_pair->value = value;
-  } else {
+  }
+  else
+  {
     // if it isnt occupied add a  new linkedpair
     LinkedPair *new_pair = create_pair(key, value);
     new_pair->next = ht->storage[hash_key];
     ht->storage[hash_key] = new_pair;
-  }  
-
-
+  }
 }
 
 /****
@@ -129,10 +134,13 @@ void hash_table_remove(HashTable *ht, char *key)
   unsigned int hash_key = hash(key, ht->capacity);
 
   // go through linked pair list for the key that matches and remove it
-  if (ht->storage[hash_key] != NULL) {
+  if (ht->storage[hash_key] != NULL)
+  {
     destroy_pair(ht->storage[hash_key]);
     ht->storage[hash_key] = NULL;
-  } else { 
+  }
+  else
+  {
     printf("No key found");
     exit(1);
   }
@@ -161,17 +169,16 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-    // grab all pairs in storage and destroy the pairs
-  for (int i = 0; i < ht->capacity; i++) {
-    ht->storage[i] = NULL; 
-    destroy_pair(ht->storage[i]);    
+  // grab all pairs in storage and destroy the pairs
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    ht->storage[i] = NULL;
+    destroy_pair(ht->storage[i]);
   }
 
-
-   // free storage and hash table
+  // free storage and hash table
   free(ht->storage);
   free(ht);
-
 }
 
 /****
@@ -184,11 +191,21 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  //new table with double capacity
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+
+  // copy all elements into the new sotrage
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    new_ht->storage[i] = ht->storage[i];
+  }
+
+  // destroy previous table
+  destroy_hash_table(ht);
+  ;
 
   return new_ht;
 }
-
 
 #ifndef TESTING
 int main(void)
