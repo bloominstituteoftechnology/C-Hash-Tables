@@ -70,8 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair));
   return ht;
 }
 
@@ -86,6 +87,18 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  int hashed = hash(key, ht->capacity);
+  LinkedPair *newpair = create_pair(key, value);
+  LinkedPair *iteratepair = ht->storage[hashed];
+  if (ht->storage[hashed] != NULL) {
+    while(iteratepair->next != NULL && iteratepair->key != key) {
+      iteratepair = iteratepair->next;
+    }
+    //Add them or overwrite.
+    
+  } else if (ht->storage[hashed] == NULL) {
+    ht->storage[hashed] = newpair;
+  }
 
 }
 
@@ -99,6 +112,15 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  int hashed = hash(key, ht->capacity);
+  LinkedPair *iteratepair = ht->storage[hashed];
+  while(iteratepair != NULL && strcmp(iteratepair->key, key) != 0) {
+    iteratepair = iteratepair->next;
+  }
+  iteratepair = NULL;
+  destroy_pair(iteratepair);
+  
+  // Remove linkedpair. Free and set to null.
 
 }
 
@@ -112,7 +134,16 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int hashed = hash(key, ht->capacity);
+  LinkedPair *iteratepair = ht->storage[hashed];
+  while(iteratepair != NULL && strcmp(iteratepair->key, key) != 0) {
+    iteratepair = iteratepair->next;
+  }
+  if(iteratepair != NULL) {
+    return iteratepair->key;
+  }
   return NULL;
+  
 }
 
 /****
@@ -122,6 +153,15 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for(int i = 0; i < ht->capacity; i++) {
+    while(ht->storage != NULL) {
+      free(ht->storage[i]);
+      ht->storage[i] = ht->storage[i]->next;
+    }
+  }
+  free(ht->capacity);
+  free(ht->storage);
+  free(ht);
 
 }
 
