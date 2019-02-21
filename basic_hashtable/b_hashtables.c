@@ -75,7 +75,7 @@ BasicHashTable *create_hash_table(int capacity)
   BasicHashTable *ht;
   ht = malloc(sizeof(BasicHashTable));
   ht->capacity = capacity;
-  ht->storage = (Pair **)calloc(capacity, sizeof(Pair));
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -96,6 +96,8 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   if (ht->storage[i] != NULL)
   {
     printf("WARNING! Overwriting a value!\n");
+    Pair *old_pair = ht->storage[i];
+    free(old_pair);
   }
 
   ht->storage[i] = create_pair(key, value);
