@@ -106,8 +106,8 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
         head = head->next;
       }
     }
-  printf("key = %s", ht->storage[hashed]->key);
-  printf("\nvalue=%s\n", ht->storage[hashed]->value);
+  // printf("key = %s", ht->storage[hashed]->key);
+  // printf("\nvalue=%s\n", ht->storage[hashed]->value);
 }
 
 /****
@@ -153,14 +153,18 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 {
   int hashed = hash(key, ht->capacity);
   if(ht->storage[hashed] == NULL){
+    printf("returning null");
     return NULL;
   }else{
-    if(ht->storage[hashed]->key == key){
+    // printf("\nKey to compare %s", ht->storage[hashed]->key);
+    // printf("actual key: %s\n",key);
+    if(strcmp(ht->storage[hashed]->key , key) == 0){
       return ht->storage[hashed]->value;
     }else{
+      printf("line 164 else statement");
       LinkedPair *head = ht->storage[hashed];
       while(head->next != NULL){
-        if(head->key == key){
+        if(strcmp(head->key , key) == 0){
           return head->value;
         }
         head = head->next;
