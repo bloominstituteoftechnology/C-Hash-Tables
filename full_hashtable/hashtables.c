@@ -138,7 +138,8 @@ void hash_table_remove(HashTable *ht, char *key)
           destroy_pair(head->next);
           return;
         }
-      head = head->next;
+        head = head->next;
+      }
     }
   }
 }
@@ -153,6 +154,22 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int hashed = hash(key, ht->capacity);
+  if(ht->storage[hashed] == NULL){
+    return NULL;
+  }else{
+    if(ht->storage[hashed]->key == key){
+      return ht->storage[hashed]->value;
+    }else{
+      LinkedPair *head = ht->storage[hashed];
+      while(head->next != NULL){
+        if(head->key == key){
+          return head->value;
+        }
+        head = head->next;
+      }
+    }
+  }
   return NULL;
 }
 
