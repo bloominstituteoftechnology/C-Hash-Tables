@@ -73,6 +73,8 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
+  printf("making a new table\n"); // <--- TESTING
+
   HashTable *ht = malloc(sizeof(HashTable));
 
   ht->capacity = capacity;
@@ -92,6 +94,8 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  printf("insterting element\n"); // <--- TESTING
+
   unsigned int index = hash(key, ht->capacity);
 
   LinkedPair *new_pair = create_pair(key, value);
@@ -133,6 +137,8 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  printf("removing element\n"); // <--- TESTING
+
   unsigned int index = hash(key, ht->capacity);
 
   if (ht->storage[index])
@@ -160,7 +166,7 @@ void hash_table_remove(HashTable *ht, char *key)
         }
         else if (pair->next->next == NULL)
         {
-          printf("no element with that key");
+          printf("no element with that key\n");
 
           break;
         }
@@ -171,7 +177,7 @@ void hash_table_remove(HashTable *ht, char *key)
   }
   else
   {
-    printf("no element with that key");
+    printf("no element with that key\n");
   }
 }
 
@@ -185,6 +191,8 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  printf("retrieving an element\n"); // <--- TESTING
+
   unsigned int index = hash(key, ht->capacity);
 
   if (ht->storage[index])
@@ -226,6 +234,8 @@ void destroy_pair_chain(LinkedPair *pair)
 
 void destroy_hash_table(HashTable *ht)
 {
+  printf("destroying a table\n"); // <--- TESTING
+
   if (ht != NULL)
   {
     for (int i = 0; i < ht->capacity; i++)
@@ -233,7 +243,6 @@ void destroy_hash_table(HashTable *ht)
       destroy_pair_chain(ht->storage[i]);
     }
 
-    free(ht->capacity);
     free(ht->storage);
     free(ht);
   }
@@ -249,6 +258,8 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
+  printf("resizing a table\n"); // <--- TESTING
+
   if (ht != NULL)
   {
     HashTable *new_ht = create_hash_table(ht->capacity * 2);
