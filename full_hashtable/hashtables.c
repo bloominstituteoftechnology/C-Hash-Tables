@@ -113,6 +113,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
         break;
       }
+
       pair = pair->next;
     }
   }
@@ -163,6 +164,7 @@ void hash_table_remove(HashTable *ht, char *key)
 
           break;
         }
+
         pair = pair->next;
       }
     }
@@ -183,6 +185,23 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+
+  if (ht->storage[index])
+  {
+    LinkedPair *pair = ht->storage[index];
+
+    while (pair->key)
+    {
+      if (strcmp(pair->key, key) == 0)
+      {
+        return pair->value;
+      }
+
+      pair = pair->next;
+    }
+  }
+
   return NULL;
 }
 
