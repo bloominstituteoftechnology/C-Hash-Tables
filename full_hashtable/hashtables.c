@@ -249,9 +249,28 @@ void destroy_pair_chain(LinkedPair *pair)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  if (ht != NULL)
+  {
+    HashTable *new_ht = create_hash_table(ht->capacity * 2);
 
-  return new_ht;
+    for (int i = 0; i < ht->capacity; i++)
+    {
+      LinkedPair *pair = ht->storage[i];
+
+      while (pair != NULL)
+      {
+        hash_table_insert(new_ht, pair->key, pair->value);
+
+        pair = pair->next;
+      }
+    }
+
+    destroy_hash_table(ht);
+
+    return new_ht;
+  }
+
+  return NULL;
 }
 
 #ifndef TESTING
