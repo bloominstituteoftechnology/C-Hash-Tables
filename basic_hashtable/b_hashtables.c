@@ -89,7 +89,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
     if (ht->storage[i])
     {
         fprintf(stderr, "Overwrote previous Pair\n");
-        free(ht->storage[i]);
+        destroy_pair(ht->storage[i]);
     }
     ht->storage[i] = create_pair(key, value);
 }
@@ -123,6 +123,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
     Pair *pair = ht->storage[i];
     if (!pair)
     {
+        fprintf(stderr, "Key not found\n");
         return NULL;
     }
     return pair->value;
@@ -137,7 +138,10 @@ void destroy_hash_table(BasicHashTable *ht)
 {
     for (int i = 0; i < ht->capacity; i++)
     {
-        free(ht->storage[i]);
+        if (ht->storage[i])
+        {
+            destroy_pair(ht->storage[i]);
+        }
     }
     free(ht->storage);
     free(ht);

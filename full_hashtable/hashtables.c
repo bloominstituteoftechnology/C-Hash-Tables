@@ -76,20 +76,20 @@ HashTable *create_hash_table(int capacity)
     return ht;
 }
 
-void append_to_end_of_pairs(LinkedPair *slp, LinkedPair *elp)
+void append_to_end_of_pairs(LinkedPair *start_lp, LinkedPair *end_lp)
 {
-    if (strcmp(elp->key, slp->key) == 0)
+    if (strcmp(end_lp->key, start_lp->key) == 0)
     {
         fprintf(stderr, "Key already exists\n");
         return;
     }
-    LinkedPair *next = slp->next;
+    LinkedPair *next = start_lp->next;
     if (!next)
     {
-        slp->next = elp;
+        start_lp->next = end_lp;
         return;
     }
-    append_to_end_of_pairs(slp, elp);
+    append_to_end_of_pairs(start_lp, end_lp);
 }
 
 /****
@@ -104,14 +104,14 @@ void append_to_end_of_pairs(LinkedPair *slp, LinkedPair *elp)
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
     unsigned int i = hash(key, ht->capacity);
-    LinkedPair *slp = ht->storage[i];
-    LinkedPair *elp = create_pair(key, value);
-    if (slp)
+    LinkedPair *start_lp = ht->storage[i];
+    LinkedPair *end_lp = create_pair(key, value);
+    if (start_lp)
     {
-        append_to_end_of_pairs(slp, elp);
+        append_to_end_of_pairs(start_lp, end_lp);
         return;
     }
-    ht->storage[i] = elp;
+    ht->storage[i] = end_lp;
 }
 
 /// Returns pair before query
@@ -146,13 +146,13 @@ LinkedPair *find_pair(LinkedPair *lp, char *query)
 void hash_table_remove(HashTable *ht, char *key)
 {
     unsigned int i = hash(key, ht->capacity);
-    LinkedPair *slp = ht->storage[i];
-    if (!slp)
+    LinkedPair *subject_lp = ht->storage[i];
+    if (!subject_lp)
     {
         fprintf(stderr, "Key not found\n");
         return;
     }
-    LinkedPair *plp = find_pair(slp, key);
+    LinkedPair *plp = find_pair(subject_lp, key);
     if (!plp)
     {
         fprintf(stderr, "Key not found\n");
@@ -181,15 +181,16 @@ void hash_table_remove(HashTable *ht, char *key)
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
     unsigned int i = hash(key, ht->capacity);
-    LinkedPair *slp = ht->storage[i];
-    if (!slp)
+    LinkedPair *subject_lp = ht->storage[i];
+    if (!subject_lp)
     {
         fprintf(stderr, "Key not found\n");
         return NULL;
     }
-    LinkedPair *lp = find_pair(slp, key);
+    LinkedPair *lp = find_pair(subject_lp, key);
     if (!lp)
     {
+        fprintf(stderr, "Key not found\n");
         return NULL;
     }
     if (strcmp(lp->key, key) == 0)
@@ -199,10 +200,10 @@ char *hash_table_retrieve(HashTable *ht, char *key)
     return lp->next->value;
 }
 
-void destroy_all_pairs(LinkedPair *slp)
+void destroy_all_pairs(LinkedPair *start_lp)
 {
-    LinkedPair *next = slp->next;
-    free(slp);
+    LinkedPair *next = start_lp->next;
+    destroy_pair(start_lp);
     if (next)
     {
         destroy_all_pairs(next);
