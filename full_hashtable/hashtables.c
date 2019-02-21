@@ -89,7 +89,7 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-   //create new node using Pair struct from above
+   //create new node using LinkedPair struct from above
   LinkedPair *new_node = create_pair(key, value); 
 
   // create array index to insert new node into 
@@ -129,7 +129,27 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  
+  // hash key to find index
+  unsigned int hash_key = hash(key, ht->capacity); 
+  // for readability, new variable
+  LinkedPair *current_node = ht->storage[hash_key]; 
+
+  while (current_node != 0) { // while there's a current node
+    if (strcmp(current_node->key, key) == 0 && current_node->next == 0) { 
+      // are the strings the same? YES --- is there a linked node? --- NO
+      destroy_pair(current_node);
+      break;
+    }
+    else if (strcmp(current_node->key, key) == 0 && current_node->next != 0) { 
+      // are the strings the same? YES ---  is there a linked node? --- YES
+      current_node->key = current_node->next->key;
+      current_node->value = current_node->next->value;
+      current_node->next = current_node->next->next;
+      break;
+    }
+    current_node = current_node->next; 
+  }
+
 }
 
 /****
@@ -142,7 +162,8 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  
+ 
+
 }
 
 /****
