@@ -103,7 +103,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     // if two keys are the same then overwrite value
     if (strcmp(currentpair->key, key) == 0)
     {
-      printf("Overwriting Value");
+      printf("Overwriting Value\n");
       currentpair->value = value;
       break;
     }
@@ -155,6 +155,23 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  // Get hash value
+  int hashvalue = hash(key, ht->capacity);
+  // Prepare to search through linked list by setting up current pair
+  LinkedPair *currentpair = ht->storage[hashvalue];
+  // while currentpair is not NULL
+  while (currentpair)
+  {
+    // if current pair key is equal to key searching for return current pair value
+    if (strcmp(currentpair->key, key) == 0)
+    {
+      return currentpair->value;
+    }
+    // if not keys not equal go to next pair in linked list
+    currentpair = currentpair->next;
+  }
+  // If current node equal to null then element not found
+  printf("Element not found\n");
   return NULL;
 }
 
@@ -185,16 +202,16 @@ HashTable *hash_table_resize(HashTable *ht)
 #ifndef TESTING
 int main(void)
 {
-  printf("=== Begin Test ===\n");
+  printf("\n=== Begin Test ===\n");
   struct HashTable *ht = create_hash_table(2);
 
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
 
-  // printf("%s", hash_table_retrieve(ht, "line_1"));
-  // printf("%s", hash_table_retrieve(ht, "line_2"));
-  // printf("%s", hash_table_retrieve(ht, "line_3"));
+  printf("%s", hash_table_retrieve(ht, "line_1"));
+  printf("%s", hash_table_retrieve(ht, "line_2"));
+  printf("%s", hash_table_retrieve(ht, "line_3"));
 
   // int old_capacity = ht->capacity;
   // ht = hash_table_resize(ht);
@@ -203,7 +220,7 @@ int main(void)
   // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
   // destroy_hash_table(ht);
-  printf("=== End Test ===\n");
+  printf("=== End Test ===\n\n");
   return 0;
 }
 #endif
