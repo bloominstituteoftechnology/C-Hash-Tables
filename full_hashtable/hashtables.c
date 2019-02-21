@@ -123,7 +123,24 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  int hashed = hash(key, ht->capacity);
+  if(ht->storage[hashed] == NULL){
+    printf("The value with that key is null");
+  }else{
+    if(ht->storage[hashed]->next == NULL){
+      destroy_pair(ht->storage[hashed]); //destroys pair / free's all the malloc'd memory
+      ht->storage[hashed] = NULL; //resets value back to NULL
+    }else {// if there is more than one value in the list
+      LinkedPair *head = ht->storage[hashed];
+      while (head->next != NULL) {
+        if (strcmp(head->next->key, key) == 0) {//compares the two keys to see if they match
+          head->next = head->next->next;
+          destroy_pair(head->next);
+          return;
+        }
+      head = head->next;
+    }
+  }
 }
 
 /****
