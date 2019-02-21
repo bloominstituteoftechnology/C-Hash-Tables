@@ -103,21 +103,21 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   {
     // if the hashed index exists and the keys are
     // identical over write the previous value
-    if (strcmp(ht->storage[hashed_key]->key, key))
+    if (strcmp(ht->storage[hashed_key]->key, key) == 0)
     {
       ht->storage[hashed_key]->value = value;
     }
-    // if the hashed index exists but the keys are
-    // different, store this key/value in the previous
-    // pairs->next
-
-    // I am assuming this needs to be ready to go
-    // multiple levels deep so changing my origional
-    // thought to a while loop
-    // ht->storage[hashed_key]->next = linked_pair; //
 
     else
     {
+      // if the hashed index exists but the keys are
+      // different, store this key/value in the previous
+      // pairs->next
+
+      // I am assuming this needs to be ready to go
+      // multiple levels deep so changing my origional
+      // thought to a while loop
+      // ht->storage[hashed_key]->next = linked_pair; //
       LinkedPair *pos_storage = ht->storage[hashed_key]->next;
       while (pos_storage != NULL)
       {
@@ -138,6 +138,33 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int hashed_key = hash(key, ht->capacity);
+  // if the key exists
+  if (ht->storage[hashed_key] != NULL)
+  {
+    // check the keys, if we found a match
+    if (strcmp(ht->storage[hashed_key]->key, key) == 0)
+    {
+      // check to see if it has a child link
+      if (ht->storage[hashed_key]->next != NULL)
+      {
+        LinkedPair *link = ht->storage[hashed_key]->next;
+        destroy_pair(ht->storage[hashed_key]);
+      }
+      else
+      {
+        // has no child link, safe to remove
+      }
+    }
+    else
+    {
+      //keys do not match but there are links to check
+    }
+  }
+  else
+  {
+    fprintf(stderr, "The item with key %s was not found in the hash table", key);
+  }
 }
 
 /****
