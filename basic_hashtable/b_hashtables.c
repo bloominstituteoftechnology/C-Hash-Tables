@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Basic hash table key/value pair
  ****/
@@ -70,7 +69,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -82,9 +83,20 @@ BasicHashTable *create_hash_table(int capacity)
 
   Don't forget to free any malloc'ed memory!
  ****/
+
+
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  unsigned int index = hash(key, ht->capacity);
+  Pair *pair = create_pair(key, value);
+  Pair *stored_pair = ht->storage[index];
+  if (stored_pair != NULL){
+    if(strcmp(key, stored_pair->key) != 0){
+      printf("overwriting value: %s, %s with %s, %s\n",
+       stored_pair->key, stored_pair->value, key, value);
+    }
+  }
+  ht->storage[index] = pair;
 }
 
 /****
@@ -92,9 +104,16 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 
   Don't forget to free any malloc'ed memory!
  ****/
+
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  unsigned int index = hash(key, ht->capacity);
+  if(ht->storage[index] == NULL){
+    printf("Can't remove");
+  } else {
+    destroy_pair(ht->storage[index]);
+    ht->storage[index] = NULL;
+  }
 }
 
 /****
@@ -104,7 +123,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int index = hash(key, ht->capacity);
+  if (ht->storage[index] == NULL){
+    printf("No Value Present");
+    return NULL;
+  }
+
+  return ht->storage[index]->value;
 }
 
 /****
@@ -114,7 +139,13 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for (int i = 0; i< ht->capacity; i++){
+    if(ht->storage[i] != NULL) {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
