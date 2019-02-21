@@ -208,6 +208,29 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  // Prepare to iterate through linked list
+  LinkedPair *currentpair;
+  LinkedPair *deletepair;
+  // iterate through storage of hash table
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    currentpair = ht->storage[i];
+
+    // while current pair not null
+    while (currentpair != NULL)
+    {
+      // prepare to delete the current pair
+      deletepair = currentpair;
+      // go to next pair
+      currentpair = currentpair->next;
+      // destroy pair
+      destroy_pair(deletepair);
+    }
+  }
+  // free storage
+  free(ht->storage);
+  // free hash table
+  free(ht);
 }
 
 /****
@@ -245,7 +268,7 @@ int main(void)
 
   // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  // destroy_hash_table(ht);
+  destroy_hash_table(ht);
   printf("=== End Test ===\n\n");
   return 0;
 }
