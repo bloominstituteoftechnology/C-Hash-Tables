@@ -121,12 +121,13 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
         break;
       }
     }
-    //
+    // ADD PAIR TO NEXT OPEN NODE
     current_node->next = new_pair;
   }
-  // If it's a NULL space in array
+  // IF THERE IS NO LINKED LIST
   else
   {
+    // ADD NODE
     ht->storage[index] = new_pair;
   }
 }
@@ -141,6 +142,28 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  // GET INDEX
+  int index = hash(key, ht->capacity);
+  // DO SOME STUFF
+  if (ht->storage[index] != NULL)
+  {
+    LinkedPair *current_node = ht->storage[index];
+    while (1)
+    {
+      if (strcmp(current_node->key, key) == 0)
+      {
+        destroy_pair(current_node);
+      }
+      if (current_node->next != NULL)
+      {
+        current_node = current_node->next;
+      }
+      else
+      {
+        break;
+      }
+    }
+  }
 }
 
 /****
@@ -182,6 +205,40 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    LinkedPair *current_node = ht->storage[i];
+    // IF THERE IS AT LEAST ONE NODE
+    if (current_node != NULL)
+    {
+      // LOOP THROUGH LINKED LIST
+      while (1)
+      {
+        // IF NODE IN LINKED LIST
+        if (current_node->next != NULL)
+        {
+          destroy_pair(current_node);
+          current_node = current_node->next;
+        }
+        // LAST ITEM IN LINKED LIST - DELETE
+        else
+        {
+          destroy_pair(current_node);
+          break;
+        }
+      }
+    }
+  }
+
+  if (ht->storage != NULL)
+  {
+    free(ht->storage);
+  }
+
+  if (ht != NULL)
+  {
+    free(ht);
+  }
 }
 
 /****
@@ -194,7 +251,17 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  // CREATE NEW HASH TABLE
+  HashTable *new_ht = calloc(ht->capacity * 2, ht->capacity * 2 * sizeof(HashTable));
+  new_ht->capacity = ht->capacity * 2;
+  new_ht->storage = calloc(new_ht->capacity, sizeof(LinkedPair) * new_ht->capacity);
+
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    new_ht->storage[i] = ht->storage[i];
+  }
+
+  destroy_hash_table(ht);
 
   return new_ht;
 }
@@ -212,13 +279,13 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  // int old_capacity = ht->capacity;
-  // ht = hash_table_resize(ht);
-  // int new_capacity = ht->capacity;
+  int old_capacity = ht->capacity;
+  ht = hash_table_resize(ht);
+  int new_capacity = ht->capacity;
 
-  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  // destroy_hash_table(ht);
+  destroy_hash_table(ht);
 
   return 0;
 }
