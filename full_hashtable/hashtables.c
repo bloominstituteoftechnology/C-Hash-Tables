@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Hash table key/value pair with linked list pointer
  ****/
-typedef struct LinkedPair {
+typedef struct LinkedPair
+{
   char *key;
   char *value;
   struct LinkedPair *next;
@@ -15,7 +15,8 @@ typedef struct LinkedPair {
 /****
   Hash table with linked pairs
  ****/
-typedef struct HashTable {
+typedef struct HashTable
+{
   int capacity;
   LinkedPair **storage;
 } HashTable;
@@ -38,7 +39,8 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) {
+  if (pair != NULL)
+  {
     free(pair->key);
     free(pair->value);
     free(pair);
@@ -54,9 +56,10 @@ unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
   int c;
-  unsigned char * u_str = (unsigned char *)str;
+  unsigned char *u_str = (unsigned char *)str;
 
-  while ((c = *u_str++)) {
+  while ((c = *u_str++))
+  {
     hash = ((hash << 5) + hash) + c;
   }
 
@@ -70,7 +73,10 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair));
 
   return ht;
 }
@@ -86,7 +92,40 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int hashed_key = hash(key, ht->capacity);
+  LinkedPair *linked_pair = create_pair(key, value);
+  // if the hashed index is empty store pair
+  if (ht->storage[hashed_key] == NULL)
+  {
+    ht->storage[hashed_key] = linked_pair;
+  }
+  else
+  {
+    // if the hashed index exists and the keys are
+    // identical over write the previous value
+    if (strcmp(ht->storage[hashed_key]->key, key) == 0)
+    {
+      ht->storage[hashed_key]->value = value;
+    }
 
+    else
+    {
+      // if the hashed index exists but the keys are
+      // different, store this key/value in the previous
+      // pairs->next
+
+      // I am assuming this needs to be ready to go
+      // multiple levels deep so changing my origional
+      // thought to a while loop
+      // ht->storage[hashed_key]->next = linked_pair; //
+      LinkedPair *pos_storage = ht->storage[hashed_key]->next;
+      while (pos_storage != NULL)
+      {
+        pos_storage = pos_storage->next;
+      }
+      pos_storage->next = linked_pair;
+    }
+  }
 }
 
 /****
@@ -99,7 +138,53 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int hashed_key = hash(key, ht->capacity);
 
+  // if the key exists
+  if (ht->storage[hashed_key] != NULL)
+  {
+    // check the keys, if we found a match
+    if (strcmp(ht->storage[hashed_key]->key, key) == 0)
+    {
+      // check to see if it has a child link
+      if (ht->storage[hashed_key]->next != NULL)
+      {
+        // make a reference for the child link
+        // delete the pair
+        // replace the old pair with the link
+        LinkedPair *link = ht->storage[hashed_key]->next;
+        destroy_pair(ht->storage[hashed_key]);
+        ht->storage[hashed_key] = link;
+        destroy_pair(link);
+      }
+      else
+      {
+        // has no child link, safe to remove
+        destroy_pair(ht->storage[hashed_key]);
+      }
+    }
+    else
+    {
+      int key_found = 0;
+      LinkedPair *poss_key_prev_link = ht->storage[hashed_key];
+      //keys do not match but there are links to check
+      while (key_found == 0)
+      {
+        if (strcmp(poss_key_prev_link->next->key, key) == 0)
+        {
+          key_found = 1;
+        }
+        else
+        {
+          poss_key_prev_link = poss_key_prev_link->next;
+        }
+      }
+    }
+  }
+  else
+  {
+    fprintf(stderr, "The item with key %s was not found in the hash table", key);
+  }
 }
 
 /****
@@ -122,7 +207,6 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
 }
 
 /****
@@ -139,7 +223,6 @@ HashTable *hash_table_resize(HashTable *ht)
 
   return new_ht;
 }
-
 
 #ifndef TESTING
 int main(void)
