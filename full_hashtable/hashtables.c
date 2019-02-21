@@ -76,7 +76,7 @@ HashTable *create_hash_table(int capacity)
   HashTable *ht = malloc(sizeof(HashTable));
 
   ht->capacity = capacity;
-  ht->storage = calloc(calloc, sizeof(char *));
+  ht->storage = calloc(capacity, sizeof(char *));
 
   return ht;
 }
@@ -142,7 +142,7 @@ void hash_table_remove(HashTable *ht, char *key)
     if (strcmp(pair->key, key) == 0)
     {
       destroy_pair(pair);
-      ht->storage[index] == NULL;
+      ht->storage[index] = NULL;
     }
     else
     {
@@ -210,6 +210,20 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 
   Don't forget to free any malloc'ed memory!
  ****/
+void destroy_pair_chain(LinkedPair *pair)
+{
+  if (pair != NULL)
+  {
+    LinkedPair *next_pair = pair->next;
+
+    destroy_pair(pair);
+    if (next_pair != NULL)
+    {
+      destroy_pair_chain(next_pair);
+    }
+  }
+}
+
 void destroy_hash_table(HashTable *ht)
 {
   if (ht != NULL)
@@ -222,20 +236,6 @@ void destroy_hash_table(HashTable *ht)
     free(ht->capacity);
     free(ht->storage);
     free(ht);
-  }
-}
-
-void destroy_pair_chain(LinkedPair *pair)
-{
-  if (pair != NULL)
-  {
-    LinkedPair *next_pair = pair->next;
-
-    destroy_pair(pair);
-    if (next_pair != NULL)
-    {
-      destroy_pair_chain(next_pair);
-    }
   }
 }
 
