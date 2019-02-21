@@ -128,6 +128,56 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  int i;
+  LinkedPair *node;
+  LinkedPair *prevNode;
+
+  i = hash(key, ht->capacity);
+
+  if (ht->storage[i] == NULL)
+  {
+    printf("Nothing there\n");
+  }
+
+  if (strcmp(ht->storage[i]->key, key) == 0 && ht->storage[i]->next == NULL)
+  {
+    destroy_pair(ht->storage[i]);
+    ht->storage[i] = NULL;
+  }
+  else
+  {
+    if (strcmp(ht->storage[i]->key, key) == 0 && ht->storage[i]->next != NULL)
+    {
+      node = ht->storage[i];
+      ht->storage[i] = node->next;
+      destroy_pair(node);
+    }
+    else
+    {
+      prevNode = ht->storage[i];
+      node = ht->storage[i]->next;
+      while (node != NULL)
+      {
+        if (strcmp(node->key, key) == 0)
+        {
+          if (node->next == NULL)
+          {
+            prevNode->next = node->next;
+            destroy_pair(node);
+            break;
+          }
+          else
+          {
+            prevNode->next = NULL;
+            destroy_pair(node);
+            break;
+          }
+        }
+        prevNode = node;
+        node = node->next;
+      }
+    }
+  }
 }
 
 /****
@@ -150,7 +200,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
     return NULL;
   }
 
-  if (ht->storage[i]->next == NULL)
+  if (strcmp(ht->storage[i]->key, key) == 0 && ht->storage[i]->next == NULL)
   {
     return ht->storage[i]->value;
   }
@@ -180,7 +230,6 @@ void destroy_hash_table(HashTable *ht)
     if (ht->storage[i] != NULL)
     {
       destroy_pair(ht->storage[i]);
-      free(ht->storage[i]);
     }
   }
   if (ht->storage != NULL)
@@ -216,10 +265,17 @@ int main(void)
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
+  hash_table_insert(ht, "line_4", "Linked list saves the day!\n");
+  // hash_table_insert(ht, "line_5", "Linked list saves the day!\n");
 
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
+  printf("%s", hash_table_retrieve(ht, "line_4"));
+  hash_table_remove(ht, "line_3");
+
+  printf("Line_3: %s\n", hash_table_retrieve(ht, "line_3"));
+  printf("%s\n", hash_table_retrieve(ht, "line_4"));
 
   // int old_capacity = ht->capacity;
   // ht = hash_table_resize(ht);
