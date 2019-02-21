@@ -70,8 +70,11 @@ All values in storage should be initialized to NULL
 ****/
 BasicHashTable *create_hash_table(int capacity)
 {
+    // allocate space for the single struct
     BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+    // define the structs capacity
     ht->capacity = capacity;
+    // allocate enough space for the storage of Pair*'s
     ht->storage = calloc(capacity, sizeof(Pair *));
     return ht;
 }
@@ -85,12 +88,16 @@ Don't forget to free any malloc'ed memory!
 ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+    // hash the key
     unsigned int i = hash(key, ht->capacity);
+    // see if there's already a Pair* at hashed index
     if (ht->storage[i])
     {
-        fprintf(stderr, "Overwrote previous Pair\n");
+        printf("Overwrote previous Pair '%s: %s'\n", ht->storage[i]->key, ht->storage[i]->value);
+        // destroy the previous pair
         destroy_pair(ht->storage[i]);
     }
+    // create a Pair* from the key and value and asign it to hashed index
     ht->storage[i] = create_pair(key, value);
 }
 
@@ -101,13 +108,17 @@ Don't forget to free any malloc'ed memory!
 ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+    // hash the given key to an index
     unsigned int i = hash(key, ht->capacity);
+    // check if storage holds a pair at that index
     if (!ht->storage[i])
     {
         fprintf(stderr, "Key not found\n");
         return;
     }
+    // free the pair
     destroy_pair(ht->storage[i]);
+    // null the storage at the hashed index
     ht->storage[i] = NULL;
 }
 
@@ -118,14 +129,16 @@ Should return NULL if the key is not found.
 ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+    // hash the key to an index
     unsigned int i = hash(key, ht->capacity);
-    Pair *pair = ht->storage[i];
-    if (!pair)
+    // check if storage is empty
+    if (!ht->storage[i])
     {
         fprintf(stderr, "Key not found\n");
         return NULL;
     }
-    return pair->value;
+    // return value of Pair* in storage at hashed index
+    return  ht->storage[i]->value;
 }
 
 /****
@@ -135,14 +148,19 @@ Don't forget to free any malloc'ed memory!
 ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+    // loop through all of storage
     for (int i = 0; i < ht->capacity; i++)
     {
+        // check if a Pair* is present at the index
         if (ht->storage[i])
         {
+            // destroy the Pair*
             destroy_pair(ht->storage[i]);
         }
     }
+    // free storage
     free(ht->storage);
+    // free struct
     free(ht);
 }
 
