@@ -104,11 +104,13 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
       if (strcmp(pair->key, key) == 0)
       {
         pair->value = value;
+
         break;
       }
       else if (!pair->next)
       {
         pair->next = new_pair;
+
         break;
       }
       pair = pair->next;
@@ -130,6 +132,45 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+
+  if (ht->storage[index])
+  {
+    LinkedPair *pair = ht->storage[index];
+
+    if (strcmp(pair->key, key) == 0)
+    {
+      destroy_pair(pair);
+      ht->storage[index] = NULL;
+    }
+    else
+    {
+      while (pair->next)
+      {
+        if (strcmp(pair->next->key, key) == 0)
+        {
+          LinkedPair *next_pair = pair->next->next;
+
+          destroy_pair(pair->next);
+
+          pair->next = next_pair;
+
+          break;
+        }
+        else if (!pair->next->next)
+        {
+          printf("no element with that key");
+
+          break;
+        }
+        pair = pair->next;
+      }
+    }
+  }
+  else
+  {
+    printf("no element with that key");
+  }
 }
 
 /****
