@@ -88,6 +88,35 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  // create the index to store your pair
+  unsigned int index = hash(key, ht->capacity);
+
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair;
+
+  // if the location exists then we will make a linked list
+  while(current_pair != NULL && strcmp(current_pair->key, key) != 0)
+  {
+    // make the next point to the current pair
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+
+  }
+  // if there is a current pair
+  if(current_pair != NULL)
+  {
+    //set the current pair value to our value
+    current_pair->value = value;
+  }
+  else
+  {
+    // else we want to create a new pair and store it at the index
+    LinkedPair *new_pair = create_pair(key, value);
+    new_pair->next = ht->storage[index];
+    ht->storage[index] = new_pair;
+  }
+  
+
 
 }
 
