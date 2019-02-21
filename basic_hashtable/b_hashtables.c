@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Basic hash table key/value pair
  ****/
@@ -70,8 +69,12 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(char *));
+  for (int i=0; i<capacity; i++) {
+    ht->storage[i] = NULL;
+  }
   return ht;
 }
 
@@ -84,7 +87,15 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  int index = hash(key, ht->capacity);
+  if(ht->storage[index] != NULL) {
+    printf("error\n");
+    destroy_pair(ht->storage[index]);
+    ht->storage[index] = create_pair(key, value);
+  }
+  else {
+    ht->storage[index] = create_pair(key, value);
+  }
 }
 
 /****
@@ -94,7 +105,9 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int index = hash(key, ht->capacity);
+  destroy_pair(ht->storage[index]);
+  ht->storage[index] = NULL;
 }
 
 /****
@@ -104,7 +117,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int index = hash(key, ht->capacity);
+  if((ht->storage[index]) != NULL)
+  {
+    return ht->storage[index]->value;
+  }
   return NULL;
+  printf("no key found\n");
 }
 
 /****
@@ -114,7 +133,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  free(ht->storage);
 }
 
 
