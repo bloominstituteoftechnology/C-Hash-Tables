@@ -70,7 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));;
 
   return ht;
 }
@@ -86,6 +88,30 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+   // get that hash
+  unsigned int hash_key = hash(key, ht->capacity);
+
+   //  see if index is occupied
+  // --> if (ht->storage[index] != NULL)
+  LinkedPair *current_pair = ht->storage[hash_key];
+  LinkedPair *last_pair;
+
+
+   // if it is occupied go through linkedpairs to find a pari that has the same key     
+  while (current_pair != NULL && strcmp( current_pair->key, key ) != 0) {
+    last_pair = current_pair; 
+    current_pair = last_pair->next; 
+  }
+
+   if (current_pair != NULL) {
+    current_pair->value = value;
+  } else {
+    // if it isnt occupied add a  new linkedpair
+    LinkedPair *new_pair = create_pair(key, value);
+    new_pair->next = ht->storage[hash_key];
+    ht->storage[hash_key] = new_pair;
+  }  
+
 
 }
 
