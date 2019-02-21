@@ -109,7 +109,9 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
       else if (!pair->next)
       {
         pair->next = new_pair;
+        break;
       }
+      pair = pair->next;
     }
   }
   else
