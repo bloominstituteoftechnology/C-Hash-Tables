@@ -114,18 +114,6 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     ht->storage[i] = end_lp;
 }
 
-void ht_insert_pair(HashTable *ht, LinkedPair *end_lp)
-{
-    unsigned int i = hash(end_lp->key, ht->capacity);
-    LinkedPair *start_lp = ht->storage[i];
-    if (start_lp)
-    {
-        append_to_end_of_pairs(start_lp, end_lp);
-        return;
-    }
-    ht->storage[i] = end_lp;
-}
-
 /// Returns pair before query (unless query ends up being the first in the linked list)
 LinkedPair *find_pair(LinkedPair *lp, char *query)
 {
@@ -258,16 +246,15 @@ HashTable *hash_table_resize(HashTable *ht)
         if (ht->storage[i])
         {
             lp = ht->storage[i];
-            ht_insert_pair(new_ht, lp);
+            hash_table_insert(new_ht, lp->key, lp->value);
             while (lp->next)
             {
                 lp = lp->next;
-                ht_insert_pair(new_ht, lp);
+                hash_table_insert(new_ht, lp->key, lp->value);
             }
         }
     }
-    free(ht->storage);
-    free(ht);
+    destroy_hash_table(ht);
     return new_ht;
 }
 
@@ -290,12 +277,8 @@ int main(void)
     int new_capacity = ht->capacity;
 
     printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
-
-    printf("%s", hash_table_retrieve(ht, "line_1"));
-    printf("%s", hash_table_retrieve(ht, "line_2"));
-    printf("%s", hash_table_retrieve(ht, "line_3"));
-
-    // destroy_hash_table(ht);
+    
+    destroy_hash_table(ht);
 
     return 0;
 }
