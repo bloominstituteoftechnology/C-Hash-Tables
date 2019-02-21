@@ -180,6 +180,19 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+  LinkedPair *pair = ht->storage[index];
+
+  // while the pair exists
+  while(pair)
+  {
+    if(!strcmp(pair->key, key))
+    {
+      return pair->value;
+    }
+    // set to next pair
+    pair = pair->next;
+  }
   return NULL;
 }
 
