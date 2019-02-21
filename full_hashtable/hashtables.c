@@ -93,6 +93,18 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned hash_idx = hash(key, ht->capacity);
+
+  // if pair doesnt exist yet
+  if (ht->storage[hash_idx] == NULL)
+  {
+    ht->storage[hash_idx] = create_pair(key, value);
+  }
+  else
+  {
+    // add pair as a new node
+    ht->storage[hash_idx]->next = create_pair(key, value);
+  }
 }
 
 /****
@@ -117,7 +129,25 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  unsigned hash_idx = hash(key, ht->capacity);
+
+  if (ht->storage[hash_idx] == NULL)
+  {
+    printf("whut");
+    return NULL;
+  }
+  else
+  {
+    LinkedPair *current_pair = ht->storage[hash_idx];
+    while (1)
+    {
+      if (strcmp(current_pair->key, key) == 0)
+      {
+        return current_pair->value;
+      }
+      current_pair = current_pair->next;
+    }
+  }
 }
 
 /****
@@ -147,7 +177,7 @@ HashTable *hash_table_resize(HashTable *ht)
 #ifndef TESTING
 int main(void)
 {
-  struct HashTable *ht = create_hash_table(2);
+  struct HashTable *ht = create_hash_table(4);
 
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
@@ -157,13 +187,13 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  int old_capacity = ht->capacity;
-  ht = hash_table_resize(ht);
-  int new_capacity = ht->capacity;
+  // int old_capacity = ht->capacity;
+  // ht = hash_table_resize(ht);
+  // int new_capacity = ht->capacity;
 
-  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
 
   return 0;
 }
