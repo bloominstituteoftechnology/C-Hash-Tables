@@ -143,7 +143,12 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int i = hash(key, ht -> capacity);
+  if(ht -> storage[i] != NULL) {
+    return ht -> storage[i] -> value;
+  } else {
+    return NULL;
+  }
 }
 
 /****
@@ -153,7 +158,11 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for(int i = 0; i < ht -> capacity; i++) {
+    destroy_pair(ht -> storage[i];)
+  }
+  free(ht -> storage);
+  free(ht);
 }
 
 /****
