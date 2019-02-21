@@ -111,10 +111,14 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 {
   // Get hash value
   int hashvalue = hash(key, ht->capacity);
-  // Free memory
-  destroy_pair(ht->storage[hashvalue]);
-  // set value to NULL
-  ht->storage[hashvalue] = NULL;
+  // Check if not null
+  if (ht->storage[hashvalue] != NULL)
+  {
+    //Free memory
+    destroy_pair(ht->storage[hashvalue]);
+    // set value to NULL
+    ht->storage[hashvalue] = NULL;
+  }
 }
 
 /****
@@ -132,6 +136,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
     return ht->storage[hashvalue]->value;
   }
   // else return NULL
+  printf("Element could not be found");
   return NULL;
 }
 
@@ -145,7 +150,10 @@ void destroy_hash_table(BasicHashTable *ht)
   // Iterate through pairs and free memory
   for (int i = 0; i < ht->capacity; i++)
   {
-    destroy_pair(ht->storage[i]);
+    if (ht->storage[i] != NULL)
+    {
+      destroy_pair(ht->storage[i]);
+    }
   }
   // free storage
   free(ht->storage);
