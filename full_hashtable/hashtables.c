@@ -148,6 +148,9 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  // get that hash
+  unsigned int hash_key = hash(key, ht->capacity);
+
   return NULL;
 }
 
@@ -158,6 +161,16 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+    // grab all pairs in storage and destroy the pairs
+  for (int i = 0; i < ht->capacity; i++) {
+    ht->storage[i] = NULL; 
+    destroy_pair(ht->storage[i]);    
+  }
+
+
+   // free storage and hash table
+  free(ht->storage);
+  free(ht);
 
 }
 
