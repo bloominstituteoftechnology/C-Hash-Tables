@@ -85,13 +85,9 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
-}
-
-void ht_insert(ht_hash_table* ht, const char* key, const char* value) {
   Pair *pair = create_pair(key, value);
-  int hashed_key_pair = hash(pair->key, ht->capacity);
-  ht->storage[hashed_key_pair] = pair;
+  int hashed_key_index = hash(pair->key, ht->capacity);
+  ht->storage[hashed_key_index] = pair;
 }
 
 /****
@@ -101,11 +97,11 @@ void ht_insert(ht_hash_table* ht, const char* key, const char* value) {
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  int hashed_key_pair = hash(key, ht->capacity);
-  if (ht->storage[hashed_key_pair] != NULL)
+  int hashed_key_index = hash(key, ht->capacity);
+  if (ht->storage[hashed_key_index] != NULL)
   {
-    free(ht->storage[hashed_key_pair]);
-    ht->storage[hashed_key_pair] = NULL;
+    free(ht->storage[hashed_key_index]);
+    ht->storage[hashed_key_index] = NULL;
   }
 }
 
@@ -116,8 +112,8 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  int hashed_key_pair = hash(key, ht->capacity);
-  Pair *retrieved_pair = ht->storage[hashed_key_pair];
+  int hashed_key_index = hash(key, ht->capacity);
+  Pair *retrieved_pair = ht->storage[hashed_key_index];
   if (retrieved_pair != NULL) {
     return retrieved_pair->value;
   }
@@ -137,8 +133,8 @@ void destroy_hash_table(BasicHashTable *ht)
     {
       if (ht->storage[i])
       {
-        int hashed_key_pair = hash(ht->storage[i]->key, ht->capacity);
-        destroy_pair(ht->storage[hashed_key_pair]);
+        int hashed_key_index = hash(ht->storage[i]->key, ht->capacity);
+        destroy_pair(ht->storage[hashed_key_index]);
         free(ht->storage[i]);
       }
     }
