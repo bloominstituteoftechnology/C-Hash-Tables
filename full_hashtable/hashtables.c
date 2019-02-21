@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Hash table key/value pair with linked list pointer
  ****/
-typedef struct LinkedPair {
+typedef struct LinkedPair
+{
   char *key;
   char *value;
   struct LinkedPair *next;
@@ -15,7 +15,8 @@ typedef struct LinkedPair {
 /****
   Hash table with linked pairs
  ****/
-typedef struct HashTable {
+typedef struct HashTable
+{
   int capacity;
   LinkedPair **storage;
 } HashTable;
@@ -38,7 +39,8 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
-  if (pair != NULL) {
+  if (pair != NULL)
+  {
     free(pair->key);
     free(pair->value);
     free(pair);
@@ -54,9 +56,10 @@ unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
   int c;
-  unsigned char * u_str = (unsigned char *)str;
+  unsigned char *u_str = (unsigned char *)str;
 
-  while ((c = *u_str++)) {
+  while ((c = *u_str++))
+  {
     hash = ((hash << 5) + hash) + c;
   }
 
@@ -71,7 +74,9 @@ unsigned int hash(char *str, int max)
 HashTable *create_hash_table(int capacity)
 {
   HashTable *ht;
-
+  ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
   return ht;
 }
 
@@ -86,7 +91,46 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  // Get hash value
+  int hashvalue = hash(key, ht->capacity);
+  // Prepare to search through linked list by creating pointers to current and previous pairs
+  LinkedPair *currentpair = ht->storage[hashvalue];
+  LinkedPair *previouspair = NULL;
 
+  // Search linked list as long as current pair is not NULL
+  while (currentpair != NULL)
+  {
+    // if two keys are the same then overwrite value
+    if (strcmp(currentpair->key, key) == 0)
+    {
+      printf("Overwriting Value\n");
+      currentpair->value = value;
+      break;
+    }
+    // If key not found change current
+    else
+    {
+      previouspair = currentpair;
+      currentpair = currentpair->next;
+    }
+  }
+  // If current pair is Null and not found in linked list
+  // If while loop breaks with current pair defined this will not run
+  if (currentpair == NULL)
+  {
+    // Create Linked pair
+    LinkedPair *newpair = create_pair(key, value);
+    // If there is a previous pair set it's next to new pair
+    if (previouspair != NULL)
+    {
+      previouspair->next = newpair;
+    }
+    // else set new pair to hash value
+    else
+    {
+      ht->storage[hashvalue] = newpair;
+    }
+  }
 }
 
 /****
@@ -99,7 +143,32 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  // Get hash value
+  int hashvalue = hash(key, ht->capacity);
+  // Prepare to search through linked list by setting current pair and previous pair.
+  LinkedPair *currentpair = ht->storage[hashvalue];
+  LinkedPair *previouspair = NULL;
 
+  // Search for match
+  while (currentpair != NULL && strcmp(currentpair->key, key) != 0)
+  {
+    previouspair = currentpair;
+    currentpair = currentpair->next;
+  }
+
+  // if previous pair exists
+  if (previouspair)
+  {
+    // set previous next as current next
+    previouspair->next = currentpair->next;
+  }
+  else
+  {
+    // if no previous pair
+    // set first as current next
+    ht->storage[hashvalue] = currentpair->next;
+  }
+  currentpair = NULL;
 }
 
 /****
@@ -112,6 +181,23 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  // Get hash value
+  int hashvalue = hash(key, ht->capacity);
+  // Prepare to search through linked list by setting up current pair
+  LinkedPair *currentpair = ht->storage[hashvalue];
+  // while currentpair is not NULL
+  while (currentpair)
+  {
+    // if current pair key is equal to key searching for return current pair value
+    if (strcmp(currentpair->key, key) == 0)
+    {
+      return currentpair->value;
+    }
+    // if not keys not equal go to next pair in linked list
+    currentpair = currentpair->next;
+  }
+  // If current node equal to null then element not found
+  printf("Element not found\n");
   return NULL;
 }
 
@@ -122,7 +208,29 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  // Prepare to iterate through linked list
+  LinkedPair *currentpair;
+  LinkedPair *deletepair;
+  // iterate through storage of hash table
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    currentpair = ht->storage[i];
 
+    // while current pair not null
+    while (currentpair != NULL)
+    {
+      // prepare to delete the current pair
+      deletepair = currentpair;
+      // go to next pair
+      currentpair = currentpair->next;
+      // destroy pair
+      destroy_pair(deletepair);
+    }
+  }
+  // free storage
+  free(ht->storage);
+  // free hash table
+  free(ht);
 }
 
 /****
@@ -135,15 +243,35 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
+  // Initialize new hash table
   HashTable *new_ht;
+  new_ht = create_hash_table(ht->capacity * 2);
+  // Set up current pair to traverse through linked list
+  LinkedPair *currentpair;
 
+  // For each hashvalue
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    currentpair = ht->storage[i];
+    // while current pair is not NULL
+    while (currentpair != NULL)
+    {
+      // insert current pair into new hash table
+      hash_table_insert(new_ht, currentpair->key, currentpair->value);
+      // iterate through linked list
+      currentpair = currentpair->next;
+    }
+  }
+  // destroy old hash table
+  destroy_hash_table(ht);
+  // return new hashtable
   return new_ht;
 }
-
 
 #ifndef TESTING
 int main(void)
 {
+  printf("\n=== Begin Test ===\n");
   struct HashTable *ht = create_hash_table(2);
 
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
@@ -161,7 +289,7 @@ int main(void)
   printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
   destroy_hash_table(ht);
-
+  printf("=== End Test ===\n\n");
   return 0;
 }
 #endif
