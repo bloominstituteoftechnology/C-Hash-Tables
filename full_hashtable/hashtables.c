@@ -142,6 +142,47 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  int hash_key = hash(key, ht->capacity);
+  if (ht->storage[hash_key] == NULL)
+  {
+    // not found
+  }
+  if (ht->storage[hash_key])
+  {
+    if (ht->storage[hash_key]->next == NULL)
+    {
+      if (strcmp(ht->storage[hash_key]->key, key) == 0)
+      {
+        destroy_pair(ht->storage[hash_key]);
+      }
+    }
+    else
+    {
+      LinkedPair *curr_pair = ht->storage[hash_key];
+      printf("next value in the list: %s\n", curr_pair->next->key);
+      do
+      {
+        printf("\n\n\n-----looking for %s in {%s}\n", key, curr_pair->key);
+        printf("%s\n", curr_pair->key);
+
+        if (strcmp(curr_pair->key, key) == 0)
+        {
+
+          if (curr_pair->next != NULL)
+          {
+            //does this break the chain/linked list?
+            curr_pair = curr_pair->next;
+          }
+          else
+          {
+            destroy_pair(curr_pair);
+          }
+        }
+        curr_pair = curr_pair->next;
+
+      } while (curr_pair);
+    }
+  }
 }
 
 /****
@@ -167,7 +208,6 @@ char *hash_table_retrieve(HashTable *ht, char *key)
       {
         return ht->storage[hash_key]->value;
       }
-      return ht->storage[hash_key]->value;
     }
     else
     {
@@ -198,6 +238,18 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    //loop through storage and free all
+    if (ht->storage[i] != NULL)
+    {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+
+  //destroy hastable
+  free(ht->capacity);
+  free(ht);
 }
 
 /****
@@ -234,7 +286,7 @@ int main(void)
 
   // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  // destroy_hash_table(ht);
+  destroy_hash_table(ht);
 
   return 0;
 }
