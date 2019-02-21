@@ -86,8 +86,8 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  //create new node
-  int new_node = create_pair(key, value); 
+  //create new node using Pair struct from above
+  Pair *new_node = create_pair(key, value); 
 
   // create array index to insert new node into 
   unsigned int new_index = hash(key, ht->capacity); 
@@ -111,7 +111,15 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
- 
+  // hash key to find index
+  unsigned int hash_key = hash(key, ht->capacity); 
+
+  if (ht->storage[hash_key] != NULL) { //if storage is occupied...
+
+    destroy_pair(ht->storage[hash_key]); // ...free memory 
+
+  }
+
 }
 
 /****
@@ -121,6 +129,14 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  // hash key to find index
+  unsigned int hash_key = hash(key, ht->capacity); 
+
+  if (ht->storage[hash_key] != NULL) { //if storage is occupied...
+
+    return ht->storage[hash_key]->value; // ...return it's contents
+
+  }
   return NULL;
 }
 
@@ -131,6 +147,13 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for (int i=0; i < ht->capacity; i++) {
+    ht->storage[i] = NULL; 
+    destroy_pair(ht->storage[i]); 
+  }
+
+  free(ht->storage);
+  free(ht);
 
 }
 
