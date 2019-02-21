@@ -163,6 +163,22 @@ void hash_table_remove(HashTable *ht, char *key)
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
  
+ // hash key to find index
+  unsigned int hash_key = hash(key, ht->capacity); 
+  // for readability, new variable
+  LinkedPair *current_node = ht->storage[hash_key]; 
+
+  while (current_node != 0) { 
+    if (strcmp(current_node->key, key) == 0) { //...if match
+      return current_node->value;
+    }
+    else if (strcmp(current_node->key, key) != 0 && current_node->next == 0) { //...if no match
+      fprintf(stderr, "key not found");
+      return NULL;
+    }
+    current_node = current_node->next; 
+  }
+  return 0;
 
 }
 
@@ -173,6 +189,13 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  for (int i=0; i < ht->capacity; i++) {
+    ht->storage[i] = NULL; 
+    destroy_pair(ht->storage[i]); 
+  }
+
+  free(ht->storage);
+  free(ht);
 
 }
 
