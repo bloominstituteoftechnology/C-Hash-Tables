@@ -114,7 +114,19 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     ht->storage[i] = end_lp;
 }
 
-/// Returns pair before query
+void ht_insert_pair(HashTable *ht, LinkedPair *end_lp)
+{
+    unsigned int i = hash(end_lp->key, ht->capacity);
+    LinkedPair *start_lp = ht->storage[i];
+    if (start_lp)
+    {
+        append_to_end_of_pairs(start_lp, end_lp);
+        return;
+    }
+    ht->storage[i] = end_lp;
+}
+
+/// Returns pair before query (unless query ends up being the first in the linked list)
 LinkedPair *find_pair(LinkedPair *lp, char *query)
 {
     // Should only be true if the first is the same as the query
@@ -193,6 +205,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
         fprintf(stderr, "Key not found\n");
         return NULL;
     }
+    // should only be true if it's the first one in the linked list
     if (strcmp(lp->key, key) == 0)
     {
         return lp->value;
@@ -202,12 +215,15 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 
 void destroy_all_pairs(LinkedPair *start_lp)
 {
-    LinkedPair *next = start_lp->next;
-    destroy_pair(start_lp);
-    if (next)
+    if (start_lp)
     {
-        destroy_all_pairs(next);
-    }
+        LinkedPair *next = start_lp->next;
+        destroy_pair(start_lp);
+        if (next)
+        {
+            destroy_all_pairs(next);
+        }
+    }   
 }
 
 /****
@@ -237,9 +253,24 @@ HashTable *hash_table_resize(HashTable *ht)
 {
     HashTable *new_ht = malloc(sizeof(HashTable));
     new_ht->capacity = ht->capacity * 2;
-    ht->storage = realloc(ht->storage, ht->capacity * sizeof(LinkedPair *));
-    new_ht->storage = ht->storage;
-    destroy_hash_table(ht);
+    LinkedPair **new_storage = calloc(new_ht->capacity, sizeof(LinkedPair *));
+    for (int i = 0; i < ht->capacity; i++)
+    {
+        LinkedPair *lp = ht->storage[i];
+        if (ht->storage[i])
+        {
+            lp = ht->storage[i];
+            ht_insert_pair(new_ht, lp);
+            while (lp->next)
+            {
+                lp = lp->next;
+                ht_insert_pair(new_ht, lp);
+            }
+        }
+    }
+    new_ht->storage = new_storage;
+    free(ht->storage);
+    free(ht);
     return new_ht;
 }
 
@@ -263,7 +294,7 @@ int main(void)
 
     printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-    // destroy_hash_table(ht);
+    destroy_hash_table(ht);
 
     return 0;
 }
