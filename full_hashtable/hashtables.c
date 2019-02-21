@@ -91,10 +91,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     printf("Either the key or value is NULL");
   }
   int hashed = hash(key, ht->capacity);//creates an index value
-  if(ht->storage[hashed] != NULL){
-    printf("That index already has a value");
-    exit(1);
-  }else{
+
     LinkedPair *p = create_pair(key, value); //creates a new pair
     if(ht->storage[hashed] == NULL){ //if index is already empty just place in there
       ht->storage[hashed] = p;
@@ -109,8 +106,8 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
         head = head->next;
       }
     }
-    
-  }
+  printf("key = %s", ht->storage[hashed]->key);
+  printf("\nvalue=%s\n", ht->storage[hashed]->value);
 }
 
 /****
@@ -218,7 +215,7 @@ int main(void)
 
   printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
 
   return 0;
 }
