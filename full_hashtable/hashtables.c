@@ -139,6 +139,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 void hash_table_remove(HashTable *ht, char *key)
 {
   unsigned int hashed_key = hash(key, ht->capacity);
+
   // if the key exists
   if (ht->storage[hashed_key] != NULL)
   {
@@ -148,17 +149,36 @@ void hash_table_remove(HashTable *ht, char *key)
       // check to see if it has a child link
       if (ht->storage[hashed_key]->next != NULL)
       {
+        // make a reference for the child link
+        // delete the pair
+        // replace the old pair with the link
         LinkedPair *link = ht->storage[hashed_key]->next;
         destroy_pair(ht->storage[hashed_key]);
+        ht->storage[hashed_key] = link;
+        destroy_pair(link);
       }
       else
       {
         // has no child link, safe to remove
+        destroy_pair(ht->storage[hashed_key]);
       }
     }
     else
     {
+      int key_found = 0;
+      LinkedPair *poss_key_prev_link = ht->storage[hashed_key];
       //keys do not match but there are links to check
+      while (key_found == 0)
+      {
+        if (strcmp(poss_key_prev_link->next->key, key) == 0)
+        {
+          key_found = 1;
+        }
+        else
+        {
+          poss_key_prev_link = poss_key_prev_link->next;
+        }
+      }
     }
   }
   else
