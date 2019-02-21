@@ -161,9 +161,12 @@ char *hash_table_retrieve(HashTable *ht, char *key)
     if(strcmp(ht->storage[hashed]->key , key) == 0){
       return ht->storage[hashed]->value;
     }else{
-      printf("line 164 else statement");
+      // printf("line 164 else statement");
       LinkedPair *head = ht->storage[hashed];
-      while(head->next != NULL){
+      // printf("%s", head->next->key);
+      while(head != NULL){
+        // printf("inside while 167: head->key = %s",head->key);
+        // printf("inside while 167: key = %s",key);
         if(strcmp(head->key , key) == 0){
           return head->value;
         }
