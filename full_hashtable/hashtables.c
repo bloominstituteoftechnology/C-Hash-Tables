@@ -185,7 +185,12 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 void destroy_hash_table(HashTable *ht)
 {
   for(int i = 0; i < ht->capacity; i++){
-    destroy_pair(ht->storage[i]); 
+    LinkedPair *head = ht->storage[i];
+    while(head != NULL){
+      printf("\ndestoying pair");
+      destroy_pair(head); 
+      head = head->next;
+    }
   }
   free(ht->storage);
   free(ht);
@@ -207,7 +212,7 @@ HashTable *hash_table_resize(HashTable *ht)
     double_capacity->storage[i] = ht->storage[i];
   }
   double_capacity->capacity = ht->capacity * 2;
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
   return double_capacity;
 }
 
