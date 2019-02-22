@@ -39,10 +39,15 @@ LinkedPair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(LinkedPair *pair)
 {
+  printf("destroy_pair(%s, %s)\n", pair->key, pair->value); // <--- TESTING
+
   if (pair != NULL)
   {
+    printf("freeing key\n"); // <--- TESTING
     free(pair->key);
+    printf("freeing value\n"); // <--- TESTING
     free(pair->value);
+    printf("freeing pair\n"); // <--- TESTING
     free(pair);
   }
 
@@ -80,7 +85,7 @@ HashTable *create_hash_table(int capacity)
   HashTable *ht = malloc(sizeof(HashTable));
 
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(char *));
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -100,21 +105,29 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
   unsigned int index = hash(key, ht->capacity);
 
-  LinkedPair *new_pair = create_pair(key, value);
-
-  if (ht->storage[index])
+  if (ht->storage[index] != NULL)
   {
+    printf("found an existing element at that index\n"); // <--- TESTING
+
     LinkedPair *pair = ht->storage[index];
+    printf("pair at index: key %s\n", pair->key); // <--- TESTING
+
     while (pair != NULL)
     {
       if (strcmp(pair->key, key) == 0)
       {
+        printf("key exists, updating value\n"); // <--- TESTING
+
         pair->value = value;
 
         break;
       }
       else if (pair->next == NULL)
       {
+        printf("got to end of list, appending new pair\n"); // <--- TESTING
+
+        LinkedPair *new_pair = create_pair(key, value);
+
         pair->next = new_pair;
 
         break;
@@ -125,6 +138,9 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   }
   else
   {
+    printf("no elements at that index, assigning new pair\n"); // <--- TESTING
+
+    LinkedPair *new_pair = create_pair(key, value);
     ht->storage[index] = new_pair;
   }
 }
@@ -231,6 +247,7 @@ void destroy_pair_chain(LinkedPair *pair)
     LinkedPair *next_pair = pair->next;
 
     destroy_pair(pair);
+
     if (next_pair != NULL)
     {
       destroy_pair_chain(next_pair);
@@ -293,23 +310,52 @@ HashTable *hash_table_resize(HashTable *ht)
 #ifndef TESTING
 int main(void)
 {
-  struct HashTable *ht = create_hash_table(2);
+  // struct HashTable *ht = create_hash_table(2);
 
-  hash_table_insert(ht, "line_1", "Tiny hash table\n");
-  hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
-  hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
+  // hash_table_insert(ht, "line_1", "Tiny hash table\n");
+  // hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
+  // hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
 
-  printf("%s", hash_table_retrieve(ht, "line_1"));
-  printf("%s", hash_table_retrieve(ht, "line_2"));
-  printf("%s", hash_table_retrieve(ht, "line_3"));
+  // printf("%s", hash_table_retrieve(ht, "line_1"));
+  // printf("%s", hash_table_retrieve(ht, "line_2"));
+  // printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  int old_capacity = ht->capacity;
-  ht = hash_table_resize(ht);
-  int new_capacity = ht->capacity;
+  // int old_capacity = ht->capacity;
+  // ht = hash_table_resize(ht);
+  // int new_capacity = ht->capacity;
 
-  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
+
+  struct HashTable *ht = create_hash_table(32);
+
+  // char *return_value = hash_table_retrieve(ht, "key-0");
+  // mu_assert(return_value == NULL, "Initialized value is not NULL");
+
+  hash_table_insert(ht, "key-0", "val-0");
+  hash_table_insert(ht, "key-1", "val-1");
+  hash_table_insert(ht, "key-2", "val-2");
+  hash_table_insert(ht, "key-3", "val-3");
+  hash_table_insert(ht, "key-4", "val-4");
+  hash_table_insert(ht, "key-5", "val-5");
+  hash_table_insert(ht, "key-6", "val-6");
+  hash_table_insert(ht, "key-7", "val-7");
+  hash_table_insert(ht, "key-8", "val-8");
+  hash_table_insert(ht, "key-9", "val-9");
+
+  printf("overwriting elements\n"); // <--- TESTING
+
+  hash_table_insert(ht, "key-0", "new-val-0");
+  hash_table_insert(ht, "key-1", "new-val-1");
+  hash_table_insert(ht, "key-2", "new-val-2");
+  hash_table_insert(ht, "key-3", "new-val-3");
+  hash_table_insert(ht, "key-4", "new-val-4");
+  hash_table_insert(ht, "key-5", "new-val-5");
+  hash_table_insert(ht, "key-6", "new-val-6");
+  hash_table_insert(ht, "key-7", "new-val-7");
+  hash_table_insert(ht, "key-8", "new-val-8");
+  hash_table_insert(ht, "key-9", "new-val-9");
 
   return 0;
 }
