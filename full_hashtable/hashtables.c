@@ -45,6 +45,8 @@ void destroy_pair(LinkedPair *pair)
     free(pair->value);
     free(pair);
   }
+
+  printf("destroyed pair\n"); // <--- TESTING
 }
 
 /****
@@ -150,6 +152,8 @@ void hash_table_remove(HashTable *ht, char *key)
     {
       if (strcmp(pair->key, key) == 0)
       {
+        printf("found a match\n"); // <--- TESTING
+
         if (prev_pair != NULL)
         {
           prev_pair->next = pair->next;
@@ -159,6 +163,7 @@ void hash_table_remove(HashTable *ht, char *key)
           ht->storage[index] = pair->next;
         }
 
+        printf("destroying pair %s, %s\n", pair->key, pair->value); // <--- TESTING
         destroy_pair(pair);
 
         break;
@@ -178,6 +183,8 @@ void hash_table_remove(HashTable *ht, char *key)
   {
     printf("no element with that key\n");
   }
+
+  printf("hash_table_remove completed execution\n"); // <--- TESTING
 }
 
 /****
