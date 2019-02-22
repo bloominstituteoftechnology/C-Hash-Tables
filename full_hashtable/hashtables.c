@@ -248,7 +248,10 @@ void destroy_hash_table(HashTable *ht)
   }
 
   //destroy hastable
-  free(ht->capacity);
+  if (ht->capacity != NULL)
+  {
+    free(ht->capacity);
+  }
   free(ht);
 }
 
@@ -262,7 +265,22 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+
+  //loop through existing elements and copy to new hashtable
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    if (ht->storage[i] != NULL)
+    {
+      int hash_key = hash(ht->storage[i]->key, new_ht->capacity);
+      new_ht->storage[hash_key] = ht->storage[i];
+    }
+
+    free(ht->storage[i]);
+  }
+
+  free(ht->capacity);
+  free(ht);
 
   return new_ht;
 }
