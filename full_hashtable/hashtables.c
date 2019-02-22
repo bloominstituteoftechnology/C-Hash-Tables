@@ -94,7 +94,7 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-  printf("insterting element\n"); // <--- TESTING
+  printf("inserting element\n"); // <--- TESTING
 
   unsigned int index = hash(key, ht->capacity);
 
@@ -141,38 +141,37 @@ void hash_table_remove(HashTable *ht, char *key)
 
   unsigned int index = hash(key, ht->capacity);
 
-  if (ht->storage[index])
+  if (ht->storage[index] != NULL)
   {
     LinkedPair *pair = ht->storage[index];
+    LinkedPair *prev_pair = NULL;
 
-    if (strcmp(pair->key, key) == 0)
+    while (pair != NULL)
     {
-      destroy_pair(pair);
-      ht->storage[index] = NULL;
-    }
-    else
-    {
-      while (pair->next != NULL)
+      if (strcmp(pair->key, key) == 0)
       {
-        if (strcmp(pair->next->key, key) == 0)
+        if (prev_pair != NULL)
         {
-          LinkedPair *next_pair = pair->next->next;
-
-          destroy_pair(pair->next);
-
-          pair->next = next_pair;
-
-          break;
+          prev_pair->next = pair->next;
         }
-        else if (pair->next->next == NULL)
+        else
         {
-          printf("no element with that key\n");
-
-          break;
+          ht->storage[index] = pair->next;
         }
 
-        pair = pair->next;
+        destroy_pair(pair);
+
+        break;
       }
+      else if (pair->next == NULL)
+      {
+        printf("no element with that key\n");
+
+        break;
+      }
+
+      prev_pair = pair;
+      pair = pair->next;
     }
   }
   else
@@ -191,7 +190,7 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  printf("retrieving an element\n"); // <--- TESTING
+  printf("retrieving element\n"); // <--- TESTING
 
   unsigned int index = hash(key, ht->capacity);
 
