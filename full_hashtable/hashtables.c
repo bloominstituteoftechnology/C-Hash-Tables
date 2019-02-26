@@ -206,11 +206,12 @@ void destroy_all_pairs(LinkedPair *start_lp)
     if (start_lp)
     {
         LinkedPair *next = start_lp->next;
-        destroy_pair(start_lp);
         if (next)
         {
-            destroy_all_pairs(next);
+            return destroy_all_pairs(next);
         }
+        destroy_pair(start_lp);
+        return;
     }   
 }
 
@@ -277,7 +278,7 @@ int main(void)
     int new_capacity = ht->capacity;
 
     printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
-    
+
     destroy_hash_table(ht);
 
     return 0;
