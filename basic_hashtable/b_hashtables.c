@@ -91,7 +91,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   //hash key to get index
   unsigned int index = hash(key, ht->capacity);
-  //create a pair using key and value
+  //create a new pair using key and value
   Pair *new_pair = create_pair(key, value);
   //store current pair
   Pair *pair = ht->storage[index];
@@ -139,7 +139,18 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  //retrive value
+  //get index using hash function
+  unsigned int index = hash(key, ht->capacity);
+  //store current pair
+  Pair *pair = ht->storage[index];
+  //if pair exists retrieve value
+  while (pair != NULL)
+  {
+    if (strcmp(key, pair->key) == 0) {
+      return pair->value;
+    }
+  }
+
   return NULL;
 }
 
@@ -148,10 +159,10 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void destroy_hash_table(BasicHashTable *ht)
-{
+// void destroy_hash_table(BasicHashTable *ht)
+// {
 
-}
+// }
 
 
 #ifndef TESTING
@@ -178,5 +189,5 @@ int main(void)
 #endif
 
 
-https://github.com/jamesroutley/write-a-hash-table
+//https://github.com/jamesroutley/write-a-hash-table
 
