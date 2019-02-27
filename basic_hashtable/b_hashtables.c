@@ -74,6 +74,7 @@ BasicHashTable *create_hash_table(int capacity)
   ht->capacity = capacity;
   ht->storage = calloc(capacity, sizeof(Pair));
   // ht->Pair **storage;
+  
   return ht;
 }
 
@@ -84,9 +85,16 @@ BasicHashTable *create_hash_table(int capacity)
 
   Don't forget to free any malloc'ed memory!
  ****/
+// hash_table_insert(ht, "line", "Here today...\n");
+
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  unsigned index = hash(key, ht->capacity);
+  if (ht->storage[index]) {
+    printf("This value will be overwriting");
+    destroy_pair(ht->storage[index]);
+  }
+  ht->storage[index] = create_pair(key, value);
 }
 
 /****
@@ -127,9 +135,9 @@ int main(void)
 
   hash_table_insert(ht, "line", "Here today...\n");
 
-  printf("%s", hash_table_retrieve(ht, "line"));
+  // printf("%s", hash_table_retrieve(ht, "line"));
 
-  hash_table_remove(ht, "line");
+  // hash_table_remove(ht, "line");
 
   if (hash_table_retrieve(ht, "line") == NULL) {
     printf("...gone tomorrow. (success)\n");
