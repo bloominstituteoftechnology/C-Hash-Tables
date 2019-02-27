@@ -90,7 +90,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   Pair *insert_pair = create_pair(key, value);
 
   // hash the value
-  int hashed = hash(value, ht->capacity);
+  int hashed = hash(key, ht->capacity);
   Pair *current_pair = ht->storage[hashed];
   if (ht->storage[hashed] != NULL) {
     if (strcmp(current_pair->key, key) != 0) {
@@ -110,18 +110,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  // iterate through table
-  for (int i = 0; i < ht->capacity; i++) {
-    // check if current hash is NULL
-    if (ht->storage[i] != NULL) {
-      Pair *current_pair = ht->storage[i];
-      if (strcmp(current_pair->key, key) == 0) {
-        free(current_pair->key);
-        free(current_pair->value);
-        ht->storage[i] = NULL;
-        break;
-      }
-    }
+  int hashed = hash(key, ht->capacity);
+  Pair *current_pair = ht->storage[hashed];
+  if (ht->storage[hashed] != NULL) {
+    destroy_pair(current_pair);
+    ht->storage[hashed] = NULL;
   }
 }
 
@@ -132,6 +125,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  // iterate through ht
+  for (int i = 0; i < ht->capacity; i++) {
+    // check if current hash element is NULL
+    if (ht->storage[i] != NULL) {
+
+    }
+  }
   return NULL;
 }
 
