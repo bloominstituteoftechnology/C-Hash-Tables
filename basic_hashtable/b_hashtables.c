@@ -17,7 +17,7 @@ typedef struct Pair {
 typedef struct BasicHashTable {
   int capacity;
   Pair **storage;
-} BasicHashTable;
+} BasicHashTable; 
 
 /****
   Create a key/value pair to be stored in the hash table.
