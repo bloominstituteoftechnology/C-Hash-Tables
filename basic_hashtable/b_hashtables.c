@@ -13,11 +13,38 @@ typedef struct Pair {
 
 /****
   Basic hash table
+    Double pointer indirection
+    Pair*  holds a key-value pair (a pointer to a key-value pair)
+    Pair** is an array of key-value pairs
+    Storage (aka a bookshelf) holds a key-value pair or Pair*
  ****/
 typedef struct BasicHashTable {
   int capacity;
-  Pair **storage;
+  Pair **storage;     // Double pointer indirection 
 } BasicHashTable;
+
+/*** 
+Deconstructed BasicHashTable
+
+BasicHashTable = {
+  capacity: 5;
+  storage: *[
+        * Pair = {
+          *key: 'key';
+          *value: 'value';
+        },
+        * Pair = {
+          *key: 'key';
+          *value: 'value';
+        },
+        * Pair = {
+          *key: 'key';
+          *value: 'value';
+        },
+  ]
+
+}
+***/
 
 /****
   Create a key/value pair to be stored in the hash table.
@@ -67,13 +94,28 @@ unsigned int hash(char *str, int max)
 
   All values in storage should be initialized to NULL
   (hint: look up `calloc`)
+  void *calloc(size_t nitems, size_t size)
+    - nitems − This is the number of elements to be allocated.
+    - size − This is the size of elements.
+  a = (int*)calloc(n, sizeof(int));
+  Difference between malloc and calloc:
+   malloc does not set the memory to zero 
+   calloc sets allocated memory to zero.
+
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = calloc(capacity, sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = (Pair**)calloc(capacity, sizeof(Pair));
+
+  // for loop using malloc: 
+    // len = capacity 
+    // ht->storage[i] = (Pair**)malloc(capacity * sizeof(Pair));
 
   return ht;
 }
+
 
 /****
   Fill this in.
@@ -84,7 +126,11 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  // for(int i = 0; i < ht->capacity; i++) {
+  //   if (key == ht->storage->key) {
+  //     fprintf(stderr, "Warning: %d has already been used \n", key);
+  //   }
+  // }
 }
 
 /****
@@ -114,7 +160,14 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  //   for(int i = 0; i < ht->capacity; i++) {
+  //     destroy_pair(ht->storage[i]);
+  //     free(ht->storage[i]);
+  //   }
+  //   if (ht != NULL) {
+  //     free(ht->storage);
+  //     free(ht);
+  // }
 }
 
 
