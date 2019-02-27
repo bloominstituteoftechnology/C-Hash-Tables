@@ -159,10 +159,22 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 
   Don't forget to free any malloc'ed memory!
  ****/
-// void destroy_hash_table(BasicHashTable *ht)
-// {
-
-// }
+void destroy_hash_table(BasicHashTable *ht)
+{
+  //for each index in the hash table loop through until capacity is reached
+  for (int index = 0; index < ht->capacity; index++)
+  {
+    //check for null
+    if (ht->storage[index] != NULL)
+    {
+    //free elements with destroy pair
+    destroy_pair(pair);
+    }
+  }
+  //free all storage and hash table
+  free(ht->storage);
+  free(ht);
+}
 
 
 #ifndef TESTING
