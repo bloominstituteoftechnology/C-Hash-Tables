@@ -116,7 +116,14 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int i = hash(key, ht->capacity);
+
+  if(ht->storage[i]) {
+    return ht->storage[i];
+  }
+  else {
+    return NULL;
+  }
 }
 
 /****
