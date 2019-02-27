@@ -110,7 +110,19 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  // iterate through table
+  for (int i = 0; i < ht->capacity; i++) {
+    // check if current hash is NULL
+    if (ht->storage[i] != NULL) {
+      Pair *current_pair = ht->storage[i];
+      if (strcmp(current_pair->key, key) == 0) {
+        free(current_pair->key);
+        free(current_pair->value);
+        ht->storage[i] = NULL;
+        break;
+      }
+    }
+  }
 }
 
 /****
