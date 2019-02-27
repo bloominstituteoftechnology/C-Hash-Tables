@@ -47,7 +47,6 @@ void destroy_pair(Pair *pair)
 
 /****
   djb2 hash function
-
   Do not modify this!
  ****/
 unsigned int hash(char *str, int max)
@@ -66,7 +65,6 @@ unsigned int hash(char *str, int max)
 
 /****
   Fill this in.
-
   All values in storage should be initialized to NULL
   (hint: look up `calloc`)
  ****/
@@ -82,9 +80,7 @@ BasicHashTable *create_hash_table(int capacity)
 
 /****
   Fill this in.
-
   If you are overwriting a value with a different key, print a warning.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
@@ -93,10 +89,10 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   unsigned int target_index = hash(key, ht->capacity); // creates an array index for node to be inserted into
 
   if (ht->storage[target_index] != NULL)
-  {                                                          // If the node at the index is not empty
-    printf("You're overwriting an existing value value!\n"); // give warning
-    destroy_pair(ht->storage[target_index]);                 // free up the memory at that index
-    ht->storage[target_index] = new_pair;                    // insert new node into target index
+  { // If the node at the index is not empty
+    fprintf(stderr, "You're overwriting an existing value value!\n");
+    destroy_pair(ht->storage[target_index]); // free up the memory at that index
+    ht->storage[target_index] = new_pair;    // insert new node into target index
   }
   else
   {
@@ -106,22 +102,22 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 
 /****
   Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   unsigned int hashed_key = hash(key, ht->capacity); // hash the incoming key to find the index
 
-  if (ht->storage[hashed_key] != NULL)
-  {                                        // if the index at storage is not empty
-    destroy_pair(ht->storage[hashed_key]); // free up the memory at that index
+  if (ht->storage[hashed_key] == NULL)
+  { // if the index at storage is empty, return a message
+    fprintf(stderr, "Unable to remove entry with provided key.");
   }
+
+  ht->storage[hashed_key] = NULL; // otherwise set the current node to NULL
 }
 
 /****
   Fill this in.
-
   Should return NULL if the key is not found.
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
@@ -138,11 +134,17 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 
 /****
   Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    ht->storage[i] = NULL;        // without NULL -> error for object 0x7fbecec02b20: pointer being freed was not allocated
+    destroy_pair(ht->storage[i]); // destroy pair has built in NULL check and frees key, value, and node
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 #ifndef TESTING
@@ -150,28 +152,23 @@ int main(void)
 {
   struct BasicHashTable *ht = create_hash_table(16);
 
-  // MY TESTS
-  hash_table_insert(ht, "kevin", "portland\n");      // index 15
-  hash_table_insert(ht, "jason", "san francisco\n"); // index 9
-  hash_table_insert(ht, "alex", "missouri\n");       // also index 15, collision -> will override tim
-  printf("%s", hash_table_retrieve(ht, "jason"));    // returns san francisco
-  hash_table_remove(ht, "jason");                    // removes the specified key
-  printf("%s", hash_table_retrieve(ht, "jason"));    // returns nothing since it was deleted
-
   // DEFAULT TESTS
-  // hash_table_insert(ht, "line", "Here today...\n");
+  hash_table_insert(ht, "line", "Here today...\n");
 
-  // printf("%s", hash_table_retrieve(ht, "line"));
+  printf("%s", hash_table_retrieve(ht, "line"));
 
-  // hash_table_remove(ht, "line");
+  hash_table_remove(ht, "line");
 
-  // if (hash_table_retrieve(ht, "line") == NULL) {
-  //   printf("...gone tomorrow. (success)\n");
-  // } else {
-  //   fprintf(stderr, "ERROR: STILL HERE\n");
-  // }
+  if (hash_table_retrieve(ht, "line") == NULL)
+  {
+    printf("...gone tomorrow. (success)\n");
+  }
+  else
+  {
+    fprintf(stderr, "ERROR: STILL HERE\n");
+  }
 
-  // destroy_hash_table(ht);
+  destroy_hash_table(ht);
 
   return 0;
 }
