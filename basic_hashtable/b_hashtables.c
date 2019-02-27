@@ -65,7 +65,7 @@ unsigned int hash(char *str, int max)
 /****
   Fill this in.
 
-  All values in storage should be initialized to NULL
+  All value in storage should be initialized to NULL
   (hint: look up `calloc`)
  ****/
 BasicHashTable *create_hash_table(int capacity)
