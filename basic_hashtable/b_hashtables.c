@@ -107,6 +107,16 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
 
+  int index = hash(key, (*ht).capacity);
+
+  if((*ht).storage[index] != NULL) {
+
+    free((*ht).storage[index]);
+
+    (*ht).storage[index] = NULL;
+
+  }
+
 }
 
 /****
@@ -121,7 +131,9 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 
   if((*ht).storage[index] != NULL) {
 
-    return (*(*ht).storage[index]).value;
+    Pair *pair = (*ht).storage[index];
+
+    return (*pair).value;
 
   } else {
 
