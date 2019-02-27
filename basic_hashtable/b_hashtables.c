@@ -72,7 +72,7 @@ BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(Pair));
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -91,11 +91,15 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 
   // hash the value
   int hashed = hash(value, ht->capacity);
-  
+  Pair *current_pair = ht->storage[hashed];
   if (ht->storage[hashed] != NULL) {
-    printf("warning!");
+    if (strcmp(current_pair->key, key) != 0) {
+      printf("warning!");
+      // handle collision tomorrow
+    }
+    destroy_pair(current_pair);
   }
-  ht->storage[hashed] = strdup(insert_pair);
+  ht->storage[hashed] = insert_pair;
 
 }
 
