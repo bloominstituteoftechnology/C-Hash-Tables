@@ -92,10 +92,12 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     
   if (ht->storage[index] != NULL) {
     ht->storage[index]->next = new_pair;
+    printf("\n%d", index);
   }
   else
   {
     ht->storage[index] = new_pair;
+    printf("\n%d\n", index);
   }
 }
 
@@ -123,20 +125,27 @@ void hash_table_remove(HashTable *ht, char *key)
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
   unsigned int index = hash(key, ht->capacity);
-    
-  if (ht->storage[index]) 
+  printf("\n%s\n", ht->storage[index]->value);
+  if (ht->storage[index] == NULL)
   {
-    if (ht->storage[index]->key == key)
+    return NULL;
+  }
+    
+  else
+  {
+    if (strcmp(ht->storage[index]->key, key) == 0)
     {
       return ht->storage[index]->value;
     }
     else
     {
-      struct LinkedPair *i = ht->storage[index]->next;
+      LinkedPair *i = malloc(sizeof(LinkedPair));
+      i = ht->storage[index]->next;
       while (i != NULL)
       {
         if (i->key == key)
         {
+          destroy_pair(i);
           return i->value;
         }
         else 
@@ -146,7 +155,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
       }
     }
   }
-  return NULL;
+  
 }
 
 /****
@@ -179,11 +188,11 @@ HashTable *hash_table_resize(HashTable *ht)
 int main(void)
 {
   struct HashTable *ht = create_hash_table(2);
-  printf("success"); 
   
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n"); 
+  printf("\n%s", hash_table_retrieve(ht, "line_3"));
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
