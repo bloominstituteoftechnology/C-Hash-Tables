@@ -89,6 +89,22 @@ BasicHashTable *create_hash_table(int capacity)
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
 
+  int new_pair = create_pair(key, value);
+  int new_hash = hash(new_pair, (*ht).capacity);
+
+  int array_size = 0;
+  for(int i = 0; (*ht).storage[i] != NULL; i++) {
+
+    array_size++;
+
+  }
+
+  int index = (new_hash % array_size);
+
+  free((*ht).storage[index]);
+
+  (*ht).storage[index] = new_hash;
+
 }
 
 /****
@@ -118,7 +134,9 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  free((*ht).storage);
 
+  free(ht);
 }
 
 
