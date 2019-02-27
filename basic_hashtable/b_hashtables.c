@@ -93,6 +93,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 
   int index = hash(key, (*ht).capacity);
 
+  if((*ht).storage[index] != NULL) {
+
+    printf("Collision warning: overwriting previous value.\n");
+
+  }
+
   free((*ht).storage[index]);
 
   (*ht).storage[index] = new_pair;
