@@ -86,7 +86,17 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  Pair *pair = create_pair(key, value);
+  unsigned int i = hash(key, ht->capacity);
 
+  /* will use actual collision handling a bit later, for now just the warning */
+
+  if(ht->storage[i]) {
+    fprintf(stderr, "Indexing error: there is a current value being overwritten.\n");
+    free(ht->storage[i]); /* if ht->storage[i] exists, this message comes up and the memory at index i is freed */
+  }
+
+  ht->storage[i] = pair;
 }
 
 /****
