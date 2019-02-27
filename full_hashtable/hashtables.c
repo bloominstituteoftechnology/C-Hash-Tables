@@ -70,7 +70,11 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+
+  (*ht).capacity = capacity;
+
+  (*ht).storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -86,6 +90,30 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+
+  LinkedPair *new_pair = create_pair(key, value);
+
+  int index = hash(key, (*ht).capacity);
+
+  LinkedPair *current_pair = (*ht).storage[index];
+
+  if((*ht).storage[index] != NULL) {
+
+    while((*current_pair).next != NULL && (*current_pair).key != key) {
+
+      current_pair = (*current_pair).next;
+
+    }
+
+    free(current_pair);
+    current_pair = new_pair;
+    
+  } else {
+
+    free(current_pair);
+    current_pair = new_pair;
+
+  }
 
 }
 
@@ -123,6 +151,10 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 void destroy_hash_table(HashTable *ht)
 {
 
+  free((*ht).storage);
+
+  free(ht);
+
 }
 
 /****
@@ -135,7 +167,12 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table((2 * (*ht).capacity));
+
+  (*new_ht).storage = (*ht).storage;
+
+  free((*ht).storage);
+  free(ht);
 
   return new_ht;
 }
