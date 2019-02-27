@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* initial commit */ 
 
 /****
   Basic hash table key/value pair
