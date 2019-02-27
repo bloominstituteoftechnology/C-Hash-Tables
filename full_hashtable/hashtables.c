@@ -128,6 +128,28 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 void hash_table_remove(HashTable *ht, char *key)
 {
 
+  int index = hash(key, (*ht).capacity);
+
+  LinkedPair *current_pair = (*ht).storage[index];
+
+  if((*ht).storage[index] != NULL) {
+
+    while((*current_pair).next != NULL && (*current_pair).key != key) {
+
+      current_pair = (*current_pair).next;
+
+    }
+
+    destroy_pair(current_pair);
+    current_pair = NULL;
+    
+  } else {
+
+    destroy_pair(current_pair);
+    current_pair = NULL;
+
+  }
+
 }
 
 /****
@@ -140,7 +162,27 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+
+  int index = hash(key, (*ht).capacity);
+
+  if((*ht).storage[index] != NULL) {
+
+    LinkedPair *current_pair = (*ht).storage[index];
+
+    while((*current_pair).next != NULL && (*current_pair).key != key) {
+
+      current_pair = (*current_pair).next;
+
+    }
+
+    return (*current_pair).value;
+    
+  } else {
+
+    return NULL;
+
+  }
+
 }
 
 /****
@@ -171,8 +213,7 @@ HashTable *hash_table_resize(HashTable *ht)
 
   (*new_ht).storage = (*ht).storage;
 
-  free((*ht).storage);
-  free(ht);
+  destroy_hash_table(ht);
 
   return new_ht;
 }
