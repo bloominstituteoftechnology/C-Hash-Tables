@@ -111,6 +111,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int hashed_key = hash(key, ht->capacity); // hash the incoming key to find the index
+
+  if (ht->storage[hashed_key] != NULL)
+  {                                        // if the index at storage is not empty
+    destroy_pair(ht->storage[hashed_key]); // free up the memory at that index
+  }
 }
 
 /****
@@ -120,7 +126,14 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int hashed_key = hash(key, ht->capacity); // hash the incoming key to find the index
+
+  if (ht->storage[hashed_key] != NULL)
+  {                                        // if the index at storage is not empty
+    return ht->storage[hashed_key]->value; // return value at key
+  }
+
+  return NULL; // if nothing is there, return null
 }
 
 /****
@@ -137,22 +150,28 @@ int main(void)
 {
   struct BasicHashTable *ht = create_hash_table(16);
 
-  hash_table_insert(ht, "line", "Here today...\n");
+  // MY TESTS
+  hash_table_insert(ht, "kevin", "portland\n");      // index 15
+  hash_table_insert(ht, "jason", "san francisco\n"); // index 9
+  hash_table_insert(ht, "alex", "missouri\n");       // also index 15, collision -> will override tim
+  printf("%s", hash_table_retrieve(ht, "jason"));    // returns san francisco
+  hash_table_remove(ht, "jason");                    // removes the specified key
+  printf("%s", hash_table_retrieve(ht, "jason"));    // returns nothing since it was deleted
 
-  printf("%s", hash_table_retrieve(ht, "line"));
+  // DEFAULT TESTS
+  // hash_table_insert(ht, "line", "Here today...\n");
 
-  hash_table_remove(ht, "line");
+  // printf("%s", hash_table_retrieve(ht, "line"));
 
-  if (hash_table_retrieve(ht, "line") == NULL)
-  {
-    printf("...gone tomorrow. (success)\n");
-  }
-  else
-  {
-    fprintf(stderr, "ERROR: STILL HERE\n");
-  }
+  // hash_table_remove(ht, "line");
 
-  destroy_hash_table(ht);
+  // if (hash_table_retrieve(ht, "line") == NULL) {
+  //   printf("...gone tomorrow. (success)\n");
+  // } else {
+  //   fprintf(stderr, "ERROR: STILL HERE\n");
+  // }
+
+  // destroy_hash_table(ht);
 
   return 0;
 }
