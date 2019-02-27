@@ -89,6 +89,19 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  Pair *new_pair = create_pair(key, value);            // creates a new node for insertion
+  unsigned int target_index = hash(key, ht->capacity); // creates an array index for node to be inserted into
+
+  if (ht->storage[target_index] != NULL)
+  {                                                          // If the node at the index is not empty
+    printf("You're overwriting an existing value value!\n"); // give warning
+    destroy_pair(ht->storage[target_index]);                 // free up the memory at that index
+    ht->storage[target_index] = new_pair;                    // insert new node into target index
+  }
+  else
+  {
+    ht->storage[target_index] = new_pair; // just insert new node into target index if it's empty
+  }
 }
 
 /****
