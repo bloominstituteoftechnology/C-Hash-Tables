@@ -120,9 +120,14 @@ void hash_table_remove(BasicHashTable *ht, char *key)
 
   Pair *stored_pair = ht->storage[index];
 
-  if (stored_pair != NULL && strcmp(stored_pair->key, key) == 0){
-    destroy_pair(ht->storage[index]);
+  if (stored_pair == NULL){
+    printf("Key not availble");
+    
   }
+  
+  destroy_pair(stored_pair);
+  
+  ht->storage[index] = NULL;
   
 }
 
@@ -133,12 +138,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  // printf("REACHED");
+
   // rehash to get the right index
   unsigned int index = hash(key, ht->capacity);
 
-  if (ht->storage[index]->key == NULL){
-    fprintf(stderr, "KEY NOT FOUND");
+  if (ht->storage[index] == NULL){
+    fprintf(stderr, "KEY NOT FOUND\n");
     return NULL;
   }
   // return value located at index
@@ -164,8 +169,7 @@ void destroy_hash_table(BasicHashTable *ht)
 int main(void)
 {
   struct BasicHashTable *ht = create_hash_table(16);
-  // printf("%s", ht->storage[0]);
-  // printf("REACHED HERE\n");
+
   hash_table_insert(ht, "line", "Here today...\n");
   
   printf("%s", hash_table_retrieve(ht, "line"));
