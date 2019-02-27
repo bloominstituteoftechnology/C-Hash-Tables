@@ -106,7 +106,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  unsigned int i = hash(key, ht->capacity);
+  if(ht->storage[i]) {
+    ht->storage[i]->value = NULL; /* accessing the value itself as in the retrieve function */
+    ht->storage[i]->key = NULL;
+    destroy_pair(ht->storage[i]);
+  }
 }
 
 /****
