@@ -128,7 +128,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   int hashed = hash(key, ht->capacity);
   Pair *current_pair = ht->storage[hashed];
   if (ht->storage[hashed] != NULL) {
-    return current_pair->key;
+    return current_pair->value;
   }
   return NULL;
 }
@@ -140,7 +140,14 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for (int i = 0; i < ht->capacity; i++) {
+    if (ht->storage[i] != NULL) {
+      destroy_pair(ht->storage[i]);
+      ht->storage[i] = NULL;
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
