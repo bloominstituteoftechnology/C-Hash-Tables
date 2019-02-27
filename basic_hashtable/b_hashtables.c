@@ -119,7 +119,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   unsigned int i = hash(key, ht->capacity);
 
   if(ht->storage[i]) {
-    return ht->storage[i];
+    return ht->storage[i]->value;
   }
   else {
     return NULL;
