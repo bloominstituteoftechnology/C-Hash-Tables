@@ -125,12 +125,10 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  // iterate through ht
-  for (int i = 0; i < ht->capacity; i++) {
-    // check if current hash element is NULL
-    if (ht->storage[i] != NULL) {
-
-    }
+  int hashed = hash(key, ht->capacity);
+  Pair *current_pair = ht->storage[hashed];
+  if (ht->storage[hashed] != NULL) {
+    return current_pair->key;
   }
   return NULL;
 }
