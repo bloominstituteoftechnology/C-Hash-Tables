@@ -121,8 +121,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   int index = hash(key, ht->capacity);
   if (ht->storage[index])
   {
-    destroy_pair(ht->storage[index]);
-    ht->storage[index] = NULL;
+    return ht->storage[index]->value;
   }
   else
   {
