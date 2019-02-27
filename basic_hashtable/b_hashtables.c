@@ -72,7 +72,7 @@ BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(char *));
+  ht->storage = calloc(capacity, sizeof(Pair *));
   return ht;
 }
 
@@ -87,10 +87,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   Pair *new_pair = create_pair(key, value);
   unsigned int index = hash(key, ht->capacity);
-    
-  if (ht->storage[index]) {
-    printf("\n%s\n", "You are overwriting a value.");
-    free(ht->storage[index]);
+  if (ht->storage[index])
+  {
+    if (strcmp(ht->storage[index]->key, key) != 0) {
+      printf("\n%s\n", "You are overwriting a value.");
+      destroy_pair(ht->storage[index]);
+    }
   }
 
   ht->storage[index] = new_pair;
@@ -104,11 +106,16 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   unsigned int index = hash(key, ht->capacity);
-  if (ht->storage[index]) 
+  if (strcmp(ht->storage[index]->key, key) == 0) 
   {
     ht->storage[index]->value = NULL;
     ht->storage[index]->key = NULL;
     destroy_pair(ht->storage[index]);
+    free(ht->storage[index]);
+  }
+  else
+  {
+    printf("The key does not exist.");
   }
 }
 
@@ -161,7 +168,7 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line"));
 
   hash_table_remove(ht, "line");
-
+  printf("\n%s\n", hash_table_retrieve(ht, "line"));
   if (hash_table_retrieve(ht, "line") == NULL) {
     printf("...gone tomorrow. (success)\n");
   } else {
