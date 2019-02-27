@@ -74,7 +74,7 @@ BasicHashTable *create_hash_table(int capacity)
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
   //set hash table capacity
   ht->capacity = capacity;
-  //
+  //allocate memory for storage
   ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
@@ -99,7 +99,16 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    Pair *pair = ht->storage[i];
+    if (pair != NULL) 
+    {
+      destroy_pair(pair);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
