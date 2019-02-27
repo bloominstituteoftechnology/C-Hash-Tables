@@ -16,7 +16,7 @@ typedef struct Pair {
  ****/
 typedef struct BasicHashTable {
   int capacity;
-  Pair **storage;
+  Pair **storage; //storage serves as array so it is a pointer to pointer
 } BasicHashTable;
 
 /****
@@ -89,7 +89,26 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  //hash key to get index
+  unsigned int index = hash(key, ht->capacity);
+  //create a pair using key and value
+  Pair *new_pair = create_pair(key, value);
+  //store current pair
+  Pair *pair = ht->storage[index];
+  //check current index for null. if not null destroy what is there.
+  if (ht->storage[index] != NULL)
+  {
+    //conditional statement comparing key and pair. strcmp returns 0. 0 if they are equal.
+    if (strcmp(key, pair->key) != 0)
+    {
+      printf("Warning: overwriting variable");
+      //collisions will go here
+    }
+    //delete existing pair
+    destroy_pair(pair);
+  }
+  //update current position
+  ht->storage[index] = new_pair;
 }
 
 /****
@@ -99,16 +118,18 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  for (int i = 0; i < ht->capacity; i++)
+  //get index using hash function
+  unsigned int index = hash(key, ht->capacity);
+  //create a pair
+  Pair *pair = ht->storage[index];
+  //check for null: do nothing if null. delete if there is something at that index.
+  if (ht->storage[index] == NULL)
   {
-    Pair *pair = ht->storage[i];
-    if (pair != NULL) 
-    {
-      destroy_pair(pair);
-    }
+    fprintf(stderr, "key does not exist");
+    return;
   }
-  free(ht->storage);
-  free(ht);
+  destroy_pair(pair);
+  ht->storage[index] = NULL;
 }
 
 /****
@@ -118,6 +139,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  //retrive value
   return NULL;
 }
 
