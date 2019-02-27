@@ -72,7 +72,7 @@ BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(char *));
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -86,29 +86,44 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  printf("REACHED");
+  // printf("REACHED INSERT");
   // hash the key
   unsigned int index = hash(key, ht->capacity);
 
+  // new pair
+  Pair *pair = create_pair(key, value);
+
+  // old pair to check if there is something there
+  Pair *stored_pair = ht->storage[index];
+
   if (ht->storage[index] != NULL)
   {
-    fprintf(stderr, "OVER-WRITING VALUE");
+    if (strcmp(key, stored_pair->key) != 0)
+    {
+      fprintf(stderr, "OVER-WRITING VALUE");
+    }
+    destroy_pair(stored_pair);
   }
 
   // put value inside storage at the hash location
-  ht->storage[index]->key = strdup(key);
-  ht->storage[index]->value = strdup(value);
+  ht->storage[index] = pair;
 }
 
 /****
-  Fill this in.
+  Removes value from Hashtable.
 
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   unsigned int index = hash(key, ht->capacity);
-  free(ht->storage[index]);
+
+  Pair *stored_pair = ht->storage[index];
+
+  if (stored_pair != NULL && strcmp(stored_pair->key, key) == 0){
+    destroy_pair(ht->storage[index]);
+  }
+  
 }
 
 /****
@@ -118,7 +133,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  printf("REACHED");
+  // printf("REACHED");
   // rehash to get the right index
   unsigned int index = hash(key, ht->capacity);
 
@@ -150,18 +165,18 @@ int main(void)
 {
   struct BasicHashTable *ht = create_hash_table(16);
   // printf("%s", ht->storage[0]);
-  // printf("REACHED HERE");
+  // printf("REACHED HERE\n");
   hash_table_insert(ht, "line", "Here today...\n");
   
-  // printf("%s", hash_table_retrieve(ht, "line"));
+  printf("%s", hash_table_retrieve(ht, "line"));
 
-  // hash_table_remove(ht, "line");
+  hash_table_remove(ht, "line");
 
-  // if (hash_table_retrieve(ht, "line") == NULL) {
-  //   printf("...gone tomorrow. (success)\n");
-  // } else {
-  //   fprintf(stderr, "ERROR: STILL HERE\n");
-  // }
+  if (hash_table_retrieve(ht, "line") == NULL) {
+    printf("...gone tomorrow. (success)\n");
+  } else {
+    fprintf(stderr, "ERROR: STILL HERE\n");
+  }
 
   destroy_hash_table(ht);
 
