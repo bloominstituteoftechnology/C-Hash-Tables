@@ -88,6 +88,29 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  //compute index with hash function
+  unsigned int index = hash(key, ht->capacity);
+  //create new pair to insert
+  LinkedPair *new_pair = create_pair(key, value);
+  //get the current stored pair
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair = NULL;
+  //loop through while current pair exists and keys do not match
+  while (current_pair != NULL && current_pair-> key != key)
+  {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
+  if (current_pair)
+  {
+    current_pair->value = value;
+  }
+  else
+  {
+    new_pair->next = ht->storage[index];
+  }
+  
+
 
 }
 
@@ -167,3 +190,5 @@ int main(void)
   return 0;
 }
 #endif
+
+//https://www.hackerearth.com/practice/data-structures/hash-tables/basics-of-hash-tables/tutorial/
