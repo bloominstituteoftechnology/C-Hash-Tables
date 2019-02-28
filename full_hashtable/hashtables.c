@@ -70,8 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair*));
   return ht;
 }
 
@@ -82,12 +83,20 @@ HashTable *create_hash_table(int capacity)
   added to the corresponding LinkedPair list.
 
   Inserting values to the same index with existing keys can overwrite
-  the value in th existing LinkedPair list.
+  the value in the existing LinkedPair list.
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  // unsigned int hash(char *str, int max);
+  unsigned int hash_key = hash(key, ht->capacity);
+ 
+  if (!(ht->storage[hash_key])) {
+    ht->storage[hash_key] = create_pair(key, value);
+  } else { 
+    ht->storage[hash_key]->next = create_pair(key, value);
+  }
 }
+
 
 /****
   Fill this in.
@@ -99,7 +108,19 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  unsigned int hash_key = hash(key, ht->capacity);
+ 
+  if (ht->storage[hash_key]) {
+    while(ht->storage[hash_key]) {
+      struct LinkedPair *curr_pair_ptr = ht->storage[hash_key];
+      if (strcmp(key, curr_pair_ptr->key) == 0) {
+        destroy_pair(curr_pair_ptr);
+        curr_pair_ptr = NULL;
+      }
+      ht->storage[hash_key] = curr_pair_ptr->next;
+    }
+  }
+  return;
 }
 
 /****
@@ -112,8 +133,17 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int hash_key = hash(key, ht->capacity);
+  while(ht->storage[hash_key]) {
+    struct LinkedPair *curr_pair_ptr = ht->storage[hash_key];
+    if (strcmp(key, curr_pair_ptr->key) == 0) {
+      return curr_pair_ptr->value;
+    }
+    ht->storage[hash_key] = curr_pair_ptr->next;
+  }
   return NULL;
 }
+
 
 /****
   Fill this in.
@@ -122,7 +152,15 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+    for(int i = 0; i < ht->capacity; i++) {
+      if(ht->storage[i] != NULL) {
+        destroy_pair(ht->storage[i]);
+      }
+    }
+    if (ht != NULL) {
+      free(ht->storage);
+      free(ht);
+  }
 }
 
 /****

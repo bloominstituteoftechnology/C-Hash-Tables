@@ -29,15 +29,15 @@ Deconstructed BasicHashTable
 BasicHashTable = {
   capacity: 5;
   storage: *[
-        * Pair = {
+        * Pair: {
           *key: 'key';
           *value: 'value';
         },
-        * Pair = {
+        * Pair: {
           *key: 'key';
           *value: 'value';
         },
-        * Pair = {
+        * Pair: {
           *key: 'key';
           *value: 'value';
         },
@@ -113,28 +113,18 @@ BasicHashTable *create_hash_table(int capacity)
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
   ht->capacity = capacity;
   ht->storage = calloc(capacity, sizeof(Pair*));
-
-  // for loop using malloc: 
-    // len = capacity 
-    // ht->storage[i] = (Pair**)malloc(capacity * sizeof(Pair));
-
   return ht;
 }
 
 
 /****
-  Fill this in.
-
   If you are overwriting a value with a different key, print a warning.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  // unsigned int hash(char *str, int max);
   unsigned int hash_key = hash(key, ht->capacity);
 
-  // obj
   if (ht->storage[hash_key]) {
       fprintf(stderr, "Warning: overwriting %s with a different key \n", key);
       destroy_pair(ht->storage[hash_key]);
@@ -143,25 +133,24 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 }
 
 /****
-  Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   unsigned int hash_key = hash(key, ht->capacity);
-  destroy_pair(ht->storage[hash_key]);
-  ht->storage[hash_key] = NULL;
+  if (ht->storage[hash_key]) {
+    destroy_pair(ht->storage[hash_key]);
+    ht->storage[hash_key] = NULL;
+  } else {
+    fprintf(stderr, "Warning: %s does not exist \n", key);
+  }
 }
 
 /****
-  Fill this in.
-
   Should return NULL if the key is not found.
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  // unsigned int hash(char *str, int max);
   unsigned int hash_key = hash(key, ht->capacity);
 
   if (!(ht->storage[hash_key])) {
@@ -171,8 +160,6 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 }
 
 /****
-  Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void destroy_hash_table(BasicHashTable *ht)
@@ -180,7 +167,6 @@ void destroy_hash_table(BasicHashTable *ht)
     for(int i = 0; i < ht->capacity; i++) {
       if(ht->storage[i]) {
         destroy_pair(ht->storage[i]);
-        free(ht->storage[i]);
       }
     }
     if (ht != NULL) {
