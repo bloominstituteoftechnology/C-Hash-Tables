@@ -70,8 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht-storage = calloc(ht->capacity, sizeof(LinkedPair*));
   return ht;
 }
 
@@ -86,6 +87,15 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int index = hash(key, ht->capacity);
+  HashTable *pair = create_pair(key, value);
+  if (ht->storage[index] == NULL) {
+    ht->storage[index] = pair;
+  } else {
+    ht->storage[index]->next = create_pair(key, value);
+  }
+
+
 
 }
 
