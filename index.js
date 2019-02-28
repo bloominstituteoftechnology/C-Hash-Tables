@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 const fs = require('fs')
 let file = 'keep-it-green.txt'
 var program = require('commander')
@@ -7,6 +6,7 @@ var promise = require('promise')
 var spawn = require('child_process').spawn
 var pkg = require('./package.json')
 var CWD = process.cwd()
+const fetch = require('node-fetch')
 
 function addAll () {
   return run('git', [ 'add', '--all' ])
@@ -37,30 +37,57 @@ function run (command, args) {
   })
 }
 
-fs.access(file, (err) => {
-  console.log(`${file} ${err ? 'does not exist' : 'exists'}`)
-  if (!err) {
-    fs.writeFile(file, 'Hello World!', function (err) {
-      if (err) return console.log(err)
-      Promise.resolve()
-        .then(addAll)
-        .then(commit)
-        .then(push)
-        .then(function () {
-          console.log(
-            ('[GIT AUTO COMMIT]: Commit success at ' + new Date().toString())
-              .green
-          )
+let ipsum = Promise.resolve(
+  fetch('https://baconipsum.com/api/?type=meat-and-filler')
+)
+
+ipsum
+  .then(function (response) {
+    return response.json()
+  })
+  .then(function (myJson) {
+    // console.log(JSON.stringify(myJson[0]))
+    fs.access(file, (err) => {
+      console.log(`${file} ${err ? 'does not exist' : 'exists'}`)
+      if (!err) {
+        fs.writeFile(file, myJson[0], function (err) {
+          if (err) return console.log(err)
+          Promise.resolve()
+            .then(addAll)
+            .then(commit)
+            .then(push)
+            .then(function () {
+              console.log(
+                ('[GIT AUTO COMMIT]: Commit success at ' +
+                  new Date().toString()).green
+              )
+            })
+            .catch(function (e) {
+              console.log(('[GIT AUTO COMMIT]: ' + e.message).red)
+            })
         })
-        .catch(function (e) {
-          console.log(('[GIT AUTO COMMIT]: ' + e.message).red)
+      } else {
+        let stream = fs.createWriteStream(file)
+        stream.once('open', function (fd) {
+          stream.write('stream wrote this\n')
+          stream.end()
         })
+        fs.writeFile(file, myJson[0], function (err) {
+          if (err) return console.log(err)
+          Promise.resolve()
+            .then(addAll)
+            .then(commit)
+            .then(push)
+            .then(function () {
+              console.log(
+                ('[GIT AUTO COMMIT]: Commit success at ' +
+                  new Date().toString()).green
+              )
+            })
+            .catch(function (e) {
+              console.log(('[GIT AUTO COMMIT]: ' + e.message).red)
+            })
+        })
+      }
     })
-  } else {
-    let stream = fs.createWriteStream(file)
-    stream.once('open', function (fd) {
-      stream.write('stream wrote this\n')
-      stream.end()
-    })
-  }
-})
+  })
