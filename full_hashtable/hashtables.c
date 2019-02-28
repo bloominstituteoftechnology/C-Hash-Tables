@@ -95,23 +95,27 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
   int index = hash(key, (*ht).capacity);
 
-  LinkedPair *current_pair = (*ht).storage[index];
-
   if((*ht).storage[index] != NULL) {
 
-    while((*current_pair).next != NULL && (*current_pair).key != key) {
+    LinkedPair *current_pair = (*ht).storage[index];
+
+    while((*current_pair).next != NULL) {
 
       current_pair = (*current_pair).next;
 
-    }
+      if((*current_pair).key == key) {
 
-    free(current_pair);
-    current_pair = new_pair;
+        free(current_pair);
+        current_pair = new_pair;
+
+      } 
+
+    }
     
   } else {
 
-    free(current_pair);
-    current_pair = new_pair;
+    free((*ht).storage[index]);
+    (*ht).storage[index] = new_pair;
 
   }
 
@@ -130,23 +134,29 @@ void hash_table_remove(HashTable *ht, char *key)
 
   int index = hash(key, (*ht).capacity);
 
-  LinkedPair *current_pair = (*ht).storage[index];
-
   if((*ht).storage[index] != NULL) {
 
-    while((*current_pair).next != NULL && (*current_pair).key != key) {
+    LinkedPair *current_pair = (*ht).storage[index];
 
-      current_pair = (*current_pair).next;
+    while((*current_pair).next != NULL) {
+
+      if((*current_pair).key == key) {
+
+        destroy_pair(current_pair);
+        current_pair = NULL;
+
+      } else {
+
+        current_pair = (*current_pair).next;
+
+      }
 
     }
-
-    destroy_pair(current_pair);
-    current_pair = NULL;
     
   } else {
 
-    destroy_pair(current_pair);
-    current_pair = NULL;
+    destroy_pair((*ht).storage[index]);
+    (*ht).storage[index] = NULL;
 
   }
 
@@ -169,11 +179,11 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 
     LinkedPair *current_pair = (*ht).storage[index];
 
-    while((*current_pair).next != NULL && (*current_pair).key != key) {
-
+    while((*current_pair).next != NULL) {
+      
       current_pair = (*current_pair).next;
 
-    }
+    } 
 
     return (*current_pair).value;
     
