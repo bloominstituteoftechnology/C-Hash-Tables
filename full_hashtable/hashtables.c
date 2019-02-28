@@ -91,6 +91,23 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   unsigned int i = hash(key, ht->capacity);
   LinkedPair *current = ht->storage[i];
   LinkedPair *previous; /* does not need to be set to anything initially */
+
+  while(current != NULL && strcmp(current->key, key) != 0) {
+    /* using strcmp as discussed in the guided demo earlier */
+
+    previous = current;
+    current = previous->next;
+  }
+  
+  if(current != NULL) {
+    current->value = value;
+  }
+  else {
+    LinkedPair *new = create_pair(key, value); /* if nothing is found in the bucket, create a new pair */
+    new->next = ht->storage[i];
+    ht->storage[i] = new;
+  }
+
 }
 
 /****
