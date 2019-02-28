@@ -134,7 +134,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   void hash_table_remove(HashTable * ht, char *key)
   {
     unsigned int target_index = hash(key, ht->capacity);
-    LinkedPair *current = ht->storage[target_index]; // shortens the name
+    LinkedPair *current = ht->storage[target_index]; // shortens the name serves as a marker
 
     while (current != 0)
     { // LOOP while there's a current node
@@ -164,7 +164,23 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
   char *hash_table_retrieve(HashTable * ht, char *key)
   {
-    return NULL;
+    unsigned int target_index = hash(key, ht->capacity);
+    LinkedPair *current = ht->storage[target_index]; // shortens the name and serve as marker
+
+    while (current != 0)
+    { // LOOP while there's a current node
+      if (strcmp(current->key, key) == 0)
+      { // EXIT 1 if keys match, return the value
+        return current->value;
+      }
+      else if (strcmp(current->key, key) != 0 && current->next == 0)
+      { // EXIT 2 if no key matches and no linked node, return NULL
+        fprintf(stderr, "That key was not found.");
+        return NULL;
+      }
+      current = current->next; // ITERATOR Move to the next linked node and continue with while loop to check
+    }
+    return 0;
   }
 
   /****
