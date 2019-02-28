@@ -67,8 +67,15 @@ char *basic_hash_table_test()
     return_value = hash_table_retrieve(ht, "key-6");
     mu_assert(strcmp(return_value, "new-val-6") == 0, "Value is not overwritten correctly");
     return_value = hash_table_retrieve(ht, "key-7");
+
+    printf("%s\n", return_value);
+
     mu_assert(strcmp(return_value, "new-val-7") == 0, "Value is not overwritten correctly");
+    
     return_value = hash_table_retrieve(ht, "key-8");
+
+    printf("%s\n", return_value);
+
     mu_assert(strcmp(return_value, "new-val-8") == 0, "Value is not overwritten correctly");
     return_value = hash_table_retrieve(ht, "key-9");
     mu_assert(strcmp(return_value, "new-val-9") == 0, "Value is not overwritten correctly");
