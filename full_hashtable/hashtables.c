@@ -136,7 +136,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     unsigned int target_index = hash(key, ht->capacity);
     LinkedPair *current = ht->storage[target_index]; // shortens the name serves as a marker
 
-    while (current != 0)
+    while (current->key != 0)
     { // LOOP while there's a current node
       if (strcmp(current->key, key) == 0 && current->next == 0)
       { // EXIT 1 if strings are the same and there's NOT a linked node
@@ -212,7 +212,14 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
   HashTable *hash_table_resize(HashTable * ht)
   {
-    HashTable *new_ht;
+    HashTable *new_ht = create_hash_table(ht->capacity * 2); // Create new hash table with double capacity
+
+    for (int i = 0; i < ht->capacity; i++)
+    { // copy from old storage to new storage
+      new_ht->storage[i] = ht->storage[i];
+    }
+
+    destroy_hash_table(ht); // destroy old hash table
 
     return new_ht;
   }
