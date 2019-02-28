@@ -204,8 +204,19 @@ HashTable *hash_table_resize(HashTable *ht)
   new_ht->capacity = ht->capacity * 2;
   new_ht->storage = calloc(new_ht->capacity, sizeof(LinkedPair));
 
-  
+  for(int i = 0; i < ht->capacity; i++) {
+    if(ht->storage[i] != NULL) {
+      hash_table_insert(new_ht, ht->storage[i]->key, ht->storage[i]->value); /* create a new pair */
+      while(ht->storage[i]->next != NULL) {
+        /* while there is a next bucket to move to, perform the same insertion
+        move to the following bucket when complete */
+        hash_table_insert(new_ht, ht->storage[i]->next->key, ht->storage[i]->next->value);
+        ht->storage[i] = ht->storage[i]->next;
+      }
+    }
+  }
 
+  destroy_hash_table(ht); /* free malloc'd memory before returning the new hash table */
   return new_ht;
 }
 
