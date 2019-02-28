@@ -92,17 +92,22 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
   LinkedPair *new_pair = create_pair(key, value);
 
-  if (ht->storage[index] == NULL){
-      ht->storage[index] = new_pair;
-  } else {
-    LinkedPair *current_pair = ht->storage[index];
-    while(current_pair->next != NULL){
-      if (strcmp(current_pair->key, key) == 0) {
-        // if the keys are the same overwrite the value
-        ht->storage[index]->value = value;
-      } else {
-        // if keys are different
+  LinkedPair *current_pair = ht->storage[index];
+  
+  if (current_pair == NULL){
+    ht->storage[index] = new_pair;
+  }else{
+
+  while (current_pair != NULL){
+  
+      if (strcmp(current_pair->key, key) == 0) 
+      {
+        current_pair->value = value;
+        break;
+      }
+      else if (current_pair->next == NULL){
         current_pair->next = new_pair;
+        break;
       }
       current_pair = current_pair->next;
     }
@@ -134,18 +139,24 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 {
   unsigned int index = hash(key, ht->capacity);
 
-  if (strcmp(ht->storage[index]->key, key) == 0){
-    return ht->storage[index]->value;
-  } 
-  else {
-    while(ht->storage[index]->next != NULL){
-      if (strcmp(ht->storage[index]->key, key) == 0){
-        return ht->storage[index]->value;
-      }
-    }
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair = NULL;
+  
+  
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0) {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
   }
-  fprintf(stderr, "%s NOT FOUND\n", key);
-  return NULL;
+  // current pair is either null or matches the key
+
+  if (current_pair == NULL){
+    fprintf(stderr, "KEY %s NOT FOUND", key);
+    return NULL;
+  } else {
+    return current_pair->value;
+  }
+
+
 }
 
 /****
@@ -179,13 +190,13 @@ int main(void)
 {
   struct HashTable *ht = create_hash_table(2);
 
-  hash_table_insert(ht, "line_1", "Tiny hash table\n");
-  hash_table_insert(ht, "line_1", "Filled beyond capacity\n");
-  // hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
+  hash_table_insert(ht, "line_1", "Tiny hash table");
+  printf("%s\n", hash_table_retrieve(ht, "line_1"));
 
-  printf("%s", hash_table_retrieve(ht, "line_1"));
-  // printf("%s", hash_table_retrieve(ht, "line_2"));
-  // printf("%s", hash_table_retrieve(ht, "line_3"));
+  hash_table_insert(ht, "line_2", "HELLO FROM LINE 2!");
+  printf("%s\n", hash_table_retrieve(ht, "line_2"));
+  hash_table_insert(ht, "line_2", "GOODBYE FROM LINE 2!\n");
+  printf("%s", hash_table_retrieve(ht, "line_2"));
 
   // int old_capacity = ht->capacity;
   // ht = hash_table_resize(ht);
