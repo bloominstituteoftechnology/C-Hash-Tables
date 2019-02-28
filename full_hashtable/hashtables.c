@@ -72,7 +72,7 @@ HashTable *create_hash_table(int capacity)
 {
   HashTable *ht = malloc(sizeof(HashTable));
   ht->capacity = capacity;
-  ht-storage = calloc(ht->capacity, sizeof(LinkedPair*));
+  ht->storage = calloc(ht->capacity, sizeof(LinkedPair*));
   return ht;
 }
 
@@ -88,9 +88,8 @@ HashTable *create_hash_table(int capacity)
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
   unsigned int index = hash(key, ht->capacity);
-  HashTable *pair = create_pair(key, value);
   if (ht->storage[index] == NULL) {
-    ht->storage[index] = pair;
+    ht->storage[index] = create_pair(key, value);
   } else {
     ht->storage[index]->next = create_pair(key, value);
   }
@@ -109,6 +108,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  // unsigned int index = hash(key, value);
 
 }
 
@@ -122,6 +122,16 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+  LinkedPair *pair = ht->storage[index];
+    while(pair != NULL) {
+    if (strcmp(pair->key, key) == 0) {
+      return pair->value;
+    }
+    pair = pair->next; 
+
+    
+  }
   return NULL;
 }
 
@@ -145,8 +155,13 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+  for (int i = 0; i < ht->capacity; i++) {
+    new_ht->storage[i] = ht->storage[i];
+  }
+  free(ht->storage);
+  free(ht);
+  destroy_hash_table(ht);
   return new_ht;
 }
 
