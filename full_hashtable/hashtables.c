@@ -133,7 +133,26 @@ void hash_table_remove(HashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int i = hash(key, ht->capacity);
+  LinkedPair *current = ht->storage[i];
+  LinkedPair *previous;
+
+  if(strcmp(current->key, key) == 0) {
+    return current->value;
+  }
+  else {
+    while(current != NULL && strcmp(current->key, key) != 0) {
+      previous = current;
+      current = previous->next; /* performs the same comparison and data setting as in the insert function */
+    }
+
+    if(strcmp(current->key, key) == 0) {
+      return current->value;
+    }
+    else {
+      return NULL;
+    }
+  }
 }
 
 /****
