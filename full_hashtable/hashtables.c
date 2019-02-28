@@ -70,7 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity,sizeof(LinkedPair *));
 
   return ht;
 }
@@ -86,6 +88,29 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  // Hash the key to get an array index
+  unsigned int index = hash(key, ht->capacity);
+
+   // Check if the bucket at that index is occupied
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair;
+
+   // If it's not occupied, walk through the LinkedPairs to see if you find
+  // Check for a Pair with the same key using strcmp (string compare)
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0) {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
+  if (current_pair != NULL) {
+    // If you do, overwrite that value
+    current_pair->value = value;
+  } else {
+    // If it's not occupied, add a new LinkedPair to the bucket
+    // If not, create a new pair and add it to the LinkedList
+    LinkedPair *new_pair = create_pair(key, value);
+    new_pair->next = ht->storage[index];
+    ht->storage[index] = new_pair;
+  }
 
 }
 
@@ -93,7 +118,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   Fill this in.
 
   Should search the entire list of LinkedPairs for existing
-  keys and remove matching LinkedPairs safely.
+  keys and remove matching LinkedPairs safely.ma
 
   Don't forget to free any malloc'ed memory!
  ****/
