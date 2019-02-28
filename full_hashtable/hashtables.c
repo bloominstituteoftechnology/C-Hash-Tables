@@ -104,17 +104,37 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
       free((*current_pair).value);
       (*current_pair).value = (*new_pair).value;
 
-    } else {
-
-      while((*current_pair).next != NULL && strcmp(key, (*current_pair).key) != 0) {
-
-        current_pair = (*current_pair).next;
-
-      }
+    } else if((*current_pair).next == NULL) {
 
       free((*current_pair).next);
       (*current_pair).next = new_pair;
+
+    } else if((*current_pair).next != NULL) {
+
+      while((*current_pair).next != NULL) {
+
+        if(strcmp(key, (*current_pair).key) == 0) {
+
+          free((*current_pair).value);
+          (*current_pair).value = (*new_pair).value;
+
+        } else {
+
+          current_pair = (*current_pair).next;
+
+        }
+
+      }
+
+    } else {
+
+      free((*current_pair).next);
+      (*current_pair).next = new_pair;
+
     }
+
+      //free((*current_pair).next);
+      //(*current_pair).next = new_pair;
 
   } else {
 
@@ -141,6 +161,15 @@ void hash_table_remove(HashTable *ht, char *key)
   if((*ht).storage[index] != NULL) {
 
     LinkedPair *current_pair = (*ht).storage[index];
+
+    if(strcmp(key, (*current_pair).key) == 0) {
+
+      destroy_pair(current_pair);
+      current_pair = NULL;
+
+    }
+
+    //LinkedPair *current_pair = (*ht).storage[index];
 
     while((*current_pair).next != NULL) {
 
@@ -184,10 +213,18 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 
     } else {
 
-      while((*current_pair).next != NULL && strcmp(key, (*current_pair).key) != 0) {
-        
-        current_pair = (*current_pair).next;
+      while((*current_pair).next != NULL) {
 
+        if(strcmp(key, (*current_pair).key) == 0) {
+
+          return (*current_pair).value;
+
+        } else {
+
+          current_pair = (*current_pair).next;
+          
+        }
+        
       } 
 
       return (*current_pair).value;
