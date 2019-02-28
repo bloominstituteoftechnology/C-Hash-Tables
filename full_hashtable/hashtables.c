@@ -88,7 +88,9 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  unsigned int i = hash(key, ht->capacity);
+  LinkedPair *current = ht->storage[i];
+  LinkedPair *previous; /* does not need to be set to anything initially */
 }
 
 /****
