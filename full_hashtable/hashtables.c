@@ -120,7 +120,23 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int i = hash(key, ht->capacity);
+  LinkedPair *current = ht->storage[i];
+  LinkedPair *previous = NULL;
 
+  while(current != NULL && strcmp(current->key, key) != 0) {
+    previous = current;
+    current = current->next;
+  }
+
+  if(previous != NULL) {
+    previous->next = current->next;
+  }
+  else {
+    ht->storage[i] = current->next;
+  }
+
+  current = NULL;
 }
 
 /****
