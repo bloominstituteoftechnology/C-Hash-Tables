@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.js": "javascriptreact",
+    "minunit.h": "c",
+    "minunit.h\u0000inunit.h": "c",
+    "minunit.h\u0000nunit.h": "c",
+    "minunit.h\u0000unit.h": "c",
+    "hashtables.h": "c"
+  }
+}
