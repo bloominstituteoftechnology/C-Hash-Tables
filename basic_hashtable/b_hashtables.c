@@ -125,7 +125,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   }
   else
   {
-    ptrinf("Key not found");
+    fprintf(stderr, "Key not found\n");
     return NULL;
   }
 }
