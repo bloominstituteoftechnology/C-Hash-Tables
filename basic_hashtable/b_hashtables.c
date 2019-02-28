@@ -13,11 +13,38 @@ typedef struct Pair {
 
 /****
   Basic hash table
+    Double pointer indirection
+    Pair*  holds a key-value pair (a pointer to a key-value pair)
+    Pair** is an array of key-value pairs
+    Storage (aka a bookshelf) holds a key-value pair or Pair*
  ****/
 typedef struct BasicHashTable {
   int capacity;
-  Pair **storage;
+  Pair **storage;     // Double pointer indirection 
 } BasicHashTable;
+
+/*** 
+Deconstructed BasicHashTable
+
+BasicHashTable = {
+  capacity: 5;
+  storage: *[
+        * Pair: {
+          *key: 'key';
+          *value: 'value';
+        },
+        * Pair: {
+          *key: 'key';
+          *value: 'value';
+        },
+        * Pair: {
+          *key: 'key';
+          *value: 'value';
+        },
+  ]
+
+}
+***/
 
 /****
   Create a key/value pair to be stored in the hash table.
@@ -67,54 +94,100 @@ unsigned int hash(char *str, int max)
 
   All values in storage should be initialized to NULL
   (hint: look up `calloc`)
+  void *calloc(size_t nitems, size_t size)
+    - nitems − This is the number of elements to be allocated.
+    - size − This is the size of elements.
+  a = (int*)calloc(n, sizeof(int));
+  Difference between malloc and calloc:
+   malloc 
+    does not set the memory to zero 
+    need for loop to set each spot to NULL
+    1 parameter size of
+   calloc 
+    sets all slot of allocated memory to zero.
+    2 parameters: number of slots & size
+
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair*));
   return ht;
 }
 
+
 /****
-  Fill this in.
-
   If you are overwriting a value with a different key, print a warning.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  unsigned int hash_key = hash(key, ht->capacity);
 
+  if (ht->storage[hash_key]) {
+      fprintf(stderr, "Warning: overwriting %s with a different key \n", key);
+      destroy_pair(ht->storage[hash_key]);
+  }
+  ht->storage[hash_key] = create_pair(key, value);
 }
 
 /****
-  Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  unsigned int hash_key = hash(key, ht->capacity);
+  if (ht->storage[hash_key]) {
+    destroy_pair(ht->storage[hash_key]);
+    ht->storage[hash_key] = NULL;
+  } else {
+    fprintf(stderr, "Warning: %s does not exist \n", key);
+  }
 }
 
 /****
-  Fill this in.
-
   Should return NULL if the key is not found.
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int hash_key = hash(key, ht->capacity);
+
+  if (!(ht->storage[hash_key])) {
+    return NULL;
+  }
+  return ht->storage[hash_key]->value;
 }
 
 /****
-  Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+    for(int i = 0; i < ht->capacity; i++) {
+      if(ht->storage[i]) {
+        destroy_pair(ht->storage[i]);
+      }
+    }
+    if (ht != NULL) {
+      free(ht->storage);
+      free(ht);
+  }
+}
 
+/*****
+ * Utility function to print an array.
+ *****/
+void ht_print(BasicHashTable *ht) {
+  printf("[");
+  for (int i = 0 ; i < ht->capacity ; i++) {
+    printf("%p", ht->storage[i]);
+    if (i != ht->capacity - 1) {
+      printf(",");
+    }
+  }
+  printf(", capacity: %d", ht->capacity);
+  printf("]\n");
 }
 
 
@@ -122,6 +195,7 @@ void destroy_hash_table(BasicHashTable *ht)
 int main(void)
 {
   struct BasicHashTable *ht = create_hash_table(16);
+  ht_print(ht);
 
   hash_table_insert(ht, "line", "Here today...\n");
 
@@ -130,7 +204,7 @@ int main(void)
   hash_table_remove(ht, "line");
 
   if (hash_table_retrieve(ht, "line") == NULL) {
-    printf("...gone tomorrow. (success)\n");
+    printf("\n...gone tomorrow. (success)\n");
   } else {
     fprintf(stderr, "ERROR: STILL HERE\n");
   }
