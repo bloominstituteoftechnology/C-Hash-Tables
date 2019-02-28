@@ -75,7 +75,7 @@ HashTable *create_hash_table(int capacity)
 {
   HashTable *ht;
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(Pair *));
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
   return ht;
 }
 
