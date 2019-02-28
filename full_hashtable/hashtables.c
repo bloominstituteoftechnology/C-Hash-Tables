@@ -103,9 +103,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
       return;
     }
   }
-
   ht->storage[hashed] = insert_pair;
-
 }
 
 /****
@@ -118,6 +116,19 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  int hashed = hash(key, ht->capacity);
+  LinkedPair *current_pair = ht->storage[hashed];
+  if (ht->storage[hashed] != NULL) {
+    while (current_pair->next != NULL) {
+      LinkedPair *next_pair = current_pair->next;
+      if (strcmp(current_pair->key, key) != 0) {
+        current_pair = current_pair->next;
+      }
+      // here they do match ---> now what
+      // even though they match, that doesnt mean the match->next is null
+      // need to point from previous element to next element
+    }
+  }
 
 }
 
