@@ -73,7 +73,7 @@ BasicHashTable *create_hash_table(int capacity)
   BasicHashTable *ht = malloc(sizeof(BasicHashTable)); // allocate memory for a hash table
 
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(char *)); // allocate the memory storage for size * and fill with spaces with NULL
+  ht->storage = calloc(ht->capacity, sizeof(Pair *)); // allocate the memory storage for size * and fill with spaces with NULL
 
   return ht;
 }
