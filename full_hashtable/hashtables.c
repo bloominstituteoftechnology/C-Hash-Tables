@@ -41,8 +41,6 @@ void destroy_pair(LinkedPair *pair)
 {
   if (pair != NULL)
   {
-    pair->key = NULL;
-    pair->value = NULL;
     free(pair->key);
     free(pair->value);
     free(pair);
@@ -51,7 +49,6 @@ void destroy_pair(LinkedPair *pair)
 
 /****
   djb2 hash function
-
   Do not modify this!
  ****/
 unsigned int hash(char *str, int max)
@@ -70,181 +67,184 @@ unsigned int hash(char *str, int max)
 
 /****
   Fill this in.
-
   All values in storage should be initialized to NULL
  ****/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht = malloc(sizeof(HashTable)); // allocate memory for a hash table;
-
+  HashTable *ht = malloc(sizeof(HashTable));
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(LinkedPair *)); // allocate the memory storage for a struct LinkedPair pointer;
-
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
   return ht;
 }
 
 /****
   Fill this in.
-
   Inserting values to the same index with different keys should be
   added to the corresponding LinkedPair list.
-
   Inserting values to the same index with existing keys can overwrite
   the value in th existing LinkedPair list.
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-  unsigned int target_index = hash(key, ht->capacity); // creates an array index for node to be inserted into
-  LinkedPair *new_pair = create_pair(key, value);      // creates a new node for insertion
+  if (key == NULL || value == NULL)
+  {
+    printf("Either the key or value is NULL");
+  }
+  int hashed = hash(key, ht->capacity); //creates an index value
 
-  if (ht->storage[target_index] == 0)
-  { // if the current index is empty, insert new_pair
-    ht->storage[target_index] = new_pair;
+  LinkedPair *p = create_pair(key, value); //creates a new pair
+  if (ht->storage[hashed] == NULL)
+  { //if index is already empty just place in there
+    ht->storage[hashed] = p;
   }
   else
   {
-    while (ht->storage[target_index] != 0)
-    { // if the current index is not empty, 3 things can happens
-      // 1. check if the keys are the same, then overwrite existing value with the new value
-      if (strcmp(ht->storage[target_index]->key, key) == 0)
-      { // == or != compares base addresses, strcmp to compare values
-        ht->storage[target_index]->value = value;
-        break;
-      }
-      // 2. check if keys are different AND there's an empty "next" slot, insert new pair there
-      else if (strcmp(ht->storage[target_index]->key, key) != 0 && ht->storage[target_index]->next == NULL)
+    LinkedPair *head = ht->storage[hashed];
+    int b_continue = 0;
+    while (!b_continue)
+    { //use arrows notation not dot
+      if (head->next == NULL)
       {
-        ht->storage[target_index]->next = new_pair;
-        break;
+        head->next = p;
+        b_continue = 1;
       }
-      // 3. If neither of the terminating conditionals activates, must mean that it's a new linked list node to be attached
-      // continue with while loop until there are matching keys or there's an empty "next" slot
-      ht->storage[target_index] = ht->storage[target_index]->next;
+      head = head->next;
     }
   }
+}
 
-  /****
+/****
   Fill this in.
-
   Should search the entire list of LinkedPairs for existing
   keys and remove matching LinkedPairs safely.
-
   Don't forget to free any malloc'ed memory!
  ****/
-  void hash_table_remove(HashTable * ht, char *key)
+void hash_table_remove(HashTable *ht, char *key)
+{
+  int hashed = hash(key, ht->capacity);
+  if (ht->storage[hashed] == NULL)
   {
-    unsigned int target_index = hash(key, ht->capacity);
-    LinkedPair *current = ht->storage[target_index]; // shortens the name serves as a marker
-
-    while (current->key != 0)
-    { // LOOP while there's a current node
-      if (strcmp(current->key, key) == 0 && current->next == 0)
-      { // EXIT 1 if strings are the same and there's NOT a linked node
-        destroy_pair(current);
-        break;
+    printf("The value with that key is null");
+  }
+  else
+  {
+    if (ht->storage[hashed]->next == NULL)
+    {
+      destroy_pair(ht->storage[hashed]); //destroys pair / free's all the malloc'd memory
+      ht->storage[hashed] = NULL;        //resets value back to NULL
+    }
+    else
+    { // if there is more than one value in the list
+      LinkedPair *head = ht->storage[hashed];
+      while (head->next != NULL)
+      {
+        if (strcmp(head->next->key, key) == 0)
+        { //compares the two keys to see if they match
+          head->next = head->next->next;
+          destroy_pair(head->next);
+          return;
+        }
+        head = head->next;
       }
-      else if (strcmp(current->key, key) == 0 && current->next != 0)
-      { // EXIT 2 if strings are same and there IS a linked node
-        current->key = current->next->key;
-        current->value = current->next->value;
-        current->next = current->next->next;
-        break;
-      }
-      current = current->next; // ITERATOR Move to the next linked node and continue with while loop to check
     }
   }
+}
 
-  /****
+/****
   Fill this in.
-
   Should search the entire list of LinkedPairs for existing
   keys.
-
   Return NULL if the key is not found.
  ****/
-  char *hash_table_retrieve(HashTable * ht, char *key)
+char *hash_table_retrieve(HashTable *ht, char *key)
+{
+  int hashed = hash(key, ht->capacity);
+  if (ht->storage[hashed] == NULL)
   {
-    unsigned int target_index = hash(key, ht->capacity);
-    LinkedPair *current = ht->storage[target_index]; // shortens the name and serve as marker
-
-    while (current != 0)
-    { // LOOP while there's a current node
-      if (strcmp(current->key, key) == 0)
-      { // EXIT 1 if keys match, return the value
-        return current->value;
-      }
-      else if (strcmp(current->key, key) != 0 && current->next == 0)
-      { // EXIT 2 if no key matches and no linked node, return NULL
-        fprintf(stderr, "That key was not found.");
-        return NULL;
-      }
-      current = current->next; // ITERATOR Move to the next linked node and continue with while loop to check
-    }
-    return 0;
+    printf("returning null");
+    return NULL;
   }
+  else
+  {
+    if (strcmp(ht->storage[hashed]->key, key) == 0)
+    {
+      return ht->storage[hashed]->value;
+    }
+    else
+    {
+      LinkedPair *head = ht->storage[hashed];
+      while (head != NULL)
+      {
+        if (strcmp(head->key, key) == 0)
+        {
+          return head->value;
+        }
+        head = head->next;
+      }
+    }
+  }
+  return NULL;
+}
 
-  /****
+/****
   Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
-  void destroy_hash_table(HashTable * ht)
+void destroy_hash_table(HashTable *ht)
+{
+  for (int i = 0; i < ht->capacity; i++)
   {
+    LinkedPair *head = ht->storage[i];
+    while (head != NULL)
     {
-      for (int i = 0; i < ht->capacity; i++)
-      {
-        ht->storage[i] = NULL;        // without NULL -> error for object 0x7fbecec02b20: pointer being freed was not allocated
-        destroy_pair(ht->storage[i]); // destroy pair has built in NULL check and frees key, value, and node
-      }
-
-      free(ht->storage);
-      free(ht);
+      printf("\ndestoying pair");
+      destroy_pair(head);
+      head = head->next;
     }
   }
+  free(ht->storage);
+  free(ht);
+}
 
-  /****
+/****
   Fill this in.
-
   Should create a new hash table with double the capacity
   of the original and copy all elements into the new hash table.
-
   Don't forget to free any malloc'ed memory!
  ****/
-  HashTable *hash_table_resize(HashTable * ht)
+HashTable *hash_table_resize(HashTable *ht)
+{
+  HashTable *double_capacity = malloc(sizeof(HashTable));
+  double_capacity->storage = calloc(ht->capacity * 2, sizeof(LinkedPair *));
+  for (int i = 0; i < ht->capacity; i++)
   {
-    HashTable *new_ht = create_hash_table(ht->capacity * 2); // Create new hash table with double capacity
-
-    for (int i = 0; i < ht->capacity; i++)
-    { // copy from old storage to new storage
-      new_ht->storage[i] = ht->storage[i];
-    }
-
-    destroy_hash_table(ht); // destroy old hash table
-
-    return new_ht;
+    double_capacity->storage[i] = ht->storage[i];
   }
+  double_capacity->capacity = ht->capacity * 2;
+  return double_capacity;
+}
 
 #ifndef TESTING
-  int main(void)
-  {
-    struct HashTable *ht = create_hash_table(2);
+int main(void)
+{
+  struct HashTable *ht = create_hash_table(2);
 
-    hash_table_insert(ht, "line_1", "Tiny hash table\n");
-    hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
-    hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
+  hash_table_insert(ht, "line_1", "Tiny hash table\n");
+  hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
+  hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
 
-    printf("%s", hash_table_retrieve(ht, "line_1"));
-    printf("%s", hash_table_retrieve(ht, "line_2"));
-    printf("%s", hash_table_retrieve(ht, "line_3"));
+  printf("%s", hash_table_retrieve(ht, "line_1"));
+  printf("%s", hash_table_retrieve(ht, "line_2"));
+  printf("%s", hash_table_retrieve(ht, "line_3"));
 
-    int old_capacity = ht->capacity;
-    ht = hash_table_resize(ht);
-    int new_capacity = ht->capacity;
+  int old_capacity = ht->capacity;
+  ht = hash_table_resize(ht);
+  int new_capacity = ht->capacity;
 
-    printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-    destroy_hash_table(ht);
+  destroy_hash_table(ht);
 
-    return 0;
-  }
+  return 0;
+}
 #endif
