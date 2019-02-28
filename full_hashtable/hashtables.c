@@ -41,6 +41,8 @@ void destroy_pair(LinkedPair *pair)
 {
   if (pair != NULL)
   {
+    pair->key = NULL;
+    pair->value = NULL;
     free(pair->key);
     free(pair->value);
     free(pair);
@@ -131,6 +133,25 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
   void hash_table_remove(HashTable * ht, char *key)
   {
+    unsigned int target_index = hash(key, ht->capacity);
+    LinkedPair *current = ht->storage[target_index]; // shortens the name
+
+    while (current != 0)
+    { // LOOP while there's a current node
+      if (strcmp(current->key, key) == 0 && current->next == 0)
+      { // EXIT 1 if strings are the same and there's NOT a linked node
+        destroy_pair(current);
+        break;
+      }
+      else if (strcmp(current->key, key) == 0 && current->next != 0)
+      { // EXIT 2 if strings are same and there IS a linked node
+        current->key = current->next->key;
+        current->value = current->next->value;
+        current->next = current->next->next;
+        break;
+      }
+      current = current->next; // ITERATOR Move to the next linked node and continue with while loop to check
+    }
   }
 
   /****
