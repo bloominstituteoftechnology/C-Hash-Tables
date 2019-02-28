@@ -92,9 +92,36 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-}
+  unsigned int target_index = hash(key, ht->capacity); // creates an array index for node to be inserted into
+  LinkedPair *new_pair = create_pair(key, value);      // creates a new node for insertion
 
-/****
+  if (ht->storage[target_index] == 0)
+  { // if the current index is empty, insert new_pair
+    ht->storage[target_index] = new_pair;
+  }
+  else
+  {
+    while (ht->storage[target_index] != 0)
+    { // if the current index is not empty, 3 things can happens
+      // 1. check if the keys are the same, then overwrite existing value with the new value
+      if (strcmp(ht->storage[target_index]->key, key) == 0)
+      { // == or != compares base addresses, strcmp to compare values
+        ht->storage[target_index]->value = value;
+        break;
+      }
+      // 2. check if keys are different AND there's an empty "next" slot, insert new pair there
+      else if (strcmp(ht->storage[target_index]->key, key) != 0 && ht->storage[target_index]->next == NULL)
+      {
+        ht->storage[target_index]->next = new_pair;
+        break;
+      }
+      // 3. If neither of the terminating conditionals activates, must mean that it's a new linked list node to be attached
+      // continue with while loop until there are matching keys or there's an empty "next" slot
+      ht->storage[target_index] = ht->storage[target_index]->next;
+    }
+  }
+
+  /****
   Fill this in.
 
   Should search the entire list of LinkedPairs for existing
@@ -102,11 +129,11 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
   Don't forget to free any malloc'ed memory!
  ****/
-void hash_table_remove(HashTable *ht, char *key)
-{
-}
+  void hash_table_remove(HashTable * ht, char *key)
+  {
+  }
 
-/****
+  /****
   Fill this in.
 
   Should search the entire list of LinkedPairs for existing
@@ -114,21 +141,21 @@ void hash_table_remove(HashTable *ht, char *key)
 
   Return NULL if the key is not found.
  ****/
-char *hash_table_retrieve(HashTable *ht, char *key)
-{
-  return NULL;
-}
+  char *hash_table_retrieve(HashTable * ht, char *key)
+  {
+    return NULL;
+  }
 
-/****
+  /****
   Fill this in.
 
   Don't forget to free any malloc'ed memory!
  ****/
-void destroy_hash_table(HashTable *ht)
-{
-}
+  void destroy_hash_table(HashTable * ht)
+  {
+  }
 
-/****
+  /****
   Fill this in.
 
   Should create a new hash table with double the capacity
@@ -136,34 +163,34 @@ void destroy_hash_table(HashTable *ht)
 
   Don't forget to free any malloc'ed memory!
  ****/
-HashTable *hash_table_resize(HashTable *ht)
-{
-  HashTable *new_ht;
+  HashTable *hash_table_resize(HashTable * ht)
+  {
+    HashTable *new_ht;
 
-  return new_ht;
-}
+    return new_ht;
+  }
 
 #ifndef TESTING
-int main(void)
-{
-  struct HashTable *ht = create_hash_table(2);
+  int main(void)
+  {
+    struct HashTable *ht = create_hash_table(2);
 
-  hash_table_insert(ht, "line_1", "Tiny hash table\n");
-  hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
-  hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
+    hash_table_insert(ht, "line_1", "Tiny hash table\n");
+    hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
+    hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
 
-  printf("%s", hash_table_retrieve(ht, "line_1"));
-  printf("%s", hash_table_retrieve(ht, "line_2"));
-  printf("%s", hash_table_retrieve(ht, "line_3"));
+    printf("%s", hash_table_retrieve(ht, "line_1"));
+    printf("%s", hash_table_retrieve(ht, "line_2"));
+    printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  int old_capacity = ht->capacity;
-  ht = hash_table_resize(ht);
-  int new_capacity = ht->capacity;
+    int old_capacity = ht->capacity;
+    ht = hash_table_resize(ht);
+    int new_capacity = ht->capacity;
 
-  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+    printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  destroy_hash_table(ht);
+    destroy_hash_table(ht);
 
-  return 0;
-}
+    return 0;
+  }
 #endif
