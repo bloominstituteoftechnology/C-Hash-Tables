@@ -96,7 +96,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
     last_pair = current_pair;
     current_pair = last_pair->next;
   }
-  if(current_pair != NULL) 
+  if (current_pair != NULL) 
   {
     current_pair->value = value;
   } 
@@ -118,7 +118,25 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  
+  unsigned int index = hash(key, ht->capacity);
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair = NULL;
+
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0)
+  {
+    last_pair = current_pair;
+    current_pair = current_pair->next;
+  }
+
+  if (last_pair != NULL)
+  {
+    last_pair->next = current_pair->next;
+  }
+  else
+  {
+    ht->storage[index] = current_pair->next;
+  }
+  current_pair = NULL;
 }
 
 /****
@@ -134,6 +152,11 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   unsigned int index = hash(key, ht->capacity);
   LinkedPair *current_pair = ht->storage[index];
   LinkedPair *last_pair;
+
+  if (current_pair == NULL)
+  {
+    return NULL;
+  }
   
   if (strcmp(current_pair->key, key) == 0) 
   {
