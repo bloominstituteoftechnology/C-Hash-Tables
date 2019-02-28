@@ -162,7 +162,16 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  /* should be a very similar implementation to the basic hash table destruction */
+  for(int i = 0; i < ht->capacity; i++) {
+    while(ht->storage[i] != NULL) {
+      destroy_pair(ht->storage[i]);
+      ht->storage[i] = ht->storage[i]->next;
+    }
+  }
 
+  free(ht->storage);
+  free(ht);
 }
 
 /****
