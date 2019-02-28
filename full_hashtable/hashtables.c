@@ -99,19 +99,23 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
     LinkedPair *current_pair = (*ht).storage[index];
 
-    while((*current_pair).next != NULL) {
+    if(strcmp(key, (*current_pair).key) == 0) {
 
-      current_pair = (*current_pair).next;
+      free((*current_pair).value);
+      (*current_pair).value = (*new_pair).value;
 
-      if((*current_pair).key == key) {
+    } else {
 
-        free(current_pair);
-        current_pair = new_pair;
+      while((*current_pair).next != NULL && strcmp(key, (*current_pair).key) != 0) {
 
-      } 
+        current_pair = (*current_pair).next;
 
+      }
+
+      free((*current_pair).next);
+      (*current_pair).next = new_pair;
     }
-    
+
   } else {
 
     free((*ht).storage[index]);
@@ -140,7 +144,7 @@ void hash_table_remove(HashTable *ht, char *key)
 
     while((*current_pair).next != NULL) {
 
-      if((*current_pair).key == key) {
+      if(strcmp(key, (*current_pair).key) == 0) {
 
         destroy_pair(current_pair);
         current_pair = NULL;
@@ -153,12 +157,7 @@ void hash_table_remove(HashTable *ht, char *key)
 
     }
     
-  } else {
-
-    destroy_pair((*ht).storage[index]);
-    (*ht).storage[index] = NULL;
-
-  }
+  } 
 
 }
 
@@ -179,13 +178,21 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 
     LinkedPair *current_pair = (*ht).storage[index];
 
-    while((*current_pair).next != NULL) {
-      
-      current_pair = (*current_pair).next;
+    if(strcmp(key, (*current_pair).key) == 0) {
 
-    } 
+      return (*current_pair).value;
 
-    return (*current_pair).value;
+    } else {
+
+      while((*current_pair).next != NULL && strcmp(key, (*current_pair).key) != 0) {
+        
+        current_pair = (*current_pair).next;
+
+      } 
+
+      return (*current_pair).value;
+
+    }
     
   } else {
 
@@ -240,7 +247,14 @@ int main(void)
 
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
-  printf("%s", hash_table_retrieve(ht, "line_3"));
+  printf("%s", hash_table_retrieve(ht, "line_3"));  
+
+  hash_table_insert(ht, "line_2", "VALUE OVERWRITTEN\n");
+
+  printf("%s", hash_table_retrieve(ht, "line_1"));
+  printf("%s", hash_table_retrieve(ht, "line_2"));
+  printf("%s", hash_table_retrieve(ht, "line_3"));  
+
 
   int old_capacity = ht->capacity;
   ht = hash_table_resize(ht);
