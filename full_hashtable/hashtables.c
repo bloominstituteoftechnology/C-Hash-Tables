@@ -165,7 +165,16 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    while (ht->storage[i] != NULL)
+    {
+      destroy_pair(ht->storage[i]);
+      ht->storage[i] = ht->storage[i]->next;
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
@@ -193,6 +202,7 @@ HashTable *hash_table_resize(HashTable *ht)
       }
     }
   }
+  destroy_hash_table(ht);
   return new_ht;
 }
 
