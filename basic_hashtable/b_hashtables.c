@@ -70,10 +70,19 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
+  // Create a new hash table named ht
   BasicHashTable *ht;
-
+  // Malloc the size of hash table
+  ht = malloc(sizeof(BasicHashTable));
+  // set capacity to passed in capacity
+  ht->capacity = capacity;
+  // use calloc to set storage bites and set all to 0
+  ht->storage = calloc(capacity, sizeof(Pair));
+  // return the new Hash table
   return ht;
 }
+
+/****
 
 /****
   Fill this in.
