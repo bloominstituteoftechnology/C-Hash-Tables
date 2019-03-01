@@ -115,7 +115,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 }
 
 /****
-  Fill this in.
+  Removes KV from hashtable
 
   Should search the entire list of LinkedPairs for existing
   keys and remove matching LinkedPairs safely.
@@ -124,7 +124,31 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
 
+  LinkedPair *current_pair = ht->storage[index];
+  
+  if (current_pair == NULL){
+    fprintf(stderr, "KEY NOT FOUND");
+  }else{
+
+  int i = 0;
+  while (current_pair != NULL){
+
+      if (strcmp(current_pair->key, key) == 0) 
+      {
+        // realign the LL
+        if (ht->storage[i-1] != NULL){
+          // previous pair should point to next -> next
+          ht->storage[i-1]->next = current_pair->next;
+        }
+        destroy_pair(current_pair);
+        break;
+      }
+      current_pair = current_pair->next;
+      i++;
+    }
+  }
 }
 
 /****
@@ -150,7 +174,7 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   // current pair is either null or matches the key
 
   if (current_pair == NULL){
-    fprintf(stderr, "KEY %s NOT FOUND", key);
+    fprintf(stderr, "KEY %s NOT FOUND ", key);
     return NULL;
   } else {
     return current_pair->value;
@@ -160,13 +184,30 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 }
 
 /****
-  Fill this in.
+  Destroys Hashtable
 
   Don't forget to free any malloc'ed memory!
  ****/
 void destroy_hash_table(HashTable *ht)
 {
+  LinkedPair *current_pair;
+  LinkedPair *pair_to_destroy;
 
+  for (int i = 0 ; i < ht->capacity ; i++) {
+    current_pair = ht->storage[i];
+    while(current_pair != NULL) {
+      pair_to_destroy = current_pair;
+      
+      current_pair = current_pair->next;
+      if (pair_to_destroy != NULL){
+        destroy_pair(pair_to_destroy);
+      }
+      
+    }
+  }
+
+  free(ht->storage);
+  free(ht);
 }
 
 /****
@@ -179,8 +220,20 @@ void destroy_hash_table(HashTable *ht)
  ****/
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = malloc(sizeof(HashTable));
 
+  new_ht->capacity = ht->capacity * 2;
+  new_ht->storage = calloc(new_ht->capacity, sizeof(LinkedPair *));
+
+  for (int i = 0; i < ht->capacity; i++){
+    if (ht->storage[i] != NULL){
+      // may lose other LL pointers
+      hash_table_insert(new_ht, ht->storage[i]->key, ht->storage[i]->value);
+    }
+    
+
+  }
+  destroy_hash_table(ht);
   return new_ht;
 }
 
@@ -188,15 +241,17 @@ HashTable *hash_table_resize(HashTable *ht)
 #ifndef TESTING
 int main(void)
 {
-  struct HashTable *ht = create_hash_table(2);
+  // struct HashTable *ht = create_hash_table(2);
 
-  hash_table_insert(ht, "line_1", "Tiny hash table");
-  printf("%s\n", hash_table_retrieve(ht, "line_1"));
+  // hash_table_insert(ht, "line_1", "Tiny hash table");
+  // printf("%s\n", hash_table_retrieve(ht, "line_1"));
+  // hash_table_remove(ht, "line_1");
+  // printf("(REMOVED SUCCESS)%s\n", hash_table_retrieve(ht, "line_1"));
 
-  hash_table_insert(ht, "line_2", "HELLO FROM LINE 2!");
-  printf("%s\n", hash_table_retrieve(ht, "line_2"));
-  hash_table_insert(ht, "line_2", "GOODBYE FROM LINE 2!\n");
-  printf("%s", hash_table_retrieve(ht, "line_2"));
+  // hash_table_insert(ht, "line_2", "HELLO FROM LINE 2!");
+  // printf("%s\n", hash_table_retrieve(ht, "line_2"));
+  // hash_table_insert(ht, "line_2", "GOODBYE FROM LINE 2!\n");
+  // printf("%s", hash_table_retrieve(ht, "line_2"));
 
   // int old_capacity = ht->capacity;
   // ht = hash_table_resize(ht);
