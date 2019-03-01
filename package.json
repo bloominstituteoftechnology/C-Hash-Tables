@@ -1,0 +1,16 @@
+{
+  "name": "keeping-it-green",
+  "version": "0.1.0",
+  "description": "assisting on keeping that contribution chart looking green",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "luiscmartinez",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.19.0",
+    "node-fetch": "^2.3.0",
+    "promise": "^8.0.2"
+  }
+}
