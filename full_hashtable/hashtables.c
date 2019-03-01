@@ -87,13 +87,28 @@ HashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  // hash the key to get an array index
   unsigned int index = hash(key, ht->capacity);
-  if (ht->storage[index] == NULL) {
-    ht->storage[index] = create_pair(key, value);
-  } else {
-    ht->storage[index]->next = create_pair(key, value);
+  // check if the bucket at that index is occupied
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair;
+  // if it is occupied, walk through the LinkedPairs to see if you find
+  // A Pair with the same key
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0) {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
   }
 
+  // if you do overwrite that value
+  if (current_pair != NULL) {
+    current_pair->value = value;
+  } else {
+    // if not, create a new pair and add to the LinkedList
+    LinkedPair *new_pair = create_pair(key, value);
+    new_pair->next = ht->storage[index];
+    ht->storage[index] = new_pair;
+  }
+ 
 
 
 }
@@ -108,8 +123,8 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(HashTable *ht, char *key)
 {
-  // unsigned int index = hash(key, value);
-
+  unsigned int index = hash(key, ht->capacity);
+  
 }
 
 /****
