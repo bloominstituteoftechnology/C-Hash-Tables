@@ -124,7 +124,14 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 void hash_table_remove(HashTable *ht, char *key)
 {
   unsigned int index = hash(key, ht->capacity);
-  
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair;
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0) {
+    ht->storage[index] = current_pair->next;
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
+  last_pair->next = current_pair->next;
 }
 
 /****
@@ -157,7 +164,13 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  ****/
 void destroy_hash_table(HashTable *ht)
 {
-
+  for (int i = 0; i < ht->capacity; i++) {
+    if (ht->storage[i] != NULL) {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /****
