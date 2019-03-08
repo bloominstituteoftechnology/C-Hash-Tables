@@ -153,13 +153,12 @@ char *hash_table_resizing_test() {
 
 
 
-
 char *all_tests()
 {
     mu_suite_start();
 
     mu_run_test(basic_hash_table_test);
-
+    mu_run_test(hash_table_resizing_test);
     return NULL;
 }
 
