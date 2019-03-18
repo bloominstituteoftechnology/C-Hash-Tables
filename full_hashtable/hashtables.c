@@ -2,26 +2,29 @@
 #include <stdlib.h>
 #include <string.h>
 
-/****
-  Hash table key/value pair with linked list pointer
- ****/
+/*
+  Hash table key/value pair with linked list pointer.
+  Note that an instance of `LinkedPair` is also a node in a linked list.
+  More specifically, the `next` field is a pointer pointing to the the 
+  next `LinkedPair` in the list of `LinkedPair` nodes. 
+ */
 typedef struct LinkedPair {
   char *key;
   char *value;
   struct LinkedPair *next;
 } LinkedPair;
 
-/****
-  Hash table with linked pairs
- ****/
+/*
+  Hash table with linked pairs.
+ */
 typedef struct HashTable {
   int capacity;
   LinkedPair **storage;
 } HashTable;
 
-/****
+/*
   Create a key/value linked pair to be stored in the hash table.
- ****/
+ */
 LinkedPair *create_pair(char *key, char *value)
 {
   LinkedPair *pair = malloc(sizeof(LinkedPair));
