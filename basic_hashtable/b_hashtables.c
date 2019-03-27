@@ -70,7 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht=malloc(sizeof(BasicHashTable));
+  ht->capacity=capacity;
+  ht->storage=calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -84,7 +86,12 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  int hash_index= hash(key, ht->capacity);
+  if(ht->storage[hash_index]!=NULL){
+    printf("can\'t overwrite a value with a different key");
+    destroy_pair(ht->storage[hash_index]);
+  }
+  ht->storage[hash_index]=create_pair(key,value);
 }
 
 /****
@@ -94,7 +101,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  unsigned int hash_index= hash(key, ht->capacity);
+  if(ht->storage[hash_index]!=NULL){
+    destroy_pair(ht->storage[hash_index]);
+    ht->storage[hash_index]=NULL;
+  }
+  else{
+    printf("This key doesn\'t exist");
+  }
 }
 
 /****
@@ -104,6 +118,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int hash_index=hash(key, ht->capacity);
+  if(ht->storage[hash_index]==NULL){
+    return NULL;
+  }
+  else{
+    return ht->storage[hash_index]->value;
+  }
   return NULL;
 }
 
@@ -114,7 +135,11 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for(int i=0; i<ht->capacity; i++){
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
