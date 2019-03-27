@@ -6,7 +6,7 @@
 /****
   Basic hash table key/value pair
  ****/
-//comment
+//commentsss
 typedef struct Pair {
   char *key;
   char *value;
