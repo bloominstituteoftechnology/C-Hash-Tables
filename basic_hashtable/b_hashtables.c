@@ -90,14 +90,21 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  unsigned hash_index = hash(key, ht->capacity);
-  if (ht->storage[hash_index])
+  unsigned int index = hash(key, ht->capacity);
+  Pair *pair = create_pair(key, value);
+
+  Pair *stored_pair = ht->storage[index];
+  if (stored_pair != NULL)
   {
-    printf("can\'t overwrite a value with a different key");
-    destroy_pair(ht->storage[hash_index]);
+    if (strcmp(key, stored_pair->key) != 0)
+    {
+
+      printf("can\'t overwrite a value with a different key\n");
+    }
+    destroy_pair(ht->storage[index]);
   }
 
-  ht->storage[hash_index] = create_pair(key, value);
+  ht->storage[index] = pair;
 }
 
 /****
@@ -108,13 +115,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
   unsigned hash_index = hash(key, ht->capacity);
-  if (ht->storage[hash_index])
+  if (ht->storage[hash_index] == NULL || strcmp(ht->storage[hash_index]->key, key) != 0)
   {
-    destroy_pair(ht->storage[hash_index]);
+    printf("error: That key does not exist\n");
   }
   else
   {
-    printf("error: That key does not exist");
+    destroy_pair(ht->storage[hash_index]);
+    ht->storage[hash_index] = NULL;
   }
 }
 
