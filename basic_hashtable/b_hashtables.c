@@ -94,10 +94,8 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   Pair *pair = create_pair(key, value);
 
   Pair *stored_pair = ht->storage[index];
-  if (stored_pair != NULL)
-  {
-    if (strcmp(key, stored_pair->key) != 0)
-    {
+  if (stored_pair != NULL) {
+    if (strcmp(key, stored_pair->key) != 0) {
 
       printf("can\'t overwrite a value with a different key\n");
     }

@@ -75,6 +75,10 @@ HashTable *create_hash_table(int capacity)
 {
   HashTable *ht;
 
+  ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair));
+
   return ht;
 }
 
@@ -89,7 +93,17 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int index = hash(key, ht->capacity);
+  LinkedPair *pair = create_pair(key, value);
+  LinkedPair *stored_pair = ht->storage[index];
 
+  if (stored_pair != NULL ) {
+    if (strcmp(key, stored_pair->key) != 0) {
+      pair->next = pair;
+    } 
+  }
+
+  ht->storage[index] = pair;
 }
 
 /*
