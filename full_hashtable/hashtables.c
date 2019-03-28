@@ -143,7 +143,14 @@ void hash_table_remove(HashTable *ht, char *key)
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+  LinkedPair *stored_pair = ht->storage[index];
+  if (stored_pair == NULL) {
   return NULL;
+  } else {
+    return stored_pair->value;
+  }
+    
 }
 
 /*
@@ -154,6 +161,15 @@ char *hash_table_retrieve(HashTable *ht, char *key)
 void destroy_hash_table(HashTable *ht)
 {
 
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    if (ht->storage[i] != NULL) {
+
+    destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /*
