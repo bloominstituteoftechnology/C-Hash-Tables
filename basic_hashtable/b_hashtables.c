@@ -70,7 +70,11 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  // Allocate memory for the HasTable struct
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+
+  // Allocate memory for key/value pair storage
+  ht->storage = malloc(capacity * sizeof(char *));
 
   return ht;
 }
