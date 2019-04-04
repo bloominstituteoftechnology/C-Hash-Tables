@@ -73,7 +73,9 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -89,7 +91,28 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  //compute index with hash function
+  unsigned int index = hash(key, ht->capacity);
+  //create new pair to insert
+  LinkedPair *new_pair = create_pair(key, value);
+  //get the current stored pair
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair = NULL;
+  //loop through while current pair exists and keys do not match
+  while (current_pair != NULL && current_pair-> key != key)
+  {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
+  if (current_pair)
+  {
+    current_pair->value = value;
+  }
+  else
+  {
+    ht->storage[index] = new_pair;
+    new_pair->next = ht->storage[index];
+  }
 }
 
 /*
@@ -102,7 +125,29 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  //compute index with hash function
+  unsigned int index = hash(key, ht->capacity);
+  //get the current stored pair
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair = NULL;
+  //loop through while current pair exists and keys do not match
+  while (current_pair != NULL && current_pair-> key != key)
+  {
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
+  if (!current_pair)
+  {
+    printf("Warning: unable to remove");
+  }
+  else
+  {
+    if(!last_pair)
+    {
+      
+    }
+  }
+  
 }
 
 /*
@@ -168,3 +213,5 @@ int main(void)
   return 0;
 }
 #endif
+
+//https://www.hackerearth.com/practice/data-structures/hash-tables/basics-of-hash-tables/tutorial/
