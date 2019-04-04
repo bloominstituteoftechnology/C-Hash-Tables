@@ -73,7 +73,11 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+
+  // Allocate memory for key/value pair storage
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
+  ht->capacity = capacity;
 
   return ht;
 }
@@ -84,11 +88,38 @@ HashTable *create_hash_table(int capacity)
   Inserting values to the same index with different keys should be
   added to the corresponding LinkedPair list.
 
-  Inserting values to the same index with existing keys can overwrite
-  the value in th existing LinkedPair list.
+  Inserting values to the same index with existing keys can overwrite the value in th existing LinkedPair list.
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+
+  // Hash the key
+  unsigned int index = hash(key, ht->capacity);
+  // Create a key/value pair
+  LinkedPair *linkedPair = create_pair(key, value);
+
+  LinkedPair *stored_linked_pair = ht->storage[index];
+
+  // If there is something already there
+  if (stored_linked_pair != NULL)
+  {
+
+    if (strcmp(key, stored_linked_pair->key) != 0)
+    {
+      stored_linked_pair->next = linkedPair;
+    }
+    if (strcmp(key, stored_linked_pair->key) == 0)
+    {
+      printf("WARNING: key/value already in LL?\n");
+    }
+    destroy_pair(stored_linked_pair);
+    return;
+  }
+
+  // Add the hashedkey to the appropriate spot in ht
+  ht->storage[index] = linkedPair;
+
+
 
 }
 
