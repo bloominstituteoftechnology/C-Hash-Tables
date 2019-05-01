@@ -73,7 +73,11 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+
+  // Allocate memory for key/value pair storage
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
+  ht->capacity = capacity;
 
   return ht;
 }
@@ -84,11 +88,38 @@ HashTable *create_hash_table(int capacity)
   Inserting values to the same index with different keys should be
   added to the corresponding LinkedPair list.
 
-  Inserting values to the same index with existing keys can overwrite
-  the value in th existing LinkedPair list.
+  Inserting values to the same index with existing keys can overwrite the value in th existing LinkedPair list.
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+
+  // Hash the key
+  unsigned int index = hash(key, ht->capacity);
+  // Create a key/value pair
+  LinkedPair *linkedPair = create_pair(key, value);
+
+  LinkedPair *stored_linked_pair = ht->storage[index];
+
+  // If there is something already there
+  if (stored_linked_pair != NULL)
+  {
+
+    if (strcmp(key, stored_linked_pair->key) != 0)
+    {
+      stored_linked_pair->next = linkedPair;
+    }
+    if (strcmp(key, stored_linked_pair->key) == 0)
+    {
+      printf("WARNING: key already in LL, overriding value\n");
+      stored_linked_pair->value = value;
+    }
+    return;
+  }
+
+  // Add the hashedkey to the appropriate spot in ht
+  ht->storage[index] = linkedPair;
+
+
 
 }
 
@@ -103,6 +134,19 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 void hash_table_remove(HashTable *ht, char *key)
 {
 
+  unsigned int index = hash(key, ht->capacity);
+
+  if (ht->storage[index] == NULL || (
+      strcmp(ht->storage[index]->key, key) != 0))
+  {
+    printf("Unable to remove entry\n");
+  }
+  else
+  {
+    destroy_pair(ht->storage[index]);
+    ht->storage[index] = NULL;
+  }
+
 }
 
 /*
@@ -115,7 +159,35 @@ void hash_table_remove(HashTable *ht, char *key)
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  // hash the provided key to get the index
+  unsigned int index = hash(key, ht->capacity);
+
+  // if there's nothing there return NULL
+  if (ht->storage[index] == NULL)
+  {
+    printf("Unable to retrieve entry\n");
+
+
+    return NULL;
+  }
+
+  // if the key's don't match search next LinkedPair if available
+
+  int * currentelement = ht->storage[index];
+  while (currentelement->next =! NULL) {
+
+    if 
+      ((strcmp(currentKey->key, key) != 0))   {
+    printf("Found it!\n");
+    return currentKey->value;
+  }
+
+      currentelement = currentelement->next;
+
+  }
+
+  // otherwise return the value at the given key
+  return ht->storage[index]->value;
 }
 
 /*
