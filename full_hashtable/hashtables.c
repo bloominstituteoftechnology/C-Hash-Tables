@@ -73,8 +73,10 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
+  HashTable *ht = malloc(sizeof(HashTable));
+  
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *)); /* calloc takes care of initializing every storage value to NULL here */
   return ht;
 }
 
@@ -89,6 +91,25 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int i = hash(key, ht->capacity);
+  LinkedPair *current = ht->storage[i];
+  LinkedPair *previous; /* does not need to be set to anything initially */
+
+  while(current != NULL && strcmp(current->key, key) != 0) {
+    /* using strcmp as discussed in the guided demo earlier */
+
+    previous = current;
+    current = previous->next;
+  }
+  
+  if(current != NULL) {
+    current->value = value;
+  }
+  else {
+    LinkedPair *new = create_pair(key, value); /* if nothing is found in the bucket, create a new pair */
+    new->next = ht->storage[i];
+    ht->storage[i] = new;
+  }
 
 }
 
@@ -102,7 +123,23 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int i = hash(key, ht->capacity);
+  LinkedPair *current = ht->storage[i];
+  LinkedPair *previous = NULL;
 
+  while(current != NULL && strcmp(current->key, key) != 0) {
+    previous = current;
+    current = current->next;
+  }
+
+  if(previous != NULL) {
+    previous->next = current->next;
+  }
+  else {
+    ht->storage[i] = current->next;
+  }
+
+  current = NULL;
 }
 
 /*
@@ -115,7 +152,26 @@ void hash_table_remove(HashTable *ht, char *key)
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int i = hash(key, ht->capacity);
+  LinkedPair *current = ht->storage[i];
+  LinkedPair *previous;
+
+  if(strcmp(current->key, key) == 0) {
+    return current->value;
+  }
+  else {
+    while(current != NULL && strcmp(current->key, key) != 0) {
+      previous = current;
+      current = previous->next; /* performs the same comparison and data setting as in the insert function */
+    }
+
+    if(strcmp(current->key, key) == 0) {
+      return current->value;
+    }
+    else {
+      return NULL;
+    }
+  }
 }
 
 /*
@@ -125,7 +181,16 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  */
 void destroy_hash_table(HashTable *ht)
 {
+  /* should be a very similar implementation to the basic hash table destruction */
+  for(int i = 0; i < ht->capacity; i++) {
+    while(ht->storage[i] != NULL) {
+      destroy_pair(ht->storage[i]);
+      ht->storage[i] = ht->storage[i]->next;
+    }
+  }
 
+  free(ht->storage);
+  free(ht);
 }
 
 /*
@@ -138,8 +203,23 @@ void destroy_hash_table(HashTable *ht)
  */
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = malloc(sizeof(HashTable));
+  new_ht->capacity = ht->capacity * 2;
+  new_ht->storage = calloc(new_ht->capacity, sizeof(LinkedPair));
 
+  for(int i = 0; i < ht->capacity; i++) {
+    if(ht->storage[i] != NULL) {
+      hash_table_insert(new_ht, ht->storage[i]->key, ht->storage[i]->value); /* create a new pair */
+      while(ht->storage[i]->next != NULL) {
+        /* while there is a next bucket to move to, perform the same insertion
+        move to the following bucket when complete */
+        hash_table_insert(new_ht, ht->storage[i]->next->key, ht->storage[i]->next->value);
+        ht->storage[i] = ht->storage[i]->next;
+      }
+    }
+  }
+
+  destroy_hash_table(ht); /* free malloc'd memory before returning the new hash table */
   return new_ht;
 }
 

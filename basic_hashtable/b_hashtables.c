@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* initial commit */ 
 
 /****
   Basic hash table key/value pair
@@ -70,8 +71,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair *));
   return ht;
 }
 
@@ -84,7 +86,17 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  Pair *pair = create_pair(key, value);
+  unsigned int i = hash(key, ht->capacity);
 
+  /* will use actual collision handling a bit later, for now just the warning */
+
+  if(ht->storage[i]) {
+    fprintf(stderr, "Indexing error: there is a current value being overwritten.\n");
+    free(ht->storage[i]); /* if ht->storage[i] exists, this message comes up and the memory at index i is freed */
+  }
+
+  ht->storage[i] = pair;
 }
 
 /****
@@ -94,7 +106,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  unsigned int i = hash(key, ht->capacity);
+  if(ht->storage[i]) {
+    ht->storage[i]->value = NULL; /* accessing the value itself as in the retrieve function */
+    ht->storage[i]->key = NULL;
+    destroy_pair(ht->storage[i]);
+  }
 }
 
 /****
@@ -104,7 +121,14 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int i = hash(key, ht->capacity);
+
+  if(ht->storage[i]) {
+    return ht->storage[i]->value;
+  }
+  else {
+    return NULL;
+  }
 }
 
 /****
@@ -114,7 +138,8 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  free(ht->storage);
+  free(ht);
 }
 
 
