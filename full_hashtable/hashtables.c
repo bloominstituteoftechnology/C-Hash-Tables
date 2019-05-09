@@ -73,7 +73,9 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -89,6 +91,35 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  // create the index to store your pair
+  unsigned int index = hash(key, ht->capacity);
+
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair;
+
+  // if the location exists then we will make a linked list
+  while(current_pair != NULL && strcmp(current_pair->key, key) != 0)
+  {
+    // make the next point to the current pair
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+
+  }
+  // if there is a current pair
+  if(current_pair != NULL)
+  {
+    //set the current pair value to our value
+    current_pair->value = value;
+  }
+  else
+  {
+    // else we want to create a new pair and store it at the index
+    LinkedPair *new_pair = create_pair(key, value);
+    new_pair->next = ht->storage[index];
+    ht->storage[index] = new_pair;
+  }
+  
+
 
 }
 
@@ -102,6 +133,43 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
+  // get the index of the hashed key
+  unsigned int index = hash(key, ht->capacity);
+
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *previous_pair = NULL;
+
+  // while the current pair has a value and the keys are diff
+  while(current_pair != NULL && strcmp(current_pair->key, key) != 0)
+  {
+    // set previous pair to our current pair
+    // set the current pair to our prevs next
+    previous_pair = current_pair;
+    current_pair = current_pair->next;
+  }
+  // if our current pair is empty
+  if(current_pair == NULL)
+  {
+    // print warning
+    printf("Cannot remove the entry with the key of: %s\n", key);
+  }
+  else
+  {
+    // else if our previous pair is NULL
+    if(previous_pair == NULL)
+    {
+      // set index in storage to the next value of our current pair
+      ht->storage[index] = current_pair->next;
+    }
+    else
+    {
+      // else our previous pair next is our current pair next
+      previous_pair->next = current_pair->next;
+    }
+    current_pair = NULL;
+    
+  }
+  
 
 }
 
@@ -115,6 +183,19 @@ void hash_table_remove(HashTable *ht, char *key)
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+  LinkedPair *pair = ht->storage[index];
+
+  // while the pair exists
+  while(pair)
+  {
+    if(!strcmp(pair->key, key))
+    {
+      return pair->value;
+    }
+    // set to next pair
+    pair = pair->next;
+  }
   return NULL;
 }
 
