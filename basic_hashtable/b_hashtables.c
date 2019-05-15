@@ -69,10 +69,12 @@ unsigned int hash(char *str, int max)
   (hint: look up `calloc`)
  ****/
 BasicHashTable *create_hash_table(int capacity)
-{
-  BasicHashTable *ht;
+{ 
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable)); // initialize ht pointer using Basic hashtable struct
+  ht->capacity = capacity; // set capacity
+  ht->storage = calloc(capacity, sizeof(Pair)); // set storage with calloc (length, sizeof(element))
 
-  return ht;
+  return ht; // return ht
 }
 
 /****
@@ -84,7 +86,13 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  unsigned int i = hash(key, ht->capacity); // create index using djb2 hash function
+  if (ht->storage[i]) // check if value exists at key
+    {
+      printf("Warning... overwriting existing value...");
+      free(ht->storage[i]); // destroy existing key-value pair
+    }
+  ht->storage[i] = create_pair(key, value); // create new pair
 }
 
 /****
@@ -94,17 +102,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
-}
-
-/****
-  Fill this in.
-
-  Should return NULL if the key is not found.
- ****/
-char *hash_table_retrieve(BasicHashTable *ht, char *key)
-{
-  return NULL;
+  unsigned int i = hash(key, ht->capacity); // create index using djb2 hash function
+  if (ht->storage[i]) // check if value exists at key
+  {
+    free(ht->storage[i]); // destroy existing key-value pair
+    ht->storage[i] = NULL; // replace with NULL
+  }
 }
 
 /****
@@ -114,8 +117,40 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  if (ht) {
+    for(int i = 0; i < ht->capacity; i++)
+    {
+      if(ht->storage[i])
+      {
+        free(ht->storage[i]); // deleting indexes 
+      }
+    }
+    free(ht->storage);
+    free(ht);
+  }
 }
+
+/****
+  Fill this in.
+
+  Should return NULL if the key is not found.
+ ****/
+char *hash_table_retrieve(BasicHashTable *ht, char *key)
+{
+  unsigned int i = hash(key, ht->capacity); // create index using djb2 hash function
+  if (ht) // check if value exists at key
+    {
+      for(int i = 0; i < ht->capacity; i++) // loop for as long as index exists
+        {
+          return ht->storage[i];
+          return ht->storage;
+          return ht;// return indices, storage and hashtable 
+        }  
+    }
+  return NULL; // return NULL if ht doesn't exist
+}
+
+
 
 
 #ifndef TESTING
