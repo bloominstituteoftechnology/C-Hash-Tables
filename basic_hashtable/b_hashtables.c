@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Basic hash table key/value pair
  ****/
@@ -70,7 +69,10 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht  = malloc(sizeof(BasicHashTable));
+
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(char *));
 
   return ht;
 }
@@ -84,7 +86,22 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  //create new node using Pair struct from above
+  Pair *new_node = create_pair(key, value); 
 
+  // create array index to insert new node into 
+  unsigned int new_index = hash(key, ht->capacity); 
+
+  if (ht->storage[new_index] != NULL){ //if storage is occupied...
+
+    printf("warning: overwriting a value\n");
+    destroy_pair(ht->storage[new_index]); // ...free memory (using destroy_pair defined above)
+    ht->storage[new_index] = new_node; // ...and insert new node 
+
+  }
+  else {
+    ht->storage[new_index] = new_node; // or if storage is empty, insert new node
+  }
 }
 
 /****
@@ -94,6 +111,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  // hash key to find index
+  unsigned int hash_key = hash(key, ht->capacity); 
+
+  if (ht->storage[hash_key] != NULL) { //if storage is occupied...
+
+    destroy_pair(ht->storage[hash_key]); // ...free memory 
+
+  }
 
 }
 
@@ -104,6 +129,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  // hash key to find index
+  unsigned int hash_key = hash(key, ht->capacity); 
+
+  if (strcmp(ht->storage[hash_key]->key, key) == 0) {
+      return ht->storage[hash_key]->value;
+    }
+    
   return NULL;
 }
 
@@ -114,6 +146,13 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+  for (int i=0; i < ht->capacity; i++) {
+    ht->storage[i] = NULL; 
+    destroy_pair(ht->storage[i]); 
+  }
+
+  free(ht->storage);
+  free(ht);
 
 }
 

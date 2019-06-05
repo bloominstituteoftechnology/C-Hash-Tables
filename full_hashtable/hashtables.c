@@ -73,7 +73,10 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht =malloc(sizeof(HashTable));
+
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(char *));
 
   return ht;
 }
@@ -89,6 +92,33 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+   //create new node using LinkedPair struct from above
+  LinkedPair *new_node = create_pair(key, value); 
+
+  // create array index to insert new node into 
+  unsigned int new_index = hash(key, ht->capacity); 
+
+  if (ht->storage[new_index] == 0) { // if current index is empty, insert new_node
+    ht->storage[new_index] = new_node;
+  }
+
+   else {
+    while (ht->storage[new_index] != 0) { 
+      // if the keys are the same, replace current value with new value
+      if (strcmp(ht->storage[new_index]->key, key) == 0) { 
+        ht->storage[new_index]->value = value;
+        break;
+      }
+      // if keys are different AND there's an available "next" slot, insert in next slot
+      else if (strcmp(ht->storage[new_index]->key, key) != 0 && ht->storage[new_index]->next == NULL) {
+        ht->storage[new_index]->next = new_node;
+        break;
+      }
+      //attach linked list node
+      ht->storage[new_index] = ht->storage[new_index]->next;
+    }
+  }
+
 
 }
 
@@ -102,6 +132,26 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
+  // hash key to find index
+  unsigned int hash_key = hash(key, ht->capacity); 
+  // for readability, new variable
+  LinkedPair *current_node = ht->storage[hash_key]; 
+
+  while (current_node != 0) { // while there's a current node
+    if (strcmp(current_node->key, key) == 0 && current_node->next == 0) { 
+      // are the strings the same? YES --- is there a linked node? --- NO
+      destroy_pair(current_node);
+      break;
+    }
+    else if (strcmp(current_node->key, key) == 0 && current_node->next != 0) { 
+      // are the strings the same? YES ---  is there a linked node? --- YES
+      current_node->key = current_node->next->key;
+      current_node->value = current_node->next->value;
+      current_node->next = current_node->next->next;
+      break;
+    }
+    current_node = current_node->next; 
+  }
 
 }
 
@@ -115,7 +165,24 @@ void hash_table_remove(HashTable *ht, char *key)
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+ 
+ // hash key to find index
+  unsigned int hash_key = hash(key, ht->capacity); 
+  // for readability, new variable
+  LinkedPair *current_node = ht->storage[hash_key]; 
+
+  while (current_node != 0) { 
+    if (strcmp(current_node->key, key) == 0) { //...if match
+      return current_node->value;
+    }
+    else if (strcmp(current_node->key, key) != 0 && current_node->next == 0) { //...if no match
+      fprintf(stderr, "key not found");
+      return NULL;
+    }
+    current_node = current_node->next; 
+  }
+  return 0;
+
 }
 
 /*
@@ -125,6 +192,13 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  */
 void destroy_hash_table(HashTable *ht)
 {
+  for (int i=0; i < ht->capacity; i++) {
+    ht->storage[i] = NULL; 
+    destroy_pair(ht->storage[i]); 
+  }
+
+  free(ht->storage);
+  free(ht);
 
 }
 
