@@ -73,7 +73,9 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -89,7 +91,22 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  LinkedPair *insert_pair = create_pair(key, value);
 
+  int hashed = hash(key, ht->capacity);
+  
+  LinkedPair *current_pair = ht->storage[hashed];
+
+  if (ht->storage[hashed] != NULL) {
+    if (strcmp(current_pair->key, key) != 0) {
+      while (current_pair->next != NULL) {
+        current_pair = current_pair->next;
+      }
+      current_pair->next = insert_pair;
+      return;
+    }
+  }
+  ht->storage[hashed] = insert_pair;
 }
 
 /*
@@ -102,6 +119,19 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
+  int hashed = hash(key, ht->capacity);
+  LinkedPair *current_pair = ht->storage[hashed];
+  if (ht->storage[hashed] != NULL) {
+    while (current_pair->next != NULL) {
+      LinkedPair *next_pair = current_pair->next;
+      if (strcmp(current_pair->key, key) != 0) {
+        current_pair = current_pair->next;
+      }
+      // here they do match ---> now what
+      // even though they match, that doesnt mean the match->next is null
+      // need to point from previous element to next element
+    }
+  }
 
 }
 
