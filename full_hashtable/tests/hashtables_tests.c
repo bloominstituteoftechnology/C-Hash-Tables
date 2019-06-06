@@ -161,8 +161,8 @@ char *all_tests()
 
     mu_run_test(test_hash_table_insertion_and_retrieval);
     mu_run_test(test_hash_table_insertion_overwrites_correctly);
-    mu_run_test(test_hash_table_removes_correctly);
-    mu_run_test(hash_table_resizing_test);
+    // mu_run_test(test_hash_table_removes_correctly);
+    // mu_run_test(hash_table_resizing_test);
 
     return NULL;
 }

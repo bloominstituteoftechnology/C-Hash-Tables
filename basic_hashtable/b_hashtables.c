@@ -88,13 +88,17 @@ BasicHashTable *create_hash_table(int capacity)
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   // find new hashed index from key and capacity
-  int new_index = hash(key, ht->capacity);
+  unsigned int new_index = hash(key, ht->capacity);
+  // create new pair
+  Pair *pair = create_pair(key, value);
   // determine if key/pair already exists
+  Pair *stored_pair = ht->storage[new_index];
   if (ht->storage[new_index] != NULL)
   {
     if (strcmp(ht->storage[new_index]->key, key) == 0)
     {
-      printf("Key is: %s\n", ht->storage[new_index]->key);
+      printf("Destroy key: %s\n", ht->storage[new_index]->key);
+      destroy_pair(stored_pair);
     }
     else
     {
@@ -105,8 +109,6 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   {
     printf("Key is doesn't exist: NULL.\n");
   }
-  // create new pair
-  Pair *pair = create_pair(key, value);
   // place new pair in hashed index of hash table
   ht->storage[new_index] = pair;
 }
@@ -121,9 +123,18 @@ void hash_table_remove(BasicHashTable *ht, char *key)
   // find hashed index
   int index = hash(key, ht->capacity);
   // destroy pair via hashed index
-  destroy_pair(ht->storage[index]);
-  // set storage index to null
-  ht->storage[index] = NULL;
+  if (ht->storage[index] != NULL && strcmp(ht->storage[index]->key, key) == 0)
+  {
+    // remove pair
+    destroy_pair(ht->storage[index]);
+    // set storage index to null
+    ht->storage[index] = NULL;
+  }
+  else
+  {
+    // print error
+    printf(stderr, "Unable to remove entry with key: %s\n", key);
+  }
 }
 
 /****
@@ -136,14 +147,12 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
   // find hashed index value from key
   int index = hash(key, ht->capacity);
   // if key value / indexed storage value is null return null else return value
-  if (ht->storage[index] == NULL)
-  {
-    return NULL;
-  }
-  else
+  if (ht->storage[index] != NULL && strcmp(ht->storage[index]->key, key) == 0)
   {
     return ht->storage[index]->value;
   }
+  printf(stderr, "Unable to remove entry with key: %s\n", key);
+  return NULL;
 }
 
 /****
@@ -156,10 +165,15 @@ void destroy_hash_table(BasicHashTable *ht)
   // loop through storage and destrpy pairings and then free storage per index
   for (int i = 0; i < ht->capacity; i++)
   {
-    destroy_pair(ht->storage[i]);
+    if (ht->storage[i] != NULL)
+    {
+
+      destroy_pair(ht->storage[i]);
+    }
+
     // free(ht->storage[i]); not necessary already handled by destroy_pair();
   }
-  // free overall storage 
+  // free overall storage
   free(ht->storage);
   // free hash table structure
   free(ht);
