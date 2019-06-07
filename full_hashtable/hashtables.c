@@ -94,72 +94,94 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-  // find new hashed index from key and capacity
-  unsigned int new_index = hash(key, ht->capacity);
-  printf("new_index: %d\n", new_index);
-  // create new pair
-  LinkedPair *pair = create_pair(key, value);
-  // determine if key/pair already exists
-  LinkedPair *stored_pair = ht->storage[new_index];
+  // // find new hashed index from key and capacity
+  // unsigned int new_index = hash(key, ht->capacity);
+  // printf("new_index: %d\n", new_index);
+  // // create new pair
+  // LinkedPair *pair = create_pair(key, value);
+  // // determine if key/pair already exists
+  // LinkedPair *stored_pair = ht->storage[new_index];
 
-  if (ht->storage[new_index] != NULL)
+  // if (ht->storage[new_index] != NULL)
+  // {
+  //   LinkedPair *pt1 = stored_pair;
+  //   LinkedPair *ptr_lag1;
+  //   int index2 = 0;
+  //   while (pt1->next != NULL)
+  //   {
+  //     if (strcmp(pt1->key, key) == 0)
+  //     {
+  //       printf("Destroy key: %s %s\n", pt1->key, pt1->value);
+  //       pair->next = pt1->next;
+  //       destroy_pair(pt1);
+  //       if (index2 != 0)
+  //       {
+  //         ptr_lag1->next = pair;
+  //       }
+  //       return;
+  //     }
+  //     index2++;
+  //     ptr_lag1 = pt1;
+  //     pt1 = pt1->next;
+  //   }
+  //   if (strcmp(pt1->key, key) == 0)
+  //   {
+  //     printf("Destroy key 2nd: %s %s\n", pt1->key, pt1->value);
+  //     // printf("pt1->next: %s\n", pt1->next);
+  //     // if (pt1->next == NULL)
+  //     // {
+  //     //   printf("nulllllllllll");
+  //     //   pair->next == NULL;
+  //     // }
+  //     // else
+  //     // {
+  //     //   pair->next = pt1->next;
+  //     // }
+  //     if (index2 == 0)
+  //     {
+  //       pt1 = pair;
+  //       return;
+  //     }
+
+  //     destroy_pair(pt1);
+  //     printf("destroyed");
+  //     ptr_lag1->next = pair;
+  //     printf("ptr_lag1->next");
+  //     return;
+  //   }
+  //   else
+  //   {
+  //     pt1->next = pair;
+  //     printf("Keys do not match: %s.\n", key);
+  //   }
+  // }
+  // else
+  // {
+  //   printf("Key is doesn't exist: %s.\n", key);
+  //   // place new pair in hashed index of hash table
+  //   ht->storage[new_index] = pair;
+  // }
+
+  unsigned int index = hash(key, ht->capacity);
+
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *last_pair;
+
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0)
   {
-    LinkedPair *pt1 = stored_pair;
-    LinkedPair *ptr_lag1;
-    int index2 = 0;
-    while (pt1->next != NULL)
-    {
-      if (strcmp(pt1->key, key) == 0)
-      {
-        printf("Destroy key: %s %s\n", pt1->key, pt1->value);
-        pair->next = pt1->next;
-        destroy_pair(pt1);
-        if (index2 != 0)
-        {
-          ptr_lag1->next = pair;
-        }
-        return;
-      }
-      index2++;
-      ptr_lag1 = pt1;
-      pt1 = pt1->next;
-    }
-    if (strcmp(pt1->key, key) == 0)
-    {
-      printf("Destroy key 2nd: %s %s\n", pt1->key, pt1->value);
-      // printf("pt1->next: %s\n", pt1->next);
-      // if (pt1->next == NULL)
-      // {
-      //   printf("nulllllllllll");
-      //   pair->next == NULL;
-      // }
-      // else
-      // {
-      //   pair->next = pt1->next;
-      // }
-      if (index2 == 0)
-      {
-        pt1 = pair;
-        return;
-      }
-      
-      destroy_pair(pt1);
-      printf("destroyed");
-      ptr_lag1->next = pair;
-      printf("ptr_lag1->next");
-      return;
-    }
-    else
-    {
-      printf("Keys do not match: %s.\n", key);
-      pt1->next = pair;
-    }
+    last_pair = current_pair;
+    current_pair = last_pair->next;
+  }
+
+  if (current_pair != NULL)
+  {
+    current_pair->value = value;
   }
   else
   {
-    printf("Key is doesn't exist: %s.\n", key);
-    // place new pair in hashed index of hash table
-    ht->storage[new_index] = pair;
+    LinkedPair *new_pair = create_pair(key, value);
+    new_pair->next = ht->storage[index];
+    ht->storage[index] = new_pair;
   }
 }
 
@@ -173,52 +195,82 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
-  // find hashed index
-  int index = hash(key, ht->capacity);
-  // destroy pair via hashed index
-  if (ht->storage[index] != NULL)
+  unsigned int index = hash(key, ht->capacity);
+
+  LinkedPair *current_pair = ht->storage[index];
+  LinkedPair *previous_pair = NULL;
+
+  while (current_pair != NULL && strcmp(current_pair->key, key) != 0)
   {
-    LinkedPair *ptr = ht->storage[index];
-    LinkedPair *ptr_lag;
-    int index = 0;
-    while (ptr->next != NULL)
-    {
-      if (strcmp(ptr->key, key) == 0)
-      {
-        if (ptr_lag != 0)
-        {
-          ptr_lag->next = ptr->next;
-          // remove pair
-          destroy_pair(ptr);
-        }
-        else
-        {
-          ht->storage[index] = ptr->next;
-          destroy_pair(ptr);
-        }
-      }
-      index++;
-      ptr_lag = ptr;
-      ptr = ptr->next;
-    }
-    if (strcmp(ptr->key, key) == 0)
-    {
-      // remove pair
-      destroy_pair(ptr);
-      // set storage index to null
-      ptr_lag->next = NULL;
-    }
-    else
-    {
-      // print error
-      printf(stderr, "Unable to remove entry with key: %s\n", key);
-    }
+    previous_pair = current_pair;
+    current_pair = current_pair->next;
+  }
+
+  if (current_pair == NULL)
+  {
+
+    fprintf(stderr, "Unable to remove entry with key: %s\n", key);
   }
   else
   {
-    // print error
-    printf(stderr, "Unable to remove entry with key: %s\n", key);
+
+    if (previous_pair == NULL)
+    { // Removing the first element in the Linked List
+      ht->storage[index] = current_pair->next;
+    }
+    else
+    {
+      previous_pair->next = current_pair->next;
+    }
+
+    destroy_pair(current_pair);
   }
+  // // find hashed index
+  // int index = hash(key, ht->capacity);
+  // // destroy pair via hashed index
+  // if (ht->storage[index] != NULL)
+  // {
+  //   LinkedPair *ptr = ht->storage[index];
+  //   LinkedPair *ptr_lag;
+  //   int index = 0;
+  //   while (ptr->next != NULL)
+  //   {
+  //     if (strcmp(ptr->key, key) == 0)
+  //     {
+  //       if (ptr_lag != 0)
+  //       {
+  //         ptr_lag->next = ptr->next;
+  //         // remove pair
+  //         destroy_pair(ptr);
+  //       }
+  //       else
+  //       {
+  //         ht->storage[index] = ptr->next;
+  //         destroy_pair(ptr);
+  //       }
+  //     }
+  //     index++;
+  //     ptr_lag = ptr;
+  //     ptr = ptr->next;
+  //   }
+  //   if (strcmp(ptr->key, key) == 0)
+  //   {
+  //     // remove pair
+  //     destroy_pair(ptr);
+  //     // set storage index to null
+  //     ptr_lag->next = NULL;
+  //   }
+  //   else
+  //   {
+  //     // print error
+  //     printf(stderr, "Unable to remove entry with key: %s\n", key);
+  //   }
+  // }
+  // else
+  // {
+  //   // print error
+  //   printf(stderr, "Unable to remove entry with key: %s\n", key);
+  // }
 }
 /*
   Fill this in.
@@ -293,31 +345,83 @@ void destroy_hash_table(HashTable *ht)
  */
 HashTable *hash_table_resize(HashTable *ht)
 {
-  int new_capacity = ht->capacity * 2;
-  HashTable *new_ht = create_hash_table(new_capacity);
-  new_ht->storage = ht->storage;
+  // int new_capacity = ht->capacity * 2;
+  // HashTable *new_ht = create_hash_table(new_capacity);
+  // new_ht->storage = ht->storage;
+  // destroy_hash_table(ht);
+  // return new_ht;
+  HashTable *new_ht = create_hash_table(2 * ht->capacity);
+
+  LinkedPair *current_pair;
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    current_pair = ht->storage[i];
+    while (current_pair != NULL)
+    {
+      hash_table_insert(new_ht, current_pair->key, current_pair->value);
+      current_pair = current_pair->next;
+    }
+  }
   destroy_hash_table(ht);
+
   return new_ht;
 }
 
 #ifndef TESTING
 int main(void)
 {
-  struct HashTable *ht = create_hash_table(2);
+  // struct HashTable *ht = create_hash_table(2);
 
-  hash_table_insert(ht, "line_1", "Tiny hash table\n");
-  hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
-  hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
+  // hash_table_insert(ht, "line_1", "Tiny hash table\n");
+  // hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
+  // hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
 
-  printf("%s", hash_table_retrieve(ht, "line_1"));
-  printf("%s", hash_table_retrieve(ht, "line_2"));
-  printf("%s", hash_table_retrieve(ht, "line_3"));
+  // printf("%s", hash_table_retrieve(ht, "line_1"));
+  // printf("%s", hash_table_retrieve(ht, "line_2"));
+  // printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  int old_capacity = ht->capacity;
-  ht = hash_table_resize(ht);
-  int new_capacity = ht->capacity;
+  // int old_capacity = ht->capacity;
+  // ht = hash_table_resize(ht);
+  // int new_capacity = ht->capacity;
 
-  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+
+  struct HashTable *ht = create_hash_table(8);
+
+  hash_table_insert(ht, "key-0", "val-0");
+  hash_table_insert(ht, "key-1", "val-1");
+  hash_table_insert(ht, "key-2", "val-2");
+  hash_table_insert(ht, "key-3", "val-3");
+  hash_table_insert(ht, "key-4", "val-4");
+  hash_table_insert(ht, "key-5", "val-5");
+  hash_table_insert(ht, "key-6", "val-6");
+  hash_table_insert(ht, "key-7", "val-7");
+  hash_table_insert(ht, "key-8", "val-8");
+  hash_table_insert(ht, "key-9", "val-9");
+
+  hash_table_insert(ht, "key-0", "new-val-0");
+  hash_table_insert(ht, "key-1", "new-val-1");
+  hash_table_insert(ht, "key-2", "new-val-2");
+  hash_table_insert(ht, "key-3", "new-val-3");
+  hash_table_insert(ht, "key-4", "new-val-4");
+  hash_table_insert(ht, "key-5", "new-val-5");
+  hash_table_insert(ht, "key-6", "new-val-6");
+  hash_table_insert(ht, "key-7", "new-val-7");
+  hash_table_insert(ht, "key-8", "new-val-8");
+  hash_table_insert(ht, "key-9", "new-val-9");
+
+  printf("read");
+
+  hash_table_retrieve(ht, "key-0");
+  hash_table_retrieve(ht, "key-1");
+  hash_table_retrieve(ht, "key-2");
+  hash_table_retrieve(ht, "key-3");
+  hash_table_retrieve(ht, "key-4");
+  hash_table_retrieve(ht, "key-5");
+  hash_table_retrieve(ht, "key-6");
+  hash_table_retrieve(ht, "key-7");
+  hash_table_retrieve(ht, "key-8");
+  hash_table_retrieve(ht, "key-9");
 
   destroy_hash_table(ht);
 
