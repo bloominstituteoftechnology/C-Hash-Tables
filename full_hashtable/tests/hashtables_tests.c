@@ -69,6 +69,8 @@ char *test_hash_table_insertion_overwrites_correctly()
     hash_table_insert(ht, "key-8", "new-val-8");
     hash_table_insert(ht, "key-9", "new-val-9");
 
+    // printf("read");
+
     mu_assert(strcmp(hash_table_retrieve(ht, "key-0"), "new-val-0") == 0, "Value is not overwritten correctly");
     mu_assert(strcmp(hash_table_retrieve(ht, "key-1"), "new-val-1") == 0, "Value is not overwritten correctly");
     mu_assert(strcmp(hash_table_retrieve(ht, "key-2"), "new-val-2") == 0, "Value is not overwritten correctly");
