@@ -45,7 +45,6 @@ void destroy_pair(Pair *pair)
 
 /****
   djb2 hash function
-
   Do not modify this!
  ****/
 unsigned int hash(char *str, int max)
@@ -64,57 +63,86 @@ unsigned int hash(char *str, int max)
 
 /****
   Fill this in.
-
   All values in storage should be initialized to NULL
   (hint: look up `calloc`)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
 
 /****
   Fill this in.
-
   If you are overwriting a value with a different key, print a warning.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  int index = hash(key, ht->capacity);
+  if (ht->storage[index]){
+    printf("Warning Key overwriting!\n");
+    destroy_pair(ht->storage[index]);
+    ht->storage[index] = NULL; }
+  ht->storage[index] = create_pair(key, value);
 }
 
 /****
   Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+int index = hash(key, ht->capacity);
+if (ht->storage[index]) {
+	    destroy_pair(ht->storage[index]);
+      ht->storage[index] = NULL;
+	  } else {
+      printf("Key not exist\n");
+    }
 }
 
 /****
   Fill this in.
-
   Should return NULL if the key is not found.
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int index = hash(key, ht->capacity);
+  if (ht->storage[index] != NULL) {
+    
+    if (strcmp(ht->storage[index]->key, key) == 0) {
+      printf("KEY IS: %s\n", ht->storage[index]->value);
+      return ht->storage[index]->value;
+    } else {
+      printf("Keys don't match\n");
+    }
+  } else {
+      printf("Keys don't match\n");
+    }
   return NULL;
 }
 
 /****
   Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+for (int i = 0; i < ht->capacity; i++)
+  {
+    if (ht->storage[i] != NULL)
+    {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht->storage);
+  free(ht);
+  printf("Hash table has been deleted\n");
 }
 
 
@@ -122,13 +150,19 @@ void destroy_hash_table(BasicHashTable *ht)
 int main(void)
 {
   struct BasicHashTable *ht = create_hash_table(16);
+  
+  int index = hash("line", ht->capacity);
+  Pair *pair = create_pair("line", "Here today...\n");
+  ht->storage[index] = pair;
 
   hash_table_insert(ht, "line", "Here today...\n");
-
-  printf("%s", hash_table_retrieve(ht, "line"));
+  hash_table_insert(ht, "test", "hello\n");
+  hash_table_insert(ht, "value", "world\n");
+  //   hash_table_insert(ht, "key-0", "val-0");
+  //   printf("%s\n", hash_table_retrieve(ht, "key-0"));
+  // printf("%s\n", hash_table_retrieve(ht, "line"));
 
   hash_table_remove(ht, "line");
-
   if (hash_table_retrieve(ht, "line") == NULL) {
     printf("...gone tomorrow. (success)\n");
   } else {
