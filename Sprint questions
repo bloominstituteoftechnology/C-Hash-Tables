@@ -1,0 +1,20 @@
+What is an Array and how does it work?
+  - List of elements of same type in contiguous sequence of memory
+    - Can access the elements in constant time O(1) using this equation:
+      `memory_address = starting_address + index * data_size`
+
+
+What is a Hash Table and how does it work?
+  - Underlying data structure is an.... Array!
+    - Values are indexed by... hashing a key
+    - Hash will return a large unsigned (large positive number) integer `%` (modulo, or mod) the size of the underlying array which you will use as an array index
+    - Hashing collisions, or when 2 keys hash to the same index, are unavoidable (birthday problem)
+    - Handle collisions using a Linked List (key/value pairs of the same index are chained together in the same bucket) or Open Addressing (key/value pairs of the same index are placed in the next available bucket)
+
+
+What is a computer?
+  - Many way to answer this. Two things to touch on are `PROCESSOR` and `MEMORY`.
+    - Elaborate on one of the two... possiblities:
+         * Turing Machines: a theoretical construct that consists of a mechanical processor + an infinite spool of read/write tape which can solve any theoretically computable problem: a trait known as being "Turing Complete"
+          * The von Neumann architecture, which consists of a CPU (control + arithmetic/logic units), memory, input and output.
+            * Billions of transistors on a chip carefully and logically arranged to interface with memory (RAM), an operating system + file system (hard drive), input (keyboard, mouse, camera, microphone, internet) and output (screen, audio, internet).

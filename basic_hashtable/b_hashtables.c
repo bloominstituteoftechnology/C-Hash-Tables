@@ -84,12 +84,10 @@ BasicHashTable *create_hash_table(int capacity)
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
   int index = hash(key, ht->capacity);
-  if (ht->storage[index])
-  {
+  if (ht->storage[index]){
     printf("Warning Key overwriting!\n");
     destroy_pair(ht->storage[index]);
-    ht->storage[index] = NULL;
-  }
+    ht->storage[index] = NULL; }
   ht->storage[index] = create_pair(key, value);
 }
 
@@ -100,8 +98,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
 int index = hash(key, ht->capacity);
-if (ht->storage[index])
-	  {
+if (ht->storage[index]) {
 	    destroy_pair(ht->storage[index]);
       ht->storage[index] = NULL;
 	  } else {
