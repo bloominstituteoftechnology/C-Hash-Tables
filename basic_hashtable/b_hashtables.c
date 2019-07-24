@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Basic hash table key/value pair
  ****/
@@ -70,8 +69,7 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-
+  BasicHashTable *ht = calloc(capacity, sizeof(BasicHashTable));
   return ht;
 }
 
@@ -85,6 +83,14 @@ BasicHashTable *create_hash_table(int capacity)
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
 
+  unsigned int hash_key = hash(key, ht->capacity);
+
+  if (ht->storage[hash_key] != NULL) {
+    printf("Overwriting value at key.\n");
+    free(ht->storage[hash_key]);
+  }
+
+  ht->storage[hash_key] = create_pair(key, value);
 }
 
 /****
@@ -94,7 +100,14 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  unsigned int hash_key = hash(key, ht->capacity);
 
+  if (ht->storage[hash_key] != NULL) {
+    free(ht->storage[hash_key]->value);
+    free(ht->storage[hash_key]->key);
+    free(ht->storage[hash_key]);
+    ht->storage[hash_key] = NULL;
+  }
 }
 
 /****
@@ -104,7 +117,9 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int hash_key = hash(key, ht->capacity);
+  
+  return ht->storage[hash_key]->value;
 }
 
 /****
@@ -114,7 +129,8 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  free(ht->storage);
+  free(ht);
 }
 
 
