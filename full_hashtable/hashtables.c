@@ -52,7 +52,7 @@ void destroy_pair(LinkedPair *pair)
   djb2 hash function
 
   Do not modify this!
- */
+*/
 unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
@@ -70,11 +70,12 @@ unsigned int hash(char *str, int max)
   Fill this in.
 
   All values in storage should be initialized to NULL
- */
+*/
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
   return ht;
 }
 
@@ -86,10 +87,30 @@ HashTable *create_hash_table(int capacity)
 
   Inserting values to the same index with existing keys can overwrite
   the value in th existing LinkedPair list.
- */
+*/
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  unsigned int index = hash(key, ht->capacity);
 
+  LinkedPair *new_pair = create_pair(key, value);
+
+  if (ht->storage[index] != NULL && strcmp(key, ht->storage[index]->key) != 0) {
+
+    LinkedPair *previous_pair = malloc(sizeof(LinkedPair));
+
+    LinkedPair *pair = ht->storage[index];
+
+    while (pair) {
+      previous_pair = pair;
+      pair = pair->next;
+    }
+
+    pair = new_pair;
+    previous_pair->next = pair;
+
+  } else if (ht->storage[index] == NULL) {
+    ht->storage[index] = new_pair;
+  }
 }
 
 /*
@@ -102,7 +123,28 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
 
+  if (ht->storage[index] != NULL) {
+
+    LinkedPair *previous = malloc(sizeof(LinkedPair));
+
+    LinkedPair *current = ht->storage[index];
+
+    while (current || previous) {
+
+      if (previous != NULL) {
+        previous->next = NULL;
+        free(previous->key);
+        free(previous->value);
+        free(previous);
+      }
+
+      previous = current;
+      current = current->next;
+    }
+
+  }
 }
 
 /*
@@ -112,20 +154,36 @@ void hash_table_remove(HashTable *ht, char *key)
   keys.
 
   Return NULL if the key is not found.
- */
+*/
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  unsigned int index = hash(key, ht->capacity);
+
+  if (ht->storage[index] != NULL) {
+
+    LinkedPair *current = ht->storage[index];
+
+    while (current) {
+      if (strcmp(current->key, key) == 0) {
+        return current->value;
+      }
+      current = current->next;
+    }
+  }
+
   return NULL;
 }
 
 /*
-  Fill this in.
-
+  Fill ths in.
   Don't forget to free any malloc'ed memory!
  */
 void destroy_hash_table(HashTable *ht)
 {
-
+  if (ht != NULL) {
+    free(ht->storage);
+    free(ht);
+  }
 }
 
 /*
@@ -138,7 +196,12 @@ void destroy_hash_table(HashTable *ht)
  */
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = malloc(sizeof(HashTable));
+  new_ht->capacity = 2 * ht->capacity;
+  new_ht->storage = calloc((2 * ht->capacity), sizeof(LinkedPair *));
+
+  free(ht->storage);
+  free(ht);
 
   return new_ht;
 }
