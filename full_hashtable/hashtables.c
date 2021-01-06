@@ -73,7 +73,9 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
 
   return ht;
 }
@@ -89,7 +91,25 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  int index = hash(key, ht->capacity); // hash the key to get the index
 
+  if(ht->storage[index] != NULL){ // if there is something in the index already ...
+    LinkedPair *current_pair = ht->storage[index]; // store that pair in a variable while we make room
+    while(current_pair != NULL){ // so long as our current_pair has a value, do some logic checks:
+      if(strcmp(current_pair->key, key) == 0){ // if the keys for the new pair and current pair are the same,
+        free(current_pair->value); // free the value...
+        current_pair->value = strdup(value); // ... and replace it with the new value
+        break;
+      } else if(current_pair->next == NULL){ // if there is no next value in the LinkedList, insert the given pair there
+        current_pair->next = create_pair(key, value);
+        break;
+      } else {
+        current_pair = current_pair->next; // if neither of the above conditions are met, move to the next pair
+      }
+    }
+  } else {
+    ht->storage[index] = create_pair(key, value); // if there's nothing at the given index, store the new pair there
+  }
 }
 
 /*
@@ -102,7 +122,26 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
+  int index = hash(key, ht->capacity); // get our index from the hash function
 
+  if(ht->storage[index] != NULL){ // if there is a value at that index...
+    LinkedPair *current_pair = ht->storage[index]; // store that pair in a variable
+    LinkedPair *previous_pair = NULL; // and initialize a pointer for its previous pair
+    while(current_pair != NULL){ // iterate over the linked list, starting from the current pair
+      if(strcmp(current_pair->key, key) == 0){ // if the keys match, do this:
+        if(previous_pair == NULL){ // if no pair precedes it...
+          ht->storage[index] = current_pair->next; // ...assign the next pair to the current index
+        } else { // if a previous value exists...
+          previous_pair->next = current_pair->next; // ... assign the current_next value to the previous_next value
+        } /** ^ This effectively removes the pair from the LinkedList ^ **/
+        destroy_pair(current_pair); // once it's removed from the list, free its memory and end the loop
+        break;
+      } else { // if they keys don't match, iterate over the list until they do
+      previous_pair = current_pair;
+      current_pair = current_pair->next;
+    }
+  }
+}
 }
 
 /*
@@ -115,7 +154,20 @@ void hash_table_remove(HashTable *ht, char *key)
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  int index = hash(key, ht->capacity); // get our index from the hash function
+
+  if(ht->storage[index] != NULL){ // if there is a pair at that index, store it in current_pair
+    LinkedPair *current_pair = ht->storage[index];
+    while(current_pair != NULL){ // iterate to check if the keys are matching
+      if(strcmp(current_pair->key, key) == 0){ // if they do...
+        return current_pair->value; //... return that pair
+      } else {
+        current_pair = current_pair->next; // otherwise, move to the next pair in the LinkedList
+      }
+    }
+  }
+
+  return NULL; // return NULL if no key match is found
 }
 
 /*
@@ -125,7 +177,18 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  */
 void destroy_hash_table(HashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++){ // iterate over the LinkedList
+    if(ht->storage[i] != NULL){
+      LinkedPair *next_pair = ht->storage[i]->next; // keep track of the next pair for traversal
+      while(next_pair != NULL){ // remove current element from the linked list and free its memory, then move to the next pair in the list
+        free(ht->storage[i]);
+        ht->storage[i] = next_pair;
+        next_pair = ht->storage[i]->next;
+      }
+    }
+  }
+  free(ht->storage); // free the storage array
+  free(ht); // free the hash table
 }
 
 /*
@@ -138,9 +201,20 @@ void destroy_hash_table(HashTable *ht)
  */
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table(ht->capacity * 2); // initialize a new hashtable with 2x capacity
+  for(int i = 0; i < ht->capacity; i++){ // iterate over the old linked list
+    LinkedPair *current_pair = ht->storage[i];
+    if(current_pair != NULL){
+      while(current_pair != NULL){
+        hash_table_insert(new_ht, current_pair->key, current_pair->value); // copy over the elements from the old hash table
+        current_pair = current_pair->next;
+      }
+    }
+  }
 
-  return new_ht;
+  destroy_hash_table(ht); // free the old hash table's memory
+
+  return new_ht; // return the newly resized hash table
 }
 
 
