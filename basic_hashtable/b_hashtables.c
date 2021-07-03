@@ -70,8 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair *));
   return ht;
 }
 
@@ -84,7 +85,17 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  Pair *newpair = create_pair(key, value);
+  unsigned int hashed = hash(key, ht->capacity);
+  fprintf(stderr, "TEST");
+  fprintf(stderr, "%s", newpair->key);
+  fprintf(stderr, "TEST");
+  if(ht->storage[hashed] != NULL) {
+    printf("Overwriting");
+    destroy_pair(ht->storage[hashed]);
+  }
+  ht->storage[hashed] = newpair;
+  fprintf(stderr, "%s", ht->storage[hashed]->value);
 }
 
 /****
@@ -94,7 +105,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  unsigned int hashed = hash(key, ht->capacity);
+  
+  if(ht->storage[hashed] != NULL) {
+    ht->storage[hashed] = NULL;
+    destroy_pair(ht->storage[hashed]);
+  }
 }
 
 /****
@@ -104,6 +120,14 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  
+  int hashed = hash(key, ht->capacity);
+  
+  if(ht->storage[hashed] != NULL) {
+    return ht->storage[hashed]->value;
+    
+    
+  }
   return NULL;
 }
 
@@ -114,7 +138,13 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++) {
+    if(ht->storage[i] != NULL) {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
@@ -124,11 +154,11 @@ int main(void)
   struct BasicHashTable *ht = create_hash_table(16);
 
   hash_table_insert(ht, "line", "Here today...\n");
-
+  
   printf("%s", hash_table_retrieve(ht, "line"));
-
+  
   hash_table_remove(ht, "line");
-
+  
   if (hash_table_retrieve(ht, "line") == NULL) {
     printf("...gone tomorrow. (success)\n");
   } else {
