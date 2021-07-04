@@ -70,7 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
@@ -84,6 +86,16 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  Pair *newPair = create_pair(key, value);
+  unsigned int newHash = hash(key, ht->capacity);
+  if (ht->storage[newHash] != NULL) {
+    if (strcmp(ht->storage[newHash]->key, key) != 0){
+      printf("Collision occured, overwriting old pair...\n");
+    }
+    destroy_pair(ht->storage[newHash]);
+  }
+
+  ht->storage[newHash] = newPair;
 
 }
 
@@ -94,7 +106,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+ unsigned int keyHash = hash(key, ht->capacity);
+ if (ht->storage[keyHash] != NULL) {
+   destroy_pair(ht->storage[keyHash]);
+   ht->storage[keyHash] = NULL;
+ }
 }
 
 /****
@@ -104,6 +120,10 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  unsigned int keyHash = hash(key, ht->capacity);
+  if (ht->storage[keyHash]) {
+    return ht->storage[keyHash]->value;
+  }
   return NULL;
 }
 
@@ -114,7 +134,11 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++) {
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
@@ -136,6 +160,15 @@ int main(void)
   }
 
   destroy_hash_table(ht);
+
+  struct BasicHashTable *ht2 = create_hash_table(1);
+  hash_table_insert(ht, "line1", "Test Line 1...\n");
+  printf("%s", hash_table_retrieve(ht2, "line1"));
+
+  hash_table_insert(ht2, "line2", "Test Line 2...\n");
+  printf("%s", hash_table_retrieve(ht2, "line2"));
+
+  destroy_hash_table(ht2);
 
   return 0;
 }
