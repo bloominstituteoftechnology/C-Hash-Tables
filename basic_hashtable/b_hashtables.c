@@ -25,8 +25,8 @@ typedef struct BasicHashTable {
 Pair *create_pair(char *key, char *value)
 {
   Pair *pair = malloc(sizeof(Pair));
-  pair->key = strdup(key);
-  pair->value = strdup(value);
+  pair->key = key;
+  pair->value = value;
 
   return pair;
 }
@@ -36,16 +36,11 @@ Pair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(Pair *pair)
 {
-  if (pair != NULL) {
-    free(pair->key);
-    free(pair->value);
-    free(pair);
-  }
+  if (pair != NULL) free(pair);
 }
 
 /****
   djb2 hash function
-
   Do not modify this!
  ****/
 unsigned int hash(char *str, int max)
@@ -64,57 +59,73 @@ unsigned int hash(char *str, int max)
 
 /****
   Fill this in.
-
   All values in storage should be initialized to NULL
   (hint: look up `calloc`)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(Pair *));
 
   return ht;
 }
 
 /****
   Fill this in.
-
   If you are overwriting a value with a different key, print a warning.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  Pair *newPair = create_pair(key, value);
+  int newHash = hash(key, ht->capacity);
+  if (ht->storage[newHash] != NULL) {
+    printf("Value already exists, overwriting old value...");
+    destroy_pair(ht->storage[newHash]);
+  }
+
+  ht->storage[newHash] = newPair;
 
 }
 
 /****
   Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+ int keyHash = hash(key, ht->capacity);
+ if (ht->storage[keyHash] != NULL) {
+   destroy_pair(ht->storage[keyHash]);
+   ht->storage[keyHash] = NULL;
+ }
 }
 
 /****
   Fill this in.
-
   Should return NULL if the key is not found.
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int keyHash = hash(key, ht->capacity);
+  if (ht->storage[keyHash]) {
+    return ht->storage[keyHash]->value;
+  }
   return NULL;
 }
 
 /****
   Fill this in.
-
   Don't forget to free any malloc'ed memory!
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++) {
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
