@@ -20,19 +20,18 @@ typedef struct BasicHashTable {
 } BasicHashTable;
 
 /****
-  Create a key/value pair to be stored in the hash table.
+  This Creates a key/value pair to be stored in the hash table.
  ****/
 Pair *create_pair(char *key, char *value)
 {
   Pair *pair = malloc(sizeof(Pair));
-  pair->key = strdup(key);
-  pair->value = strdup(value);
-
+  pair->key = strdup(key); // when we strdup you need to free()
+  pair->value = strdup(value); // when we strdup you need to free()
   return pair;
 }
 
 /****
-  Use this function to safely destroy a hashtable pair.
+  Use this function to safely destroy a hash table pair.
  ****/
 void destroy_pair(Pair *pair)
 {
@@ -41,6 +40,7 @@ void destroy_pair(Pair *pair)
     free(pair->value);
     free(pair);
   }
+
 }
 
 /****
@@ -57,7 +57,6 @@ unsigned int hash(char *str, int max)
   while ((c = *u_str++)) {
     hash = ((hash << 5) + hash) + c;
   }
-
   return hash % max;
 }
 
@@ -72,6 +71,12 @@ BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht;
 
+  ht = malloc(sizeof(BasicHashTable));
+
+  ht->capacity = capacity;
+
+  ht->storage = calloc( capacity, sizeof(Pair*));
+
   return ht;
 }
 
@@ -84,14 +89,42 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  // make an index
+int index = hash(key, ht->capacity);
 
+  // this is the warning if we overwrite.
+  if (ht->storage[index] != NULL) {
+    printf("warning: overwriting\n");
+  // this is to successfully overwrite
+    destroy_pair(ht->storage[index]);
+  // once its destroyed this is what is going to be overwritten
+    ht->storage[index] =  create_pair(key, value);
+  
+  } else {
+    // if there is nothing in its place then this is going to be the
+    // new code
+    ht->storage[index] = create_pair(key, value);
+  }
 }
+
+//  printf("printing the key: %s/n", key);
 
 /****
   Fill this in.
 
   Don't forget to free any malloc'ed memory!
  ****/
+
+// Find and remove the desired element
+// Go to the next bucket
+// If the bucket is empty, quit
+// If the bucket is full, delete the element in that bucket
+// and re-add it to the hash table using the normal means. 
+// The item must be removed before re-adding,
+// because it is likely that the item could be added back 
+// into its original spot.
+// Repeat steps
+// remove a key from the array
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
 
@@ -112,11 +145,21 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 
   Don't forget to free any malloc'ed memory!
  ****/
+
+// destroy entire hashtable 
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  int i = 0;
+// loop through the array to get all the keys
+for (i = 0; i < ht->capacity; i++) {
+  // call the destroy each key it passes through
+  destroy_pair(ht->storage[i]);
 }
-
+// deallocate it from memory so it can be used for other puprposes. 
+free(ht->storage);
+free(ht);
+}
+// do i need to call \0? 
 
 #ifndef TESTING
 int main(void)
