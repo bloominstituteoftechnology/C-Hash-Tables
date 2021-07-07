@@ -73,8 +73,9 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity,sizeof(LinkedPair *));
   return ht;
 }
 
@@ -89,7 +90,22 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-
+  unsigned int i = hash(key, ht->capacity);
+  if(ht->storage[i]) {
+    printf("THIS IS WHERE COLLISION LINKED LISTS");
+    if(strcmp(ht->storage[i]->key, key) == 0) {
+      LinkedPair *tail = ht->storage[i]->next;
+      free(ht->storage[i]);
+      ht->storage[i] = create_pair(key, value);
+      ht->storage[i]->next = tail;
+    } else{
+      LinkedPair *tail = ht->storage[i];
+      ht->storage[i] = create_pair(key, value);
+      ht->storage[i]->next = tail;
+    }
+  } else {
+    ht->storage[i] = create_pair(key, value);
+  }
 }
 
 /*
@@ -102,7 +118,24 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
+  unsigned int i = hash(key, ht->capacity);
+  LinkedPair *previous = NULL;
+  LinkedPair *current = ht->storage[i];
 
+  while(current && strcmp(current->key, key) != 0) {
+      previous = current;
+      current = current->next;
+  }
+  if(current == NULL) {
+    printf("Error: there is no matching pair to remove.");
+  }else {
+    if(previous == NULL) {
+      ht->storage[i] = current->next;
+    }else {
+      previous->next = current->next;
+    }
+    destroy_pair(current);
+  }
 }
 
 /*
@@ -115,7 +148,20 @@ void hash_table_remove(HashTable *ht, char *key)
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int i = hash(key, ht->capacity);
+  LinkedPair *previous = NULL;
+  LinkedPair *current = ht->storage[i];
+  if(ht->storage[i]) {    
+    while(current && strcmp(current->key, key) != 0) {
+        previous = current;
+        current = current->next;
+    }
+    if(current == NULL) {
+    printf("Error: there is no matching pair.");
+    }
+  }else {
+    return current;
+  }
 }
 
 /*
@@ -125,7 +171,10 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  */
 void destroy_hash_table(HashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++) {
+    free(ht->storage[i]);
+  }
+  free(ht);
 }
 
 /*
