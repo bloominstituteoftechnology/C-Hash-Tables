@@ -73,8 +73,9 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
   return ht;
 }
 
@@ -89,7 +90,27 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  if(key == NULL || value == NULL){
+    printf("Either the key or value is NULL");
+  }
+  int hashed = hash(key, ht->capacity);//creates an index value
 
+    LinkedPair *p = create_pair(key, value); //creates a new pair
+    if(ht->storage[hashed] == NULL){ //if index is already empty just place in there
+      ht->storage[hashed] = p;
+    }else{
+      LinkedPair *head = ht->storage[hashed];
+      int b_continue = 0;
+      while(!b_continue){//use arrows notation not dot
+        if(head->next == NULL){
+          head->next = p;
+          b_continue = 1;
+        }
+        head = head->next;
+      }
+    }
+  // printf("key = %s", ht->storage[hashed]->key);
+  // printf("\nvalue=%s\n", ht->storage[hashed]->value);
 }
 
 /*
@@ -102,7 +123,25 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
-
+  int hashed = hash(key, ht->capacity);
+  if(ht->storage[hashed] == NULL){
+    printf("The value with that key is null");
+  }else{
+    if(ht->storage[hashed]->next == NULL){
+      destroy_pair(ht->storage[hashed]); //destroys pair / free's all the malloc'd memory
+      ht->storage[hashed] = NULL; //resets value back to NULL
+    }else {// if there is more than one value in the list
+      LinkedPair *head = ht->storage[hashed];
+      while (head->next != NULL) {
+        if (strcmp(head->next->key, key) == 0) {//compares the two keys to see if they match
+          head->next = head->next->next;
+          destroy_pair(head->next);
+          return;
+        }
+        head = head->next;
+      }
+    }
+  }
 }
 
 /*
@@ -115,6 +154,29 @@ void hash_table_remove(HashTable *ht, char *key)
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int hashed = hash(key, ht->capacity);
+  if(ht->storage[hashed] == NULL){
+    printf("returning null");
+    return NULL;
+  }else{
+    // printf("\nKey to compare %s", ht->storage[hashed]->key);
+    // printf("actual key: %s\n",key);
+    if(strcmp(ht->storage[hashed]->key , key) == 0){
+      return ht->storage[hashed]->value;
+    }else{
+      // printf("line 164 else statement");
+      LinkedPair *head = ht->storage[hashed];
+      // printf("%s", head->next->key);
+      while(head != NULL){ //what a stupid mistake I had head->next so it would never move to the last value
+        // printf("inside while 167: head->key = %s",head->key);
+        // printf("inside while 167: key = %s",key);
+        if(strcmp(head->key , key) == 0){
+          return head->value;
+        }
+        head = head->next;
+      }
+    }
+  }
   return NULL;
 }
 
@@ -125,7 +187,16 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  */
 void destroy_hash_table(HashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++){
+    LinkedPair *head = ht->storage[i];
+    while(head != NULL){
+      printf("\ndestoying pair");
+      destroy_pair(head); 
+      head = head->next;
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 /*
@@ -138,9 +209,14 @@ void destroy_hash_table(HashTable *ht)
  */
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-
-  return new_ht;
+  HashTable *double_capacity = malloc(sizeof(HashTable));
+  double_capacity->storage = calloc(ht->capacity * 2, sizeof(LinkedPair *));
+  for(int i = 0; i < ht->capacity; i++){
+    double_capacity->storage[i] = ht->storage[i];
+  }
+  double_capacity->capacity = ht->capacity * 2;
+  // destroy_hash_table(ht);
+  return double_capacity;
 }
 
 

@@ -70,8 +70,9 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
-
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->storage = calloc(capacity, sizeof(Pair *));// creates room for for however many pairs are needed
+  ht->capacity = capacity;
   return ht;
 }
 
@@ -84,7 +85,17 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  if(key == NULL || value == NULL){
+    printf("Either the key or value is NULL");
+  }
+  int hashed = hash(key, ht->capacity);//creates an index value
+  if(ht->storage[hashed] != NULL){
+    printf("That index already has a value");
+    exit(1);
+  }else{
+    Pair *p = create_pair(key, value); //creates a new pair
+    ht->storage[hashed] = p;
+  }
 }
 
 /****
@@ -94,7 +105,13 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-
+  int hashed = hash(key, ht->capacity);
+  if(ht->storage[hashed] == NULL){
+    printf("The value with that key is null");
+  }else{
+    destroy_pair(ht->storage[hashed]); //destroys pair / free's all the malloc'd memory
+    ht->storage[hashed] = NULL; //resets value back to NULL
+  }
 }
 
 /****
@@ -104,6 +121,12 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int hashed = hash(key, ht->capacity);
+  if(ht->storage[hashed] == NULL){
+    return NULL;
+  }else{
+    return(ht->storage[hashed]->value); //returns only the value of the pair with speciefied key
+  }
   return NULL;
 }
 
@@ -114,7 +137,11 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for(int i = 0; i < ht->capacity; i++){
+    destroy_pair(ht->storage[i]); //goes through each pair and destroys it (so evil mwhahaha)
+  }
+  free(ht->storage);
+  free(ht); // wouldn't let me free(ht-> capacity) so I just free'd the whole thing
 }
 
 
