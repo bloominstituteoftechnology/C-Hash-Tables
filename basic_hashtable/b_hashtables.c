@@ -61,7 +61,6 @@ unsigned int hash(char *str, int max)
   return hash % max;
 }
 
-
 /****
   Fill this in.
 
@@ -69,8 +68,10 @@ unsigned int hash(char *str, int max)
   (hint: look up `calloc`)
  ****/
 BasicHashTable *create_hash_table(int capacity)
-{
-  BasicHashTable *ht;
+{                                                       // aprtment example: landlord is the hash table
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable)); // malloc is the apartment building with the apartments built in
+  ht->storage = calloc(capacity, sizeof(Pair *)); // calloc is the apartment building wih no apartments built yet
+  ht->capacity = capacity;
 
   return ht;
 }
@@ -84,7 +85,16 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
+  int index = hash(key, ht->capacity); 
 
+  if (ht->storage[index] != NULL) {
+    // error handling
+    printf("Index already in use, will be overwritten!!!!!!\n");
+    destroy_pair(ht->storage[index]);
+    ht->storage[index] = create_pair(key, value);
+  } else {
+    ht->storage[index] = create_pair(key, value);
+  }
 }
 
 /****
@@ -94,7 +104,12 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  int index = hash(key, ht->capacity);
 
+  if (ht->storage[index]) {
+    destroy_pair(ht->storage[index]);
+    ht->storage[index] = NULL;
+  }
 }
 
 /****
@@ -104,6 +119,11 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int index = hash(key, ht->capacity);
+
+  if (ht->storage[index]) {
+    return ht->storage[index]->value;
+  }
   return NULL;
 }
 
@@ -114,7 +134,11 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  for (int i = 0; i < ht->capacity; i++) {
+    destroy_pair(ht->storage[i]);
+  }
+  free(ht->storage);
+  free(ht);
 }
 
 
