@@ -50,7 +50,6 @@ void destroy_pair(LinkedPair *pair)
 
 /*
   djb2 hash function
-
   Do not modify this!
  */
 unsigned int hash(char *str, int max)
@@ -68,77 +67,122 @@ unsigned int hash(char *str, int max)
 
 /*
   Fill this in.
-
   All values in storage should be initialized to NULL
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
+  HashTable *ht = malloc(sizeof(HashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, sizeof(LinkedPair *));
   return ht;
 }
 
 /*
   Fill this in.
-
   Inserting values to the same index with different keys should be
   added to the corresponding LinkedPair list.
-
   Inserting values to the same index with existing keys can overwrite
   the value in th existing LinkedPair list.
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  int hashed = hash(key, ht->capacity);
+  LinkedPair *pair = ht->storage[hashed];
 
+  if(!pair) {
+    LinkedPair *new = create_pair(key, value);
+    ht->storage[hashed] = new;
+  } else {
+    while (pair) {
+      if(!strcmp(pair->key, key)) {
+        free(pair->value);
+        pair->value = strdup(value);
+        return;
+      }
+      if(!pair->next) {
+        break;
+      }
+      pair = pair->next;
+    }
+    LinkedPair *new = create_pair(key, value);
+    pair->next = new;
+  }
 }
 
 /*
   Fill this in.
-
   Should search the entire list of LinkedPairs for existing
   keys and remove matching LinkedPairs safely.
-
   Don't forget to free any malloc'ed memory!
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
+  int hashed = hash(key, ht->capacity);
+  LinkedPair *pair = ht->storage[hashed];
+  LinkedPair *prev;
 
+  if(pair && !strcmp(pair->key, key)) {
+    ht->storage[hashed] = pair->next;
+  }
+
+  while(pair && strcmp(pair->key, key)) {
+    prev = pair;
+    pair = pair->next;
+  }
+  if(pair) {
+    prev->next = pair->next;
+  }
+  destroy_pair(pair);
 }
 
 /*
   Fill this in.
-
   Should search the entire list of LinkedPairs for existing
   keys.
-
   Return NULL if the key is not found.
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  int hashed = hash(key, ht->capacity);
+  LinkedPair *pair = ht->storage[hashed];
+
+  while(pair) {
+    if (!strcmp(pair->key, key)) {
+      return pair->value;
+    }
+    pair = pair->next;
+  }
+
   return NULL;
 }
 
 /*
   Fill this in.
-
   Don't forget to free any malloc'ed memory!
  */
 void destroy_hash_table(HashTable *ht)
 {
+  for (int i = 0; i < ht->capacity; i++) {
+    destroy_pair(ht->storage[i]);
+  }
 
+  free(ht->storage);
+  free(ht);
 }
 
 /*
   Fill this in.
-
   Should create a new hash table with double the capacity
   of the original and copy all elements into the new hash table.
-
   Don't forget to free any malloc'ed memory!
  */
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+  for(int i = 0; i < ht->capacity; i++) {
+    new_ht->storage[i] = ht->storage[i];
+  }
+  destroy_hash_table(ht);
 
   return new_ht;
 }
