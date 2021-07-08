@@ -73,9 +73,11 @@ unsigned int hash(char *str, int max)
  */
 HashTable *create_hash_table(int capacity)
 {
-  HashTable *ht;
-
-  return ht;
+      HashTable *ht = malloc(sizeof(HashTable));
+      ht->capacity = capacity;
+      ht->storage = calloc(capacity, sizeof(LinkedPair *));
+      printf("\nHash table created....\n");
+      return ht;
 }
 
 /*
@@ -89,6 +91,29 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+      unsigned int hash_key_index = hash(key, ht->capacity);
+      //if key-pair does not exists create-pair for given key-value and store on generated hash-key
+      if(ht->storage[hash_key_index] == NULL) { 
+            ht->storage[hash_key_index] = create_pair(key, value);
+            printf("%s   :  %s   INSERTED..\n", key, value);
+      }
+      else {
+            //if already exist the hash-key store at same key-index as linked list 
+            LinkedPair *current_pair = ht->storage[hash_key_index];
+            while(current_pair) {
+                  if(strcmp(current_pair->key, key) == 0) {
+                        printf("COMPAIRING current-key : %s  with  given key : %s", current_pair->key, key);
+                        current_pair->value = value;
+                        return;
+                  }
+                  else if(current_pair->next) {
+                        current_pair = current_pair->next;
+                  }
+                  else {
+                        current_pair->next = create_pair(key, value);
+                  }
+            }//while end...
+      }
 
 }
 
@@ -102,7 +127,22 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
+      unsigned int hash_key_index = hash(key, ht->capacity);
+      LinkedPair *current_pair = ht->storage[hash_key_index];
+      LinkedPair *last_pair;
 
+      while(current_pair != NULL && strcmp(current_pair->key, key) != 0) {
+            last_pair = current_pair;
+            current_pair = last_pair->next;
+      }
+
+      if(current_pair == NULL) {
+            printf("GIVEN KEY DOES NOT EXISTS...\n");
+      }
+      else {
+            destroy_pair(ht->storage[hash_key_index]);
+            ht->storage[hash_key_index] = NULL;
+      }
 }
 
 /*
@@ -115,7 +155,21 @@ void hash_table_remove(HashTable *ht, char *key)
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
-  return NULL;
+      unsigned int hash_key_index = hash(key, ht->capacity);
+      LinkedPair *current_pair = ht->storage[hash_key_index];
+      //LinkedPair *last_pair;
+      if(current_pair) {
+            while(current_pair != NULL) {
+                  if(current_pair->key == key) {
+                        return current_pair->value;
+                  }
+                  current_pair = current_pair->next;
+            }
+      } 
+      else {
+            printf("GIVEN KEY DOES NOT EXISTS...\n");
+            return NULL;
+      }
 }
 
 /*
@@ -125,7 +179,14 @@ char *hash_table_retrieve(HashTable *ht, char *key)
  */
 void destroy_hash_table(HashTable *ht)
 {
+      for(int i = 0; i < ht->capacity; i++) {
+            if(ht->storage[i] != NULL) {
+                  destroy_pair(ht->storage[i]);
+            }
+      }
 
+      free(ht->storage);
+      free(ht);
 }
 
 /*
@@ -138,16 +199,21 @@ void destroy_hash_table(HashTable *ht)
  */
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
-
-  return new_ht;
+      //create-hash-table with double capacity
+      HashTable *new_ht = create_hash_table(ht->capacity * 2);
+      //copy all key-value to new hash-table..
+      for(int i = 0; i < ht->capacity; i++) {
+          new_ht->storage[i] = ht->storage[i];
+      }
+      
+      return new_ht;
 }
 
 
 #ifndef TESTING
 int main(void)
 {
-  struct HashTable *ht = create_hash_table(2);
+  struct HashTable *ht = create_hash_table(2); //Hash table created...
 
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");

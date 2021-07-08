@@ -70,9 +70,14 @@ unsigned int hash(char *str, int max)
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+      BasicHashTable *ht;
+      ht = malloc(sizeof(BasicHashTable));
+      ht->capacity = capacity;
+      //void *calloc(size_t nunber_of_items, size_t size)
+      ht->storage = calloc(capacity, sizeof(Pair *));
+      printf("\nBasic hash table..\n");
 
-  return ht;
+      return ht;
 }
 
 /****
@@ -84,7 +89,18 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  printf("\nIN INSERT....\n");
+      //first generate a HASH-KEY for given key using hash function which will be an index.
+      int hash_key_index = hash(key, ht->capacity);
+      //check for generated hash_key already value present?
+      if(ht->storage[hash_key_index] != NULL) {
+            //if yes print warning of overwriting.
+            printf("\nOVERWRITING.........\n");
+            //Don't forget to free any malloc'ed memory ..create_pair()
+            destroy_pair(ht->storage[hash_key_index]);
+      }
+      //insert given key -- value pair
+      ht->storage[hash_key_index] = create_pair(key, value);
 }
 
 /****
@@ -94,6 +110,19 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+      //generate hash_key for given key 
+      int hash_key_index = hash(key, ht->capacity);
+      //check for key-value
+      if(ht->storage[hash_key_index] != NULL) {
+            ht->storage[hash_key_index] = NULL;
+            //Don't forget to free any malloc'ed memory.
+            destroy_pair(ht->storage[hash_key_index]);
+      } 
+      else {
+            //if key does not exist through an error.
+            fprintf(stderr, "\nKEY DOES NOT EXIST...\n");
+            return;
+      } 
 
 }
 
@@ -104,7 +133,16 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+      //generate hash_key for given key 
+      int hash_key_index = hash(key, ht->capacity);
+      //check for key present 
+      if(ht->storage[hash_key_index]) {
+            return ht->storage[hash_key_index]->value;
+      }
+      else {
+            fprintf(stderr, "\nKEY DOES NOT EXIST...\n");
+            return NULL;
+      }
 }
 
 /****
@@ -114,20 +152,31 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
+      //iterate through capacity 
+      //check  for key-value presence
+          //destroy key-value pair first
+      //free storage and hash-table created.
+      for(int i = 0; i < ht->capacity; i++) {
+            if(ht->storage[i] != NULL) {
+                  destroy_pair(ht->storage[i]);
+            }
+      }
 
+      free(ht->storage);
+      free(ht);
 }
 
 
 #ifndef TESTING
 int main(void)
 {
-  struct BasicHashTable *ht = create_hash_table(16);
+  struct BasicHashTable *ht = create_hash_table(16); //Basic hash table..
 
-  hash_table_insert(ht, "line", "Here today...\n");
+  hash_table_insert(ht, "line", "Here today...\n");//IN INSERT
 
-  printf("%s", hash_table_retrieve(ht, "line"));
+  printf("%s", hash_table_retrieve(ht, "line")); // Here today
 
-  hash_table_remove(ht, "line");
+  hash_table_remove(ht, "line"); //line :here today removed..
 
   if (hash_table_retrieve(ht, "line") == NULL) {
     printf("...gone tomorrow. (success)\n");
